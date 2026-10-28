@@ -1,0 +1,420 @@
+import Foundation
+import os
+
+struct Filme: Identifiable, Hashable {
+    var titulo: String
+    /// Versão ("dub"/"leg") -> fontes em ordem de preferência. O mesmo filme
+    /// existe nas duas listas de origem, e em vez de aparecer duas vezes ele
+    /// aparece uma com as duas fontes.
+    var fontes: [String: [String]]
+    var id: String { titulo }
+}
+
+struct Serie: Identifiable, Hashable {
+    var titulo: String
+    var ano: String
+    var pedaco: Int
+    var episodios: Int
+    var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
+    var id: String { nomeCompleto }
+}
+
+struct Episodio: Identifiable, Hashable {
+    var temporada: Int
+    var numero: Int
+    var versao: String
+    var urls: [String]
+    var id: String { "\(temporada)-\(numero)-\(versao)" }
+}
+
+/// Filmes e séries, baixados por pedaço conforme a navegação desce.
+///
+/// A lista de origem tem 30 MB e 300 mil linhas. Ela é pré-digerida num catálogo
+/// fatiado por letra — e as séries ainda em pedaços dentro da letra — de modo
+/// que nenhum download passe de uns 100 KB. Como a tela também navega por letra,
+/// o download acompanha o clique em vez de contrariá-lo.
+enum Vod {
+
+    /// Endereço-base da pasta `vod/`, o que o usuário informou. Sem ele nada
+    /// daqui faz pedido de rede nem lê disco: o acervo simplesmente não existe.
+    private static var base: String? { Enderecos.filmes }
+
+    /// Endereço apagado ou trocado: some tudo o que estava em memória.
+    @MainActor
+    static func esquecer() {
+        estado.withLock { $0 = Estado() }
+        indiceBusca = []
+    }
+
+    struct Gaveta: Identifiable, Hashable {
+        var letra: String
+        var filmes: Int
+        var series: Int
+        var reservados: Int
+        var id: String { letra }
+    }
+
+    /// O que o acervo aprende ao abrir e todo o resto consulta: as bases dos
+    /// endereços, as marcas de qualidade e se o índice de busca envelheceu.
+    /// As funções daqui rodam em qualquer thread, então os três moram atrás
+    /// de uma trava — antes dois deles estavam só marcados `unsafe`.
+    private struct Estado: Sendable {
+        var bases: [String] = []
+        var qualidades: [String: String] = [:]
+        var indiceBuscaSujo = false
+    }
+    private static let estado = OSAllocatedUnfairLock(initialState: Estado())
+
+    private static var bases: [String] {
+        get { estado.withLock { $0.bases } }
+        set { estado.withLock { $0.bases = newValue } }
+    }
+
+    /// Endereço -> qualidade anunciada na lista de origem ("4k", "fhd", "hd"…).
+    ///
+    /// Vem de um arquivo à parte porque o formato das fatias não tem onde
+    /// guardar isso: cada fonte é só "base:resto", e pendurar a marca ali
+    /// quebraria as versões já instaladas. São três mil linhas, o que cabe
+    /// numa leitura só.
+    private static var qualidades: [String: String] {
+        get { estado.withLock { $0.qualidades } }
+        set { estado.withLock { $0.qualidades = newValue } }
+    }
+
+    /// A qualidade de uma fonte, quando a lista de origem anuncia alguma.
+    static func qualidade(de url: String) -> String? { estado.withLock { $0.qualidades[url] } }
+
+    /// Ordem de preferência: 4K primeiro, e quem não anuncia nada no meio,
+    /// porque costuma ser 1080p — melhor que um "HD" declarado, que é 720p.
+    static func posicao(daQualidade q: String?) -> Int {
+        switch q {
+        case "4k", "uhd": return 0
+        case "fhd", "hdr": return 1
+        case "hd": return 3
+        case "sd": return 4
+        default: return 2
+        }
+    }
+
+    /// Sobe quando o formato do catálogo muda.
+    ///
+    /// O cache é por arquivo e dura entre aberturas, então um catálogo gravado
+    /// por uma versão antiga sobrevive à atualização do app — foi assim que um
+    /// índice sem as linhas `base:` deixou todo filme com endereço quebrado.
+    /// Guardar a versão junto e limpar a pasta quando ela muda evita que o
+    /// formato velho envenene o novo.
+    private static let versaoCache = "4"
+
+    static func indice() async -> [Gaveta] {
+        conferirVersao()
+        guard let texto = await indiceAtual() else { return [] }
+        var out: [Gaveta] = []
+        var encontradas: [String] = []
+        for linha in texto.split(separator: "\n") {
+            if linha.hasPrefix("base:") {
+                let partes = String(linha.dropFirst("base:".count))
+                    .trimmingCharacters(in: .whitespaces)
+                    .split(separator: " ", maxSplits: 1)
+                if partes.count == 2 { encontradas.append(String(partes[1])) }
+            } else {
+                let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+                if campos.count >= 3 {
+                    out.append(Gaveta(letra: String(campos[0]),
+                                      filmes: Int(campos[1]) ?? 0,
+                                      series: Int(campos[2]) ?? 0,
+                                      reservados: campos.count > 3 ? (Int(campos[3]) ?? 0) : 0))
+                }
+            }
+        }
+        if !encontradas.isEmpty {
+            bases = encontradas
+            conferirBases(encontradas)
+            await lerMarcas()
+        }
+        return out
+    }
+
+    /// Lê as marcas de qualidade. Depende das bases, então roda depois delas.
+    private static func lerMarcas() async {
+        guard qualidades.isEmpty, let texto = await arquivo("marcas.txt") else { return }
+        var lidas: [String: String] = [:]
+        for linha in texto.split(separator: "\n") {
+            let campos = linha.split(separator: "\t")
+            guard campos.count == 2 else { continue }
+            let endereco = montar(String(campos[0]))
+            if !endereco.isEmpty { lidas[endereco] = String(campos[1]) }
+        }
+        qualidades = lidas
+    }
+
+    /// O índice, sempre da rede quando ela responde.
+    ///
+    /// Ele é o único arquivo que dá sentido aos outros: cada filme guarda o
+    /// número da base, não o endereço. Quando a lista de origens é regerada em
+    /// outra ordem, um índice velho em disco aponta cada filme para o servidor
+    /// errado e o catálogo inteiro passa a abrir em tela preta. São menos de um
+    /// kilobyte, então vale buscar de novo a cada abertura e deixar o disco só
+    /// como reserva para quando a rede falhar.
+    private static func indiceAtual() async -> String? {
+        guard base != nil else { return nil }
+        if let texto = await baixar("indice.txt") { return texto }
+        let local = pasta.appendingPathComponent("indice.txt")
+        return try? String(contentsOf: local, encoding: .utf8)
+    }
+
+    /// Apaga as fatias em disco quando as origens mudam.
+    ///
+    /// As fatias por letra só fazem sentido junto do índice que as gerou. Se as
+    /// bases mudaram, o que está guardado aponta para o lugar errado e precisa
+    /// ser baixado de novo — o índice em si fica, que acabou de chegar.
+    private static func conferirBases(_ encontradas: [String]) {
+        let marca = pasta.appendingPathComponent("bases.txt")
+        let atual = encontradas.joined(separator: "\n")
+        let anterior = try? String(contentsOf: marca, encoding: .utf8)
+        try? atual.write(to: marca, atomically: true, encoding: .utf8)
+        guard let anterior, anterior != atual else { return }
+        let arquivos = (try? FileManager.default.contentsOfDirectory(
+            at: pasta, includingPropertiesForKeys: nil)) ?? []
+        for arquivo in arquivos where !["bases.txt", "versao.txt", "indice.txt"]
+            .contains(arquivo.lastPathComponent) {
+            try? FileManager.default.removeItem(at: arquivo)
+        }
+        indiceBuscaSuja = true
+    }
+
+    /// A busca guarda o acervo inteiro em memória; ela também vence junto.
+    private static var indiceBuscaSuja: Bool {
+        get { estado.withLock { $0.indiceBuscaSujo } }
+        set { estado.withLock { $0.indiceBuscaSujo = newValue } }
+    }
+
+    static func filmes(letra: String, reservados: Bool = false) async -> [Filme] {
+        let prefixo = reservados ? "reservado" : "filmes"
+        guard let texto = await arquivo("\(prefixo)-\(gaveta(letra)).txt") else { return [] }
+        return texto.split(separator: "\n").compactMap { linha in
+            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+            guard campos.count >= 2, !campos[0].isEmpty else { return nil }
+            var fontes: [String: [String]] = [:]
+            for parte in campos.dropFirst() {
+                guard let marca = parte.firstIndex(of: "=") else { continue }
+                let versao = String(parte[parte.startIndex..<marca])
+                let lista = FontesDesativadas.peneirar(
+                    String(parte[parte.index(after: marca)...])
+                        .split(separator: ",").map { montar(String($0)) }
+                        .filter { !$0.isEmpty })
+                if !lista.isEmpty { fontes[versao] = lista }
+            }
+            return fontes.isEmpty ? nil : Filme(titulo: String(campos[0]), fontes: fontes)
+        }
+    }
+
+    static func series(letra: String) async -> [Serie] {
+        guard let texto = await arquivo("series-\(gaveta(letra)).txt") else { return [] }
+        return texto.split(separator: "\n").compactMap { linha in
+            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+            guard campos.count >= 4, !campos[0].isEmpty else { return nil }
+            return Serie(titulo: String(campos[0]), ano: String(campos[1]),
+                         pedaco: Int(campos[2]) ?? 0, episodios: Int(campos[3]) ?? 0)
+        }
+    }
+
+    /// Animes e doramas já trazem títulos e episódios no mesmo arquivo.
+    static func colecao(_ tipo: String) async -> [(Serie, [Episodio])] {
+        guard ["animes", "doramas"].contains(tipo) else { return [] }
+        if bases.isEmpty { _ = await indice() }
+        let nome = "redeflix/links-\(tipo).txt"
+        // A classificação e os novos episódios mudam semanalmente: rede
+        // primeiro, mantendo o arquivo local somente como reserva offline.
+        let texto: String?
+        if let novo = await baixar(nome) { texto = novo }
+        else { texto = await arquivo(nome) }
+        guard let texto else { return [] }
+        var out: [(Serie, [Episodio])] = []
+        var identidade: (String, String)?
+        var episodios: [Episodio] = []
+        func concluir() {
+            guard let (titulo, ano) = identidade, !episodios.isEmpty else { return }
+            out.append((Serie(titulo: titulo, ano: ano, pedaco: -1,
+                              episodios: episodios.count), episodios))
+        }
+        for linha in texto.split(separator: "\n", omittingEmptySubsequences: false) {
+            if linha.hasPrefix("@") {
+                concluir()
+                let campos = linha.dropFirst().split(separator: "\t", omittingEmptySubsequences: false)
+                identidade = campos.first.map { (String($0), campos.count > 1 ? String(campos[1]) : "") }
+                episodios = []
+                continue
+            }
+            guard identidade != nil else { continue }
+            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+            guard campos.count >= 4 else { continue }
+            let urls = FontesDesativadas.peneirar(
+                campos[3].split(separator: ",").map { montar(String($0)) })
+                .filter { !$0.isEmpty }
+            guard !urls.isEmpty else { continue }
+            episodios.append(Episodio(temporada: Int(campos[0]) ?? 0,
+                                      numero: Int(campos[1]) ?? 0,
+                                      versao: String(campos[2]), urls: urls))
+        }
+        concluir()
+        return out
+    }
+
+    /// Episódios de uma série. Baixa só o pedaço em que ela está.
+    static func episodios(letra: String, serie: Serie) async -> [Episodio] {
+        let nome = "series-\(gaveta(letra))-\(serie.pedaco).txt"
+        guard let texto = await arquivo(nome) else { return [] }
+        var out: [Episodio] = []
+        var dentro = false
+        for linha in texto.split(separator: "\n", omittingEmptySubsequences: false) {
+            if linha.hasPrefix("@") {
+                if dentro { break }
+                let identidade = linha.dropFirst().split(
+                    separator: "\t", omittingEmptySubsequences: false)
+                let titulo = identidade.first.map(String.init) ?? ""
+                let ano = identidade.count > 1 ? String(identidade[1]) : ""
+                dentro = titulo == serie.titulo && ano == serie.ano
+                continue
+            }
+            guard dentro else { continue }
+            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+            guard campos.count >= 4 else { continue }
+            let urls = FontesDesativadas.peneirar(
+                campos[3].split(separator: ",").map { montar(String($0)) })
+                .filter { !$0.isEmpty }
+            guard !urls.isEmpty else { continue }
+            out.append(Episodio(temporada: Int(campos[0]) ?? 0,
+                                numero: Int(campos[1]) ?? 0,
+                                versao: String(campos[2]),
+                                urls: urls))
+        }
+        return out
+    }
+
+    // MARK: - Acervo inteiro
+
+    struct Achado: Identifiable, Hashable {
+        let titulo: String
+        let serie: Bool
+        let letra: String
+        let ano: String
+        var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
+        var id: String { (serie ? "s:" : "f:") + nomeCompleto }
+    }
+
+    @MainActor
+    private static var indiceBusca: [Achado] = []
+
+    /// Todo o acervo numa lista só, para procurar sem escolher letra.
+    ///
+    /// O índice traz nome, tipo e letra — 780 KB para trinta mil títulos —,
+    /// então dá para varrer o acervo inteiro sem baixar o acervo. Os extras
+    /// ficam de fora dele de propósito: o que não aparece sem o código também
+    /// não pode aparecer numa busca geral.
+    @MainActor
+    static func todos() async -> [Achado] {
+        if indiceBuscaSuja {
+            indiceBusca = []
+            indiceBuscaSuja = false
+        }
+        if !indiceBusca.isEmpty { return indiceBusca }
+        guard let texto = await arquivo("busca.txt") else { return [] }
+        let lidos = texto.split(separator: "\n").compactMap { linha -> Achado? in
+            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+            guard campos.count >= 3, !campos[0].isEmpty else { return nil }
+            return Achado(titulo: String(campos[0]),
+                          serie: campos[1] == "s",
+                          letra: String(campos[2]),
+                          ano: campos.count > 3 ? String(campos[3]) : "")
+        }
+        indiceBusca = lidos
+        return lidos
+    }
+
+    /// Os extras inteiros, juntando as letras que têm algum.
+    ///
+    /// Eles não entram no índice de busca de propósito — o que não aparece sem
+    /// o código também não pode aparecer numa busca comum —, então aqui a lista
+    /// é montada lendo os arquivos por letra. São só os nomes: as fontes ficam
+    /// para a hora de abrir, como na navegação normal.
+    static func todosReservados(_ letras: [String]) async -> [Achado] {
+        var out: [Achado] = []
+        for letra in letras {
+            guard let texto = await arquivo("reservado-\(gaveta(letra)).txt") else { continue }
+            for linha in texto.split(separator: "\n") {
+                let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+                guard campos.count >= 2, !campos[0].isEmpty else { continue }
+                out.append(Achado(titulo: String(campos[0]), serie: false,
+                                  letra: letra, ano: ""))
+            }
+        }
+        return out
+    }
+
+    /// O item guarda "base:resto"; o endereço inteiro sairia dezenas de vezes
+    /// maior, e o começo é sempre o mesmo punhado de servidores.
+    private static func montar(_ valor: String) -> String {
+        if valor.hasPrefix("http") { return valor }
+        // Sem a base o que sobra é "0:19927", que o player aceita como URL de
+        // esquema "0" e só falha na hora de tocar. Melhor não devolver fonte.
+        let bases = self.bases
+        guard let corte = valor.firstIndex(of: ":"),
+              let indice = Int(valor[valor.startIndex..<corte]),
+              bases.indices.contains(indice) else { return "" }
+        let resto = String(valor[valor.index(after: corte)...])
+        let base = bases[indice]
+        return resto.contains(".") ? base + resto : "\(base)\(resto).mp4"
+    }
+
+    private static func conferirVersao() {
+        let marca = pasta.appendingPathComponent("versao.txt")
+        let atual = try? String(contentsOf: marca, encoding: .utf8)
+        guard atual != versaoCache else { return }
+        let arquivos = (try? FileManager.default.contentsOfDirectory(
+            at: pasta, includingPropertiesForKeys: nil)) ?? []
+        for arquivo in arquivos { try? FileManager.default.removeItem(at: arquivo) }
+        try? versaoCache.write(to: marca, atomically: true, encoding: .utf8)
+    }
+
+    private static func gaveta(_ letra: String) -> String {
+        letra == "#" ? "%23" : letra
+    }
+
+    /// Conteúdo do arquivo, do disco quando já foi baixado. O catálogo muda de
+    /// vez em quando e nunca no meio de uma navegação, então o que está em
+    /// disco serve: poupa a rede e faz a segunda visita abrir na hora.
+    private static func arquivo(_ nome: String) async -> String? {
+        guard base != nil else { return nil }
+        let local = pasta.appendingPathComponent(nome.replacingOccurrences(of: "%23", with: "hash"))
+        if let texto = try? String(contentsOf: local, encoding: .utf8), !texto.isEmpty {
+            return texto
+        }
+        return await baixar(nome)
+    }
+
+    /// Busca o arquivo na rede e guarda em disco.
+    @discardableResult
+    private static func baixar(_ nome: String) async -> String? {
+        guard let base, let url = URL(string: base + nome) else { return nil }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 25
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        guard let (data, resposta) = try? await URLSession.shared.data(for: request),
+              let http = resposta as? HTTPURLResponse, (200...299).contains(http.statusCode),
+              !data.isEmpty
+        else { return nil }
+        let local = pasta.appendingPathComponent(nome.replacingOccurrences(of: "%23", with: "hash"))
+        try? FileManager.default.createDirectory(at: local.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
+        try? data.write(to: local, options: .atomic)
+        return String(decoding: data, as: UTF8.self)
+    }
+
+    private static var pasta: URL {
+        let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("SaimoTV/vod", isDirectory: true)
+        try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        return base
+    }
+}

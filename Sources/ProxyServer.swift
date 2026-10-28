@@ -1,0 +1,973 @@
+import Foundation
+import Darwin
+
+/// Local HTTP server that re-serves any upstream HLS stream under a stable,
+/// player-friendly URL:
+///
+///     http://127.0.0.1:<port>/proxy/<UUID>/<UUID>.m3u8
+///
+/// Playlists are rewritten so every segment / key / variant is routed back
+/// through this server, which means the player never talks to the upstream
+/// host directly and never has to resolve it.
+///
+/// Atende cada conexão numa thread própria. Todo estado que muda depois da
+/// abertura mora atrás de `lock`; `port` e `listenFD` são escritos uma vez só,
+/// em `start`, antes de a primeira conexão ser aceita. Por isso o
+/// `@unchecked Sendable`: a segurança existe, só que feita à mão, e o
+/// compilador não tem como enxergá-la.
+final class ProxyServer: @unchecked Sendable {
+    static let shared = ProxyServer()
+
+    private(set) var port: UInt16 = 0
+    private var listenFD: Int32 = -1
+    private var channels: [UUID: Channel] = [:]
+    private let lock = NSLock()
+
+    private init() {}
+
+    // MARK: - Registry
+
+    func register(_ channel: Channel) {
+        lock.lock(); channels[channel.id] = channel; lock.unlock()
+    }
+
+    /// HEVC inside MPEG-TS decodes to a black picture on AVFoundation, so those
+    /// streams are routed through the ffmpeg remux. The verdict is cached per
+    /// variant after the first look at the upstream playlist.
+    private var remuxVerdict: [String: Bool] = [:]
+    private var isDirectTSVerdict: [String: Bool] = [:]
+    /// Which source of a channel is currently in use; advanced on failure.
+    private var activeVariant: [UUID: Int] = [:]
+
+    /// Servidores de segmento que acabaram de falhar.
+    ///
+    /// Há CDN que espalha os segmentos por dezenas de máquinas, e parte delas
+    /// não responde — ou responde a um décimo de megabit — para quem está fora
+    /// da rede deles. O token do segmento é assinado pela máquina que o serve,
+    /// então pedir o mesmo pedaço a outra devolve 401: o que dá para fazer é
+    /// parar de oferecer ao player o que já se sabe que trava. Foi o que
+    /// segurava os canais adultos do megatv, que sorteiam host por segmento.
+    private var hostsRuins: [String: Date] = [:]
+    private static let penalidadeDeHost: TimeInterval = 300
+
+    /// A última playlist que a fonte em uso entregou boa, e quando.
+    ///
+    /// Numa playlist de mídia ao vivo o player repete o pedido a cada poucos
+    /// segundos. Uma dessas repetições falhar não quer dizer que a fonte
+    /// morreu — é 5xx solto, rede oscilando, CDN trocando de máquina. Trocar
+    /// de fonte nesse instante joga quem está assistindo para outra linha do
+    /// tempo, e era isso que fazia o canal ficar pulando de origem sozinho.
+    /// Enquanto a fonte vinha funcionando, esta lista segura o refresh: o
+    /// player recebe o que já conhece e simplesmente espera, que é o que a
+    /// norma manda quando a playlist não mudou.
+    private var ultimaBoa: [UUID: (corpo: Payload, quando: Date, fonte: Int)] = [:]
+    /// Recusas seguidas da fonte em uso, por canal. Zera a cada lista boa.
+    private var recusasSeguidas: [UUID: Int] = [:]
+    /// Quantas recusas seguidas antes de aceitar que a fonte caiu mesmo.
+    private static let recusasParaTrocar = 3
+    /// Por quanto tempo a lista guardada ainda serve no lugar de uma troca.
+    private static let validadeDaGuardada: TimeInterval = 20
+
+    func variantIndex(_ channel: Channel) -> Int {
+        lock.lock(); defer { lock.unlock() }
+        return min(activeVariant[channel.id] ?? 0, channel.variants.count - 1)
+    }
+
+    func variant(_ channel: Channel) -> Variant {
+        channel.variants[variantIndex(channel)]
+    }
+
+    private func setVariant(_ channel: Channel, _ index: Int) {
+        lock.lock(); activeVariant[channel.id] = index; lock.unlock()
+    }
+
+    func forceVariant(_ channel: Channel, _ index: Int) {
+        setVariant(channel, index)
+    }
+
+    private func needsRemux(_ channel: Channel, _ variant: Variant) -> Bool {
+        let key = "\(channel.id.uuidString)#\(variant.url.absoluteString)"
+        lock.lock()
+        if let cached = remuxVerdict[key] { lock.unlock(); return cached }
+        lock.unlock()
+
+        guard Remuxer.shared.isAvailable else { return false }
+        var verdict = variant.isDASH
+        if !verdict {
+            let ext = variant.url.pathExtension.lowercased()
+            if ext.hasPrefix("ts") || ext.hasPrefix("m2t") {
+                verdict = true
+                lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
+            } else if let headRes = try? Upstream.shared.fetch(variant.url, method: "HEAD", referer: variant.referer),
+                      headRes.contentType.lowercased().contains("video/mp2t") {
+                verdict = true
+                lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
+            } else if let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer) {
+                let text = String(decoding: res.body.prefix(64_000), as: UTF8.self).lowercased()
+                verdict = text.contains("hvc1") || text.contains("hev1")
+                // O CODECS só existe na playlist mestre. Quem serve a playlist
+                // de mídia direto — os canais adultos do megatv fazem isso —
+                // não declara codec nenhum, e o HEVC passava batido: o
+                // AVFoundation recebia o TS e ficava na tela preta. Sem o
+                // atributo, quem responde é o próprio vídeo, pelo ffprobe.
+                if !verdict, text.contains("#extinf") {
+                    verdict = Remuxer.shared.ehHEVC(variant)
+                }
+            }
+        }
+        lock.lock(); remuxVerdict[key] = verdict; lock.unlock()
+        if verdict && !variant.isDASH {
+            Log.shared.write("\(channel.name): HEVC detectado — usando remux")
+        }
+        return verdict
+    }
+
+    func channel(_ id: UUID) -> Channel? {
+        lock.lock(); defer { lock.unlock() }
+        return channels[id]
+    }
+
+    /// Address the generated links point at.
+    ///
+    /// AirPlay video hands the URL to the receiver, which then fetches it
+    /// itself — a loopback address would send the Apple TV to its own port.
+    /// The LAN address works for both the Mac and the receiver, and falls back
+    /// to loopback when the machine is offline.
+    var advertisedHost: String {
+        ProxyServer.lanAddress() ?? "127.0.0.1"
+    }
+
+    /// The generated, playable link for a channel.
+    ///
+    /// Starts the server if it has not run yet: SwiftUI initialises the App's
+    /// stored properties before its `init` body, so the model could ask for a
+    /// link — and get port 0 — before `start()` had been called. The first
+    /// channel then failed to play until the viewer switched away and back.
+    func link(for channel: Channel) -> URL {
+        if listenFD < 0 { _ = try? start() }
+        let id = channel.id.uuidString
+        return URL(string: "http://\(advertisedHost):\(port)/proxy/\(id)/\(id).m3u8")!
+    }
+
+    /// First non-loopback IPv4 address of an active interface.
+    static func lanAddress() -> String? {
+        var head: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&head) == 0, let first = head else { return nil }
+        defer { freeifaddrs(head) }
+
+        var candidates: [(name: String, address: String)] = []
+        for pointer in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            let flags = Int32(pointer.pointee.ifa_flags)
+            guard flags & IFF_UP != 0, flags & IFF_LOOPBACK == 0,
+                  let sa = pointer.pointee.ifa_addr,
+                  sa.pointee.sa_family == UInt8(AF_INET) else { continue }
+
+            var buffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+            guard getnameinfo(sa, socklen_t(sa.pointee.sa_len), &buffer,
+                              socklen_t(buffer.count), nil, 0, NI_NUMERICHOST) == 0
+            else { continue }
+            let address = String(decoding: buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) },
+                                 as: UTF8.self)
+            guard !address.hasPrefix("169.254.") else { continue }   // self-assigned
+            candidates.append((String(cString: pointer.pointee.ifa_name), address))
+        }
+        // Wi-Fi/Ethernet first, then anything else (VPN, bridges…).
+        return candidates.first { $0.name.hasPrefix("en") }?.address ?? candidates.first?.address
+    }
+
+    // MARK: - Lifecycle
+
+    @discardableResult
+    func start(preferredPort: UInt16 = 30002) throws -> UInt16 {
+        if listenFD >= 0 { return port }
+
+        // A player that closes a connection early must not kill the process.
+        signal(SIGPIPE, SIG_IGN)
+
+        for candidate in [preferredPort, 0] {
+            let fd = socket(AF_INET, SOCK_STREAM, 0)
+            guard fd >= 0 else { continue }
+            var yes: Int32 = 1
+            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, socklen_t(MemoryLayout<Int32>.size))
+
+            var addr = sockaddr_in()
+            addr.sin_family = sa_family_t(AF_INET)
+            addr.sin_port = candidate.bigEndian
+            // Bound to every interface so an AirPlay receiver on the same
+            // network can pull the stream; loopback alone would break it.
+            addr.sin_addr.s_addr = INADDR_ANY.bigEndian
+            addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+
+            let bound = withUnsafePointer(to: &addr) { ptr in
+                ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                    bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
+                }
+            }
+            guard bound == 0, listen(fd, 32) == 0 else { close(fd); continue }
+
+            var actual = sockaddr_in()
+            var len = socklen_t(MemoryLayout<sockaddr_in>.size)
+            withUnsafeMutablePointer(to: &actual) { ptr in
+                _ = ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                    getsockname(fd, $0, &len)
+                }
+            }
+            listenFD = fd
+            port = UInt16(bigEndian: actual.sin_port)
+            break
+        }
+
+        guard listenFD >= 0 else {
+            throw UpstreamError.transport("não consegui abrir porta local")
+        }
+
+        Log.shared.write("proxy em http://\(advertisedHost):\(port)")
+        Thread.detachNewThread { [weak self] in self?.acceptLoop() }
+        return port
+    }
+
+    private func acceptLoop() {
+        while listenFD >= 0 {
+            let client = accept(listenFD, nil, nil)
+            if client < 0 {
+                if errno == EINTR { continue }
+                break
+            }
+            var yes: Int32 = 1
+            setsockopt(client, IPPROTO_TCP, TCP_NODELAY, &yes, socklen_t(MemoryLayout<Int32>.size))
+            setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &yes, socklen_t(MemoryLayout<Int32>.size))
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                self?.handle(client)
+                close(client)
+            }
+        }
+    }
+
+    // MARK: - Connection handling
+
+    private func handle(_ fd: Int32) {
+        guard let head = readHead(fd) else { return }
+        let firstLine = head.components(separatedBy: "\r\n").first ?? ""
+        let parts = firstLine.split(separator: " ")
+        guard parts.count >= 2 else { return }
+        let method = String(parts[0])
+        let target = String(parts[1])
+
+        guard method == "GET" || method == "HEAD" else {
+            send(fd, status: 405, headers: [:], body: Data(), headOnly: true)
+            return
+        }
+
+        let segments = target.split(separator: "/").map(String.init)
+
+        // /health
+        if segments.first == "health" {
+            send(fd, status: 200, headers: ["Content-Type": "text/plain"],
+                 body: Data("ok\n".utf8), headOnly: method == "HEAD")
+            return
+        }
+
+        // /channels — registered channels and their generated links
+        if segments.first == "channels" {
+            lock.lock()
+            let list = channels.values.map { c in
+                ["id": c.id.uuidString, "name": c.name,
+                 "link": link(for: c).absoluteString, "source": c.source.absoluteString]
+            }
+            lock.unlock()
+            let json = (try? JSONSerialization.data(withJSONObject: list,
+                                                    options: [.prettyPrinted])) ?? Data()
+            send(fd, status: 200, headers: ["Content-Type": "application/json"],
+                 body: json, headOnly: method == "HEAD")
+            return
+        }
+
+        // /vod/<endereço em base64>.mp4 — filme ou episódio, repassado em fluxo.
+        if segments.first == "vod", segments.count >= 2 {
+            servirArquivo(fd, apelido: segments[1], pedido: head,
+                          headOnly: method == "HEAD")
+            return
+        }
+
+        // /proxy/<uuid>/<uuid>.m3u8   or   /proxy/<uuid>/s/<b64>
+        guard segments.count >= 3, segments[0] == "proxy",
+              let channelID = UUID(uuidString: segments[1]),
+              let channel = channel(channelID) else {
+            send(fd, status: 404, headers: [:], body: Data("not found".utf8),
+                 headOnly: method == "HEAD")
+            return
+        }
+
+        // /proxy/<uuid>/manifest.mpd — DASH manifest, normalised for ffmpeg.
+        //
+        // Several CDNs send the manifest chunked with no Content-Length, and
+        // ffmpeg's dash demuxer calls avio_size() on it and gives up ("Unable
+        // to read to manifest"). Serving our own copy fixes the length and an
+        // injected absolute BaseURL keeps the segment references pointing at
+        // the original CDN.
+        if segments[2].hasPrefix("manifest") {
+            do {
+                let active = variant(channel)
+                let res = try Upstream.shared.fetch(active.url, referer: active.referer)
+                let xml = normaliseMPD(String(decoding: res.body, as: UTF8.self),
+                                       source: res.finalURL)
+                send(fd, status: 200,
+                     headers: [
+                        "Content-Type": "application/dash+xml",
+                        "Cache-Control": "no-cache, no-store",
+                     ],
+                     body: Data(xml.utf8), headOnly: method == "HEAD")
+            } catch {
+                Log.shared.write("erro no manifest de \(channel.name): \(error)")
+                send(fd, status: 502, headers: [:], body: Data(), headOnly: method == "HEAD")
+            }
+            return
+        }
+
+        // /proxy/<uuid>/f/<file> — a file produced by the ffmpeg remux session
+        if segments[2] == "f", segments.count >= 4 {
+            // Multi-audio sessions nest their renditions under stream_N/.
+            let name = segments[3...].joined(separator: "/")
+            guard let file = Remuxer.shared.file(for: channelID, named: name),
+                  let data = try? Data(contentsOf: file) else {
+                send(fd, status: 404, headers: [:], body: Data(), headOnly: method == "HEAD")
+                return
+            }
+            let type = file.pathExtension.lowercased() == "m3u8"
+                ? "application/vnd.apple.mpegurl"
+                : "video/mp4"
+            send(fd, status: 200,
+                 headers: ["Content-Type": type, "Cache-Control": "no-cache"],
+                 body: data, headOnly: method == "HEAD")
+            return
+        }
+
+        // The canonical link tries each source in preference order and sticks
+        // to the first one that answers; `raw.m3u8` is the untouched
+        // passthrough that feeds ffmpeg and always uses the current source.
+        let wantsRaw = segments[2].hasPrefix("raw")
+        let isSegment = segments[2] == "s"
+        if !wantsRaw, !isSegment {
+            let start = variantIndex(channel)
+            let responder: (Payload) -> Void = { payload in
+                self.send(fd, status: 200,
+                          headers: [
+                            "Content-Type": payload.contentType,
+                            "Cache-Control": "no-cache, no-store",
+                            "Access-Control-Allow-Origin": "*",
+                          ],
+                          body: payload.body, headOnly: method == "HEAD")
+            }
+
+            // A fonte em uso tem preferência e tem crédito: enquanto ela vinha
+            // entregando, uma recusa isolada é respondida com a última lista
+            // boa em vez de uma troca. Só depois de recusas seguidas — ou de a
+            // lista guardada envelhecer — é que vale procurar outra origem.
+            if let payload = serveRoot(channel: channel, variant: channel.variants[start]) {
+                registrarBoa(channel, start, payload)
+                responder(payload)
+                return
+            }
+            if let guardada = guardadaParaSegurar(channel, start) {
+                Log.shared.write("\(channel.name): refresh da fonte \(start + 1) falhou — segurando na lista anterior")
+                responder(guardada)
+                return
+            }
+
+            for offset in 1...max(channel.variants.count, 1) {
+                let index = (start + offset) % channel.variants.count
+                if index == start { break }
+                // Committed before the attempt so /raw and /manifest resolve to
+                // the same source the attempt is testing.
+                setVariant(channel, index)
+                if let payload = serveRoot(channel: channel, variant: channel.variants[index]) {
+                    Log.shared.write("\(channel.name): usando fonte \(index + 1)")
+                    registrarBoa(channel, index, payload)
+                    responder(payload)
+                    return
+                }
+                Log.shared.write("\(channel.name): fonte \(index + 1) falhou")
+            }
+            setVariant(channel, start)
+            esquecerGuardada(channel)
+            send(fd, status: 502, headers: [:],
+                 body: Data("todas as fontes falharam".utf8), headOnly: method == "HEAD")
+            return
+        }
+
+        let active = variant(channel)
+        let targetURL: URL
+        if isSegment, segments.count >= 4,
+           let decoded = Base64URL.decode(stripSyntheticExtension(segments[3])),
+           let u = URL(string: decoded) {
+            targetURL = u
+        } else {
+            targetURL = active.url
+        }
+
+        do {
+            let origin = targetURL.scheme.flatMap { s in
+                targetURL.host.map { "\(s)://\($0)/" }
+            }
+            let res = try Upstream.shared.fetch(targetURL, referer: active.referer ?? origin)
+            guard (200...299).contains(res.status) else {
+                Log.shared.write("upstream \(res.status) em \(targetURL.lastPathComponent)")
+                if isSegment { anotarFalha(de: targetURL) }
+                send(fd, status: res.status, headers: [:], body: res.body,
+                     headOnly: method == "HEAD")
+                return
+            }
+
+            let looksLikePlaylist = res.body.prefix(7) == Data("#EXTM3U".utf8)
+            if looksLikePlaylist {
+                var text = String(decoding: res.body, as: UTF8.self)
+                // O que alimenta o ffmpeg vai como veio; o que vai ao player,
+                // na régua do Saimo Connect.
+                if !wantsRaw { text = naRegua(text, pedido: targetURL, base: res.finalURL) }
+                let rewritten = rewrite(playlist: text, base: res.finalURL, channelID: channelID)
+                send(fd, status: 200,
+                     headers: [
+                        "Content-Type": "application/vnd.apple.mpegurl",
+                        "Cache-Control": "no-cache, no-store",
+                        "Access-Control-Allow-Origin": "*",
+                     ],
+                     body: Data(rewritten.utf8), headOnly: method == "HEAD")
+            } else {
+                // Upstream disguises TS segments as images/docs/octet-stream;
+                // only trust an explicit video/* or audio/* content type.
+                var ct = res.contentType
+                if res.body.prefix(6) == Data("WEBVTT".utf8) {
+                    ct = "text/vtt"
+                } else if !(ct.hasPrefix("video/") || ct.hasPrefix("audio/")) {
+                    ct = "video/mp2t"
+                }
+                send(fd, status: 200,
+                     headers: [
+                        "Content-Type": ct,
+                        "Cache-Control": "no-cache",
+                        "Access-Control-Allow-Origin": "*",
+                     ],
+                     body: res.body, headOnly: method == "HEAD")
+            }
+        } catch {
+            Log.shared.write("erro: \(error)")
+            if isSegment { anotarFalha(de: targetURL) }
+            send(fd, status: 502, headers: [:],
+                 body: Data("upstream error: \(error)".utf8), headOnly: method == "HEAD")
+        }
+    }
+
+    // MARK: - Serving one source
+
+    private struct Payload {
+        let contentType: String
+        let body: Data
+    }
+
+    /// Guarda a lista que funcionou: é ela que segura um refresh perdido.
+    private func registrarBoa(_ channel: Channel, _ index: Int, _ payload: Payload) {
+        lock.lock()
+        ultimaBoa[channel.id] = (payload, Date(), index)
+        recusasSeguidas[channel.id] = 0
+        lock.unlock()
+    }
+
+    /// A lista guardada da fonte em uso, enquanto ainda vale insistir nela.
+    ///
+    /// Conta a recusa e devolve nil quando já foram recusas demais ou quando a
+    /// lista guardada envelheceu — aí a fonte caiu de verdade e trocar é o certo.
+    private func guardadaParaSegurar(_ channel: Channel, _ index: Int) -> Payload? {
+        lock.lock(); defer { lock.unlock() }
+        let recusas = (recusasSeguidas[channel.id] ?? 0) + 1
+        recusasSeguidas[channel.id] = recusas
+        guard recusas < Self.recusasParaTrocar,
+              let guardada = ultimaBoa[channel.id],
+              guardada.fonte == index,
+              Date().timeIntervalSince(guardada.quando) < Self.validadeDaGuardada
+        else { return nil }
+        return guardada.corpo
+    }
+
+    private func esquecerGuardada(_ channel: Channel) {
+        lock.lock()
+        ultimaBoa.removeValue(forKey: channel.id)
+        recusasSeguidas[channel.id] = 0
+        lock.unlock()
+    }
+
+    /// Alguns CDNs respondem 200, com playlist válida, mas com um aviso de
+    /// manutenção no lugar do canal: lista fechada, de poucos segundos, que o
+    /// player toca até o fim e encerra. Aceitar isso como fonte viva é o que
+    /// deixava o canal reabrindo sem parar — e escondia a fonte que prestava,
+    /// mais abaixo na lista. Vale só para lista fechada e curta, para não
+    /// derrubar os canais 24h, que são longos.
+    private func ehAvisoEnlatado(_ playlist: String) -> Bool {
+        guard playlist.contains("#EXT-X-ENDLIST") else { return false }
+        let baixo = playlist.lowercased()
+        for marca in ["manutencao", "manutenção", "maintenance", "offline", "no-signal", "sem-sinal"] {
+            if baixo.contains(marca) { return true }
+        }
+        let total = playlist.split(separator: "\n").reduce(into: 0.0) { soma, linha in
+            let t = linha.trimmingCharacters(in: .whitespaces)
+            guard t.hasPrefix("#EXTINF:"),
+                  let valor = Double(t.dropFirst(8).split(separator: ",").first ?? "") else { return }
+            soma += valor
+        }
+        return total < 60
+    }
+
+    /// Produces the playlist for a single source, or nil when that source is
+    /// unusable and the next one should be tried.
+    private func serveRoot(channel: Channel, variant: Variant) -> Payload? {
+        let id = channel.id.uuidString
+
+        if needsRemux(channel, variant) {
+            let base = "http://\(advertisedHost):\(port)/proxy/\(id)/f/"
+            let key = "\(channel.id.uuidString)#\(variant.url.absoluteString)"
+            lock.lock()
+            let isDirectTS = isDirectTSVerdict[key] ?? (variant.url.pathExtension.lowercased().hasPrefix("ts") || variant.url.pathExtension.lowercased().hasPrefix("m2t"))
+            lock.unlock()
+            let input = isDirectTS ? variant.url : URL(string: "http://127.0.0.1:\(port)/proxy/\(id)/\(variant.isDASH ? "manifest.mpd" : "raw.m3u8")")!
+            guard let text = Remuxer.shared.playlist(for: channel, variant: variant,
+                                                     sourceURL: input, rewriteBase: base)
+            else { return nil }
+            return Payload(contentType: "application/vnd.apple.mpegurl", body: Data(text.utf8))
+        }
+
+        guard let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer),
+              (200...299).contains(res.status),
+              res.body.prefix(7) == Data("#EXTM3U".utf8)
+        else { return nil }
+
+        let texto = String(decoding: res.body, as: UTF8.self)
+        if ehAvisoEnlatado(texto) {
+            Log.shared.write("\(channel.name): \(variant.url.host ?? "fonte") respondeu aviso enlatado — pulando")
+            return nil
+        }
+
+        let rewritten = rewrite(playlist: naRegua(texto, pedido: variant.url, base: res.finalURL),
+                                base: res.finalURL, channelID: channel.id)
+        return Payload(contentType: "application/vnd.apple.mpegurl", body: Data(rewritten.utf8))
+    }
+
+    // MARK: - Playlist rewriting
+
+    /// A lista de mídia na régua do Saimo Connect (`Historico`): mais longa e
+    /// com a marca de horário de cada trecho, a mesma que o celular recebe pelo
+    /// `/hls`. Assim a data que o AVPlayer informa (`currentDate()`) já é o
+    /// instante que o celular lê na lista dele, e o som no celular toca junto
+    /// com a imagem do Mac. Lista mestra passa como veio.
+    private func naRegua(_ texto: String, pedido: URL, base: URL) -> String {
+        guard !texto.contains("#EXT-X-STREAM-INF") else { return texto }
+        let baseDosTrechos = baseDosSegmentos(base)
+        return ConnectHls.listaDeMidia(
+            texto, url: pedido,
+            absoluto: { URL(string: $0, relativeTo: base)?.absoluteURL.absoluteString ?? $0 },
+            trecho: { URL(string: $0, relativeTo: baseDosTrechos)?.absoluteURL.absoluteString ?? $0 })
+    }
+
+    /// Proxied links carry a synthetic extension because extension-sniffing
+    /// players (ffmpeg, VLC) reject a variant playlist served as `.ts` and a
+    /// segment served with no extension at all. Upstream hides its segments
+    /// behind .php/.ico/.ppt/.class, so anything unrecognised becomes `.ts`.
+    private static let passthroughExtensions: Set<String> =
+        ["ts", "aac", "mp3", "mp4", "m4s", "m4a", "key"]
+
+    private func syntheticExtension(for absolute: URL) -> String {
+        let full = absolute.absoluteString.lowercased()
+        if full.contains(".m3u8") || full.contains(".m3u") { return ".m3u8" }
+        if full.contains(".vtt") || full.contains(".webvtt") { return ".vtt" }
+        let ext = absolute.pathExtension.lowercased()
+        return Self.passthroughExtensions.contains(ext) ? ".\(ext)" : ".ts"
+    }
+
+    private func proxyURL(for absolute: URL, channelID: UUID) -> String {
+        let token = Base64URL.encode(absolute.absoluteString)
+        return "http://\(advertisedHost):\(port)/proxy/\(channelID.uuidString)/s/\(token)\(syntheticExtension(for: absolute))"
+    }
+
+    /// Gives the manifest an absolute MPD-level BaseURL so its relative
+    /// SegmentTemplate references still resolve against the origin CDN once the
+    /// document is served from localhost. Existing relative BaseURLs are made
+    /// absolute instead, since two MPD-level BaseURLs would read as
+    /// alternatives rather than a prefix.
+    func normaliseMPD(_ xml: String, source: URL) -> String {
+        let base = source.deletingLastPathComponent().absoluteString
+
+        if xml.contains("<BaseURL>") {
+            var out = xml
+            var searchStart = out.startIndex
+            while let open = out.range(of: "<BaseURL>", range: searchStart..<out.endIndex),
+                  let close = out.range(of: "</BaseURL>", range: open.upperBound..<out.endIndex) {
+                let value = String(out[open.upperBound..<close.lowerBound])
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                if !value.lowercased().hasPrefix("http"),
+                   let absolute = URL(string: value, relativeTo: source)?.absoluteString {
+                    out.replaceSubrange(open.upperBound..<close.lowerBound, with: absolute)
+                    searchStart = out.index(open.upperBound, offsetBy: absolute.count)
+                } else {
+                    searchStart = close.upperBound
+                }
+            }
+            return out
+        }
+
+        guard let tagStart = xml.range(of: "<MPD"),
+              let tagEnd = xml.range(of: ">", range: tagStart.upperBound..<xml.endIndex) else {
+            return xml
+        }
+        var out = xml
+        out.insert(contentsOf: "\n  <BaseURL>\(base)</BaseURL>", at: tagEnd.upperBound)
+        return out
+    }
+
+    /// base64url never contains a dot, so everything from the first one is ours.
+    private func stripSyntheticExtension(_ s: String) -> String {
+        guard let dot = s.firstIndex(of: ".") else { return s }
+        return String(s[s.startIndex..<dot])
+    }
+
+    func anotarFalha(de url: URL) {
+        guard let host = url.host else { return }
+        lock.lock(); hostsRuins[host] = Date(); lock.unlock()
+    }
+
+    private func hostEstaRuim(_ url: URL) -> Bool {
+        guard let host = url.host else { return false }
+        lock.lock(); defer { lock.unlock() }
+        guard let quando = hostsRuins[host] else { return false }
+        if Date().timeIntervalSince(quando) < Self.penalidadeDeHost { return true }
+        hostsRuins.removeValue(forKey: host)
+        return false
+    }
+
+    func rewrite(playlist: String, base: URL, channelID: UUID) -> String {
+        var out: [String] = []
+        // O #EXTINF e o #EXT-X-BYTERANGE descrevem o segmento da linha seguinte,
+        // então saem junto com ele quando o segmento é descartado.
+        var pendentes: [String] = []
+        var descartados = 0
+        var mantidos = 0
+        for raw in playlist.split(separator: "\n", omittingEmptySubsequences: false) {
+            var line = String(raw)
+            if line.hasSuffix("\r") { line.removeLast() }
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+
+            if trimmed.isEmpty {
+                out.append(contentsOf: pendentes); pendentes = []
+                out.append(line)
+            } else if trimmed.hasPrefix("#EXTINF") || trimmed.hasPrefix("#EXT-X-BYTERANGE") {
+                pendentes.append(rewriteURIAttribute(in: line, base: base, channelID: channelID))
+            } else if trimmed.hasPrefix("#") {
+                out.append(contentsOf: pendentes); pendentes = []
+                out.append(rewriteURIAttribute(in: line, base: base, channelID: channelID))
+            } else if let abs = URL(string: trimmed, relativeTo: baseDosSegmentos(base))?.absoluteURL {
+                if hostEstaRuim(abs) {
+                    pendentes = []
+                    descartados += 1
+                } else {
+                    out.append(contentsOf: pendentes); pendentes = []
+                    out.append(proxyURL(for: abs, channelID: channelID))
+                    mantidos += 1
+                }
+            } else {
+                out.append(contentsOf: pendentes); pendentes = []
+                out.append(line)
+            }
+        }
+        out.append(contentsOf: pendentes)
+        // Uma lista vazia é pior que uma lista com buraco: se sobrou pouca
+        // coisa, vale mais entregar tudo e deixar o player tentar.
+        if descartados > 0 && mantidos < 2 {
+            hostsRuins.removeAll()
+            return rewrite(playlist: playlist, base: base, channelID: channelID)
+        }
+        if descartados > 0 {
+            Log.shared.write("playlist: \(descartados) segmento(s) de host ruim fora, \(mantidos) mantidos")
+        }
+        return prioritiseHighestVariant(out).joined(separator: "\n")
+    }
+
+    /// De onde os segmentos relativos desta playlist realmente saem.
+    ///
+    /// Há CDN que serve a playlist num endereço e os segmentos noutro: o pedido
+    /// vai para `/tos-.../proxy.m3u8?...&url=https://origem/docs/canal/x.m3u8`,
+    /// mas dentro da lista vem só o nome do arquivo, e resolvê-lo ao lado da
+    /// playlist devolve a própria playlist de novo — o player roda em círculo e
+    /// nunca mostra imagem. O caminho certo está no parâmetro `url`: é a pasta
+    /// dele, no host que respondeu, que guarda os segmentos.
+    ///
+    /// Sem esse parâmetro nada muda, e a playlist continua sendo a base — que é
+    /// o que a norma manda e o que todos os outros canais precisam.
+    func baseDosSegmentos(_ playlist: URL) -> URL {
+        guard let partes = URLComponents(url: playlist, resolvingAgainstBaseURL: false),
+              let origem = partes.queryItems?.first(where: { $0.name == "url" })?.value,
+              let caminho = URLComponents(string: origem)?.path,
+              caminho.contains("/"),
+              var destino = URLComponents(url: playlist, resolvingAgainstBaseURL: false)
+        else { return playlist }
+
+        destino.path = (caminho as NSString).deletingLastPathComponent + "/"
+        destino.query = nil
+        destino.fragment = nil
+        return destino.url ?? playlist
+    }
+
+    /// Puts the highest-bandwidth variant first in a master playlist.
+    ///
+    /// With no throughput estimate yet, AVFoundation starts on the first
+    /// variant listed — which on most feeds is the lowest, so a channel opens
+    /// visibly soft before adaptive switching catches up. Listing the best one
+    /// first makes it open sharp; ABR is untouched and still free to step down.
+    func prioritiseHighestVariant(_ lines: [String]) -> [String] {
+        guard lines.contains(where: { $0.hasPrefix("#EXT-X-STREAM-INF") }) else { return lines }
+
+        var header: [String] = []
+        var variants: [(bandwidth: Int, lines: [String])] = []
+        var index = 0
+
+        while index < lines.count {
+            let line = lines[index]
+            guard line.hasPrefix("#EXT-X-STREAM-INF") else {
+                header.append(line)
+                index += 1
+                continue
+            }
+            // The URI is the next non-comment, non-empty line.
+            var cursor = index + 1
+            var block = [line]
+            while cursor < lines.count {
+                let candidate = lines[cursor]
+                block.append(candidate)
+                let trimmed = candidate.trimmingCharacters(in: .whitespaces)
+                cursor += 1
+                if !trimmed.isEmpty && !trimmed.hasPrefix("#") { break }
+            }
+            var bandwidth = 0
+            if let range = line.range(of: "BANDWIDTH=") {
+                let digits = line[range.upperBound...].prefix { $0.isNumber }
+                bandwidth = Int(digits) ?? 0
+            }
+            variants.append((bandwidth, block))
+            index = cursor
+        }
+
+        guard variants.count > 1 else { return lines }
+        variants.sort { $0.bandwidth > $1.bandwidth }
+        return header + variants.flatMap(\.lines)
+    }
+
+    /// Rewrites `URI="..."` inside tags such as EXT-X-KEY / EXT-X-MAP / EXT-X-MEDIA.
+    private func rewriteURIAttribute(in line: String, base: URL, channelID: UUID) -> String {
+        guard let uriRange = line.range(of: "URI=\"") else { return line }
+        let valueStart = uriRange.upperBound
+        guard let closing = line[valueStart...].firstIndex(of: "\"") else { return line }
+        let value = String(line[valueStart..<closing])
+        guard let abs = URL(string: value, relativeTo: base)?.absoluteURL else { return line }
+        return line.replacingCharacters(
+            in: valueStart..<closing,
+            with: proxyURL(for: abs, channelID: channelID))
+    }
+
+    // MARK: - Socket I/O
+
+    // MARK: - Arquivo grande servido em fluxo
+
+    /// Endereço local para um filme ou episódio.
+    ///
+    /// Serve para as origens que respondem com `Content-Range` errado: elas
+    /// mandam o fim do arquivo inteiro em vez do fim do pedaço pedido, e o
+    /// AVFoundation desiste com "Operation Stopped" antes de ler um quadro.
+    /// Aqui a resposta é refeita com o intervalo que realmente veio.
+    func vodLink(for absolute: URL) -> URL {
+        if listenFD < 0 { _ = try? start() }
+        let apelido = Data(absolute.absoluteString.utf8)
+            .base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        return URL(string: "http://\(advertisedHost):\(port)/vod/\(apelido).mp4")!
+    }
+
+    private func endereco(doApelido apelido: String) -> URL? {
+        var texto = apelido
+        if let ponto = texto.lastIndex(of: ".") { texto = String(texto[texto.startIndex..<ponto]) }
+        texto = texto.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while texto.count % 4 != 0 { texto += "=" }
+        guard let dados = Data(base64Encoded: texto) else { return nil }
+        return URL(string: String(decoding: dados, as: UTF8.self))
+    }
+
+    private func servirArquivo(_ fd: Int32, apelido: String, pedido: String, headOnly: Bool) {
+        guard let alvo = endereco(doApelido: apelido) else {
+            send(fd, status: 404, headers: [:], body: Data(), headOnly: headOnly)
+            return
+        }
+
+        var request = URLRequest(url: alvo)
+        request.timeoutInterval = 30
+        request.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        let faixa = pedido.components(separatedBy: "\r\n")
+            .first { $0.lowercased().hasPrefix("range:") }?
+            .dropFirst("range:".count).trimmingCharacters(in: .whitespaces)
+        if let faixa { request.setValue(faixa, forHTTPHeaderField: "Range") }
+
+        let fluxo = FluxoVod(fd: fd, headOnly: headOnly, faixaPedida: faixa)
+        let sessao = URLSession(configuration: .default, delegate: fluxo, delegateQueue: nil)
+        sessao.dataTask(with: request).resume()
+        fluxo.esperar()
+        sessao.invalidateAndCancel()
+        if !fluxo.respondeu {
+            send(fd, status: 502, headers: [:], body: Data(), headOnly: headOnly)
+        }
+    }
+
+    private func readHead(_ fd: Int32) -> String? {
+        var buf = Data()
+        var chunk = [UInt8](repeating: 0, count: 4096)
+        while buf.range(of: Data("\r\n\r\n".utf8)) == nil {
+            let n = recv(fd, &chunk, chunk.count, 0)
+            if n <= 0 { return nil }
+            buf.append(contentsOf: chunk[0..<n])
+            if buf.count > 64 * 1024 { return nil }
+        }
+        return String(decoding: buf, as: UTF8.self)
+    }
+
+    private func send(_ fd: Int32, status: Int, headers: [String: String],
+                      body: Data, headOnly: Bool) {
+        var head = "HTTP/1.1 \(status) \(Self.reason(status))\r\n"
+        head += "Content-Length: \(body.count)\r\n"
+        head += "Connection: close\r\n"
+        for (k, v) in headers { head += "\(k): \(v)\r\n" }
+        head += "\r\n"
+
+        var payload = Data(head.utf8)
+        if !headOnly { payload.append(body) }
+
+        payload.withUnsafeBytes { rawBuf in
+            guard let base = rawBuf.baseAddress else { return }
+            var sent = 0
+            while sent < rawBuf.count {
+                let n = Darwin.send(fd, base.advanced(by: sent), rawBuf.count - sent, 0)
+                if n <= 0 { return }
+                sent += n
+            }
+        }
+    }
+
+    private static func reason(_ code: Int) -> String {
+        switch code {
+        case 200: return "OK"
+        case 404: return "Not Found"
+        case 405: return "Method Not Allowed"
+        case 502: return "Bad Gateway"
+        default: return "Status"
+        }
+    }
+}
+
+/// Repassa um arquivo remoto para o player, um pedaço de cada vez.
+///
+/// O corpo nunca é guardado inteiro: cada bloco que chega da origem vai direto
+/// para o socket do player, e a conexão fechada pelo player cancela o download.
+/// O cabeçalho é o motivo de tudo isto existir — a origem informa um
+/// `Content-Range` que termina no fim do arquivo mesmo quando manda cem bytes,
+/// e o AVFoundation trata isso como resposta truncada.
+///
+/// O URLSession chama o delegado numa fila serial só dele, e quem espera lê
+/// `respondeu` depois do sinal de fim: a ordem é garantida pelo semáforo, não
+/// pelo compilador — daí o `@unchecked Sendable`.
+private final class FluxoVod: NSObject, URLSessionDataDelegate, @unchecked Sendable {
+    private let fd: Int32
+    private let headOnly: Bool
+    private let faixaPedida: String?
+    private let fim = DispatchSemaphore(value: 0)
+    private(set) var respondeu = false
+    private var vivo = true
+
+    init(fd: Int32, headOnly: Bool, faixaPedida: String?) {
+        self.fd = fd
+        self.headOnly = headOnly
+        self.faixaPedida = faixaPedida
+    }
+
+    func esperar() { fim.wait() }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                    didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        guard let http = response as? HTTPURLResponse else {
+            completionHandler(.cancel)
+            return
+        }
+
+        let tamanho = http.expectedContentLength
+        let total = totalDeclarado(http) ?? (tamanho > 0 ? tamanho : -1)
+        let inicio = comecoPedido()
+
+        var cabecalho = ""
+        if http.statusCode == 206 || (faixaPedida != nil && http.statusCode == 200 && inicio > 0) {
+            let ultimo = inicio + max(tamanho, 1) - 1
+            cabecalho += "HTTP/1.1 206 Partial Content\r\n"
+            cabecalho += "Content-Range: bytes \(inicio)-\(ultimo)/\(total > 0 ? String(total) : "*")\r\n"
+        } else {
+            cabecalho += "HTTP/1.1 \(http.statusCode == 200 ? 200 : http.statusCode) "
+            cabecalho += "\(http.statusCode == 200 ? "OK" : "Status")\r\n"
+        }
+        if tamanho > 0 { cabecalho += "Content-Length: \(tamanho)\r\n" }
+        let tipo = http.value(forHTTPHeaderField: "Content-Type") ?? "video/mp4"
+        cabecalho += "Content-Type: \(tipo.hasPrefix("text/") ? "video/mp4" : tipo)\r\n"
+        cabecalho += "Accept-Ranges: bytes\r\n"
+        cabecalho += "Connection: close\r\n\r\n"
+
+        respondeu = true
+        if !escrever(Data(cabecalho.utf8)) || headOnly {
+            completionHandler(.cancel)
+            return
+        }
+        completionHandler(.allow)
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if !escrever(data) { dataTask.cancel() }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask,
+                    didCompleteWithError error: Error?) {
+        fim.signal()
+    }
+
+    /// O tamanho do arquivo, tirado do `Content-Range` da origem. O fim que ela
+    /// declara não serve para nada, mas o total depois da barra é confiável.
+    private func totalDeclarado(_ http: HTTPURLResponse) -> Int64? {
+        guard let bruto = http.value(forHTTPHeaderField: "Content-Range"),
+              let barra = bruto.lastIndex(of: "/") else { return nil }
+        return Int64(bruto[bruto.index(after: barra)...].trimmingCharacters(in: .whitespaces))
+    }
+
+    private func comecoPedido() -> Int64 {
+        guard let faixa = faixaPedida,
+              let igual = faixa.firstIndex(of: "=") else { return 0 }
+        let resto = faixa[faixa.index(after: igual)...]
+        let comeco = resto.prefix { $0.isNumber }
+        return Int64(comeco) ?? 0
+    }
+
+    private func escrever(_ dados: Data) -> Bool {
+        guard vivo else { return false }
+        let ok = dados.withUnsafeBytes { buffer -> Bool in
+            guard let base = buffer.baseAddress else { return true }
+            var enviado = 0
+            while enviado < buffer.count {
+                let n = Darwin.send(fd, base.advanced(by: enviado), buffer.count - enviado, 0)
+                if n <= 0 { return false }
+                enviado += n
+            }
+            return true
+        }
+        if !ok { vivo = false }
+        return ok
+    }
+}

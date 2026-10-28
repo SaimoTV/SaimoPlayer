@@ -1,0 +1,128 @@
+import Foundation
+import os
+
+/// Servidores desligados à mão, no painel do monitor.
+///
+/// Quando um provedor cai, cai inteiro: não é a fonte 3 de um canal que
+/// morreu, é o servidor que parou de responder para todo mundo. Editar o
+/// catálogo publicado a cada queda é lento e some com o link, que depois
+/// precisa voltar. Desligar o servidor no painel some com ele de todo canal e
+/// de todo filme, em todos os aplicativos, e religar devolve tudo.
+///
+/// A lista é baixada sem chave nenhuma: são nomes de servidor, que o catálogo
+/// publicado já mostra, e exigir segredo significaria embutir um segredo num
+/// aplicativo que qualquer um baixa.
+///
+/// Na primeira abertura sem rede a lista vem vazia, e nada é escondido — o
+/// erro certo a cometer: um canal a mais na tela é melhor que a lista inteira
+/// sumindo porque o monitor não respondeu.
+enum FontesDesativadas {
+
+    private static let endereco = URL(
+        string: "https://saimo-tv.pages.dev/fontes-desativadas.json")!
+    /// Uma leitura por hora. Cada aparelho perguntando de dois em dois minutos
+    /// custava caro no monitor (cobrado por pedido); desligar um servidor
+    /// agora leva até uma hora para chegar a todos. A última lista boa fica
+    /// guardada com a hora em que veio, e reabrir o app dentro da hora não
+    /// pergunta de novo.
+    private static let validade: TimeInterval = 3600
+    private static let chaveHosts = "fontesDesativadas.hosts"
+    private static let chaveLidoEm = "fontesDesativadas.lidoEm"
+
+    /// Lida pelo proxy fora da thread principal e escrita por quem baixa a
+    /// lista: uma trava só, para as duas pontas verem sempre o mesmo estado.
+    private struct Estado: Sendable {
+        var hosts: Set<String> = []
+        var lidoEm: Date = .distantPast
+    }
+    private static let estado = OSAllocatedUnfairLock(initialState: guardado())
+
+    private static func guardado() -> Estado {
+        let d = UserDefaults.standard
+        var e = Estado()
+        e.hosts = Set(d.stringArray(forKey: chaveHosts) ?? [])
+        let lido = d.double(forKey: chaveLidoEm)
+        // Relógio que voltou para trás não prende a lista velha para sempre.
+        if lido > 0, lido <= Date().timeIntervalSince1970 { e.lidoEm = Date(timeIntervalSince1970: lido) }
+        return e
+    }
+
+    private static var hosts: Set<String> { estado.withLock { $0.hosts } }
+    private static var lidoEm: Date { estado.withLock { $0.lidoEm } }
+
+    /// Os servidores desligados agora, sem ir à rede.
+    static var atuais: Set<String> { hosts }
+
+    /// Busca a lista quando ela envelheceu. Devolve `true` quando mudou, que é
+    /// quando quem chamou precisa redesenhar a lista de canais.
+    @discardableResult
+    static func atualizar() async -> Bool {
+        if Date().timeIntervalSince(lidoEm) < validade { return false }
+        var pedido = URLRequest(url: endereco)
+        pedido.setValue("*/*", forHTTPHeaderField: "Accept")
+        pedido.timeoutInterval = 10
+        // Quem manda no ritmo é este relógio, um só: o `max-age` da resposta
+        // somado a ele só atrasaria a lista nova.
+        pedido.cachePolicy = .reloadIgnoringLocalCacheData
+        guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
+              let http = resposta as? HTTPURLResponse, (200...299).contains(http.statusCode),
+              let corpo = try? JSONSerialization.jsonObject(with: dados) as? [String: Any],
+              let lista = corpo["desativados"] as? [String]
+        else { return false }
+
+        let novos = Set(lista.map { $0.lowercased() })
+        UserDefaults.standard.set(novos.sorted(), forKey: chaveHosts)
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: chaveLidoEm)
+        let mudou = estado.withLock { atual -> Bool in
+            atual.lidoEm = Date()
+            guard novos != atual.hosts else { return false }
+            atual.hosts = novos
+            return true
+        }
+        guard mudou else { return false }
+        Log.shared.write(novos.isEmpty
+            ? "nenhum servidor desligado"
+            : "servidores desligados: \(novos.sorted().joined(separator: ", "))")
+        return true
+    }
+
+    static func desligado(_ url: URL?) -> Bool {
+        guard let host = url?.host?.lowercased() else { return false }
+        return hosts.contains(host)
+    }
+
+    static func desligado(_ endereco: String) -> Bool {
+        desligado(URL(string: endereco))
+    }
+
+    /// O catálogo sem o que está desligado.
+    ///
+    /// Canal que fica sem nenhuma fonte sai da lista: ele não abriria mesmo, e
+    /// deixá-lo ali só rende clique frustrado. Volta sozinho quando o servidor
+    /// for religado.
+    static func peneirar(_ canais: [Channel]) -> [Channel] {
+        guard !hosts.isEmpty else { return canais }
+        var mexidos = 0
+        var sumiram = 0
+        let out: [Channel] = canais.compactMap { canal in
+            let vivas = canal.variants.filter { !desligado($0.url) }
+            if vivas.isEmpty { sumiram += 1; return nil }
+            if vivas.count == canal.variants.count { return canal }
+            mexidos += 1
+            var copia = canal
+            copia.variants = vivas
+            return copia
+        }
+        if mexidos > 0 || sumiram > 0 {
+            Log.shared.write("fontes desligadas: \(mexidos) canal(is) perderam fonte, "
+                             + "\(sumiram) sumiram da lista")
+        }
+        return out
+    }
+
+    /// Os endereços de um filme ou episódio sem os que estão desligados.
+    static func peneirar(_ enderecos: [String]) -> [String] {
+        guard !hosts.isEmpty else { return enderecos }
+        return enderecos.filter { !desligado($0) }
+    }
+}

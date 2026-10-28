@@ -1,0 +1,80 @@
+import Foundation
+import Combine
+
+/// Filmes e séries marcados como favoritos.
+///
+/// Guarda o tipo e a letra junto com o nome porque é assim que o acervo é
+/// fatiado: com a letra na mão, abrir um favorito custa o mesmo pedaço de
+/// catálogo que abrir o título pela navegação normal, sem varrer o acervo
+/// inteiro atrás dele.
+///
+/// A ordem importa — o que foi marcado por último aparece em cima —, então isto
+/// é uma lista gravada como texto, e não um conjunto.
+@MainActor
+final class VodFavoritos: ObservableObject {
+
+    struct Item: Identifiable, Hashable {
+        let titulo: String
+        let serie: Bool
+        let letra: String
+        /// Um extra vive na mesma letra, mas noutro arquivo.
+        let reservado: Bool
+        /// Distingue séries homônimas; filmes já carregam o ano no título.
+        let ano: String
+        var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
+        var id: String {
+            "\(serie ? "s" : "f")|\(reservado ? "r" : "n")|\(nomeCompleto)"
+        }
+
+        init(titulo: String, serie: Bool, letra: String,
+             reservado: Bool, ano: String = "") {
+            self.titulo = titulo
+            self.serie = serie
+            self.letra = letra
+            self.reservado = reservado
+            self.ano = ano
+        }
+    }
+
+    static let shared = VodFavoritos()
+
+    @Published private(set) var itens: [Item] = []
+
+    private let chave = "vodFavoritos"
+
+    private init() {
+        itens = (UserDefaults.standard.stringArray(forKey: chave) ?? []).compactMap { linha in
+            let campos = linha.components(separatedBy: "\t")
+            guard campos.count >= 3, !campos[2].isEmpty else { return nil }
+            return Item(titulo: campos[2], serie: campos[0] == "s", letra: campos[1],
+                        reservado: campos.count > 3 && campos[3] == "r",
+                        ano: campos.count > 4 ? campos[4] : "")
+        }
+    }
+
+    func contem(_ titulo: String, serie: Bool, ano: String = "") -> Bool {
+        itens.contains { $0.titulo == titulo && $0.serie == serie && $0.ano == ano }
+    }
+
+    /// Marca ou desmarca. O que entra fica em primeiro.
+    func alternar(_ item: Item) {
+        if contem(item.titulo, serie: item.serie, ano: item.ano) {
+            itens.removeAll {
+                $0.titulo == item.titulo && $0.serie == item.serie && $0.ano == item.ano
+            }
+        } else {
+            itens.insert(item, at: 0)
+        }
+        gravar()
+    }
+
+    private func gravar() {
+        let linhas = itens.map {
+            [$0.serie ? "s" : "f", $0.letra, $0.titulo,
+             $0.reservado ? "r" : "n", $0.ano]
+                .joined(separator: "\t")
+        }
+        UserDefaults.standard.set(linhas, forKey: chave)
+        UserDefaults.standard.synchronize()
+    }
+}

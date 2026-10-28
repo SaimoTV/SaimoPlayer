@@ -1,0 +1,1801 @@
+import SwiftUI
+import AppKit
+import AVKit
+import AVFoundation
+import MediaPlayer
+import Combine
+
+struct PlaybackStats {
+    var resolution: String = "—"
+    var observedBitrate: Double = 0
+    var indicatedBitrate: Double = 0
+    var droppedFrames: Int = 0
+    var stalls: Int = 0
+    var bufferedAhead: Double = 0
+    var behindLive: Double = 0
+}
+
+struct MediaChoice: Identifiable, Hashable {
+    let id: String
+    let title: String
+}
+
+@MainActor
+final class PlayerModel: NSObject, ObservableObject {
+    static let shared = PlayerModel()
+
+    // Library
+    @Published var channels: [Channel] = [] { didSet { conferirSegundaTela() } }
+    @Published var favorites: Set<String> = []
+    @Published var search: String = "" {
+        didSet {
+            Telemetria.shared.buscou(.live, search) { [weak self] in
+                !(self?.gruposDeCanais.isEmpty ?? true)
+            }
+        }
+    }
+    @Published var selection: UUID? { didSet { if selection != oldValue { play() } } }
+
+    // Playback
+    @Published private(set) var isPlaying = false
+    @Published var status: String = "parado"
+    @Published var generatedLink: URL?
+    @Published var volume: Double = 1.0 { didSet { applyVolume() } }
+    @Published var isMuted: Bool = Preferencias.isMuted {
+        didSet {
+            Preferencias.isMuted = isMuted
+            applyVolume()
+        }
+    }
+    /// Sem som enquanto a abertura do app está na tela: o último canal já
+    /// abre por baixo dela. Não é guardado, ao contrário do mudo.
+    var silenciadoPelaAbertura = false { didSet { applyVolume() } }
+    /// O som do Mac fixado pelo Saimo Connect: "0" (tela principal), "1"
+    /// (segunda tela) ou "mute". Nulo segue a regra de sempre — o som vai com
+    /// a tela ativa. Ver SaimoConnect.swift.
+    var somDoConnect: String? { didSet { applyVolume() } }
+    @Published var rate: Float = 1.0 { didSet { if isPlaying { player.rate = rate } } }
+    @Published var fillScreen: Bool = Preferencias.fillScreen {
+        didSet { Preferencias.fillScreen = fillScreen }
+    }
+    @Published var audioInteligente: Bool = Preferencias.audioInteligente {
+        didSet {
+            Preferencias.audioInteligente = audioInteligente
+            applyVolume()
+        }
+    }
+    @Published var zeroDelay: String = Preferencias.zeroDelay {
+        didSet {
+            Preferencias.zeroDelay = zeroDelay
+            aplicarZeroDelay()
+        }
+    }
+    @Published var isPiPActive = false
+    @Published var isPiPPossible = false
+    @Published var alwaysOnTop: Bool = Preferencias.alwaysOnTop {
+        didSet {
+            Preferencias.alwaysOnTop = alwaysOnTop
+            applyAlwaysOnTop()
+        }
+    }
+    @Published var showStats: Bool = Preferencias.showStats {
+        didSet { Preferencias.showStats = showStats }
+    }
+    @Published var showLog = false
+    @Published var showGuide = false
+    /// Channel list living in its own window pinned to the player.
+    /// A lista de canais numa janela à parte, ao lado do player. A lista de
+    /// sempre agora é a de vidro, dentro da janela (`PainelDeCanais`).
+    @Published var detachedList: Bool = Preferencias.detachedList {
+        didSet { Preferencias.detachedList = detachedList }
+    }
+    @Published var abrirNoCanal: Bool = Preferencias.abrirNoCanal {
+        didSet { Preferencias.abrirNoCanal = abrirNoCanal }
+    }
+    @Published var upscaling: String = Preferencias.upscaling {
+        didSet { Preferencias.upscaling = upscaling }
+    }
+    @Published var stats = PlaybackStats()
+
+    /// Qual das fontes do canal está no ar, e se ela ainda está carregando.
+    ///
+    /// Um canal costuma ter três ou quatro fontes e o proxy desce para a
+    /// seguinte sozinho quando uma falha. Sem mostrar isso, uma imagem que
+    /// demora é indistinguível de uma que não vem, e não há como saber que a
+    /// primeira fonte morreu e a segunda salvou o canal.
+    @Published var sourceIndex = 0
+    @Published var sourceCount = 1
+    @Published var sourceHost = ""
+    @Published var isLoadingSource = false
+
+    /// Filme ou episódio no ar, em vez de canal. Guardado porque quase tudo
+    /// aqui é feito para canal ao vivo — reconexão, vigia de travamento, faixa
+    /// de fonte — e nada disso vale para um arquivo que tem começo e fim.
+    @Published private(set) var playingFile: URL?
+    @Published private(set) var playingFileName = ""
+    /// Linha de apoio do arquivo: versão, temporada e episódio. É o que existe
+    /// para dizer — a lista de origem não traz sinopse nem gênero.
+    @Published private(set) var playingFileDetail = ""
+    /// Onde o arquivo no ar deve ser guardado. Ver Progresso.
+    private var chaveArquivo = ""
+
+    /// O episódio no ar, com a lista da série para achar o seguinte.
+    @Published private(set) var episodioNoAr: EpisodioNoAr?
+    /// Quem abre um episódio deixa aqui antes de chamar `playFile`: a escolha
+    /// de fonte pode passar por uma janela no meio do caminho.
+    var episodioPendente: EpisodioNoAr?
+    /// O painel de episódios aberto por cima do vídeo (tecla E).
+    @Published var painelEpisodios = false
+    /// Abertura, recapitulação e créditos do que está no ar (TheIntroDB).
+    @Published private(set) var marcas: Pulos.Marcas?
+
+    // Legendas do OpenSubtitles (Legendas.swift): à parte das que vêm no
+    // próprio vídeo, e desenhadas por cima dele.
+    @Published private(set) var legendasExt: [Legendas.Opcao] = []
+    @Published private(set) var legendaExt: Legendas.Opcao?
+    @Published private(set) var legendaAtraso: Double = 0
+    @Published private(set) var legendaAviso: String?
+    /// As falas da escolhida. Não é publicada: a tela as lê a cada instante.
+    private(set) var falasExt: [Legendas.Fala] = []
+    private var legendaBusca: Task<Void, Never>?
+    private var legendaDownload: Task<Void, Never>?
+    /// Quando o cartão do próximo episódio subiu, e se foi dispensado.
+    @Published private(set) var proximoDesde: Date?
+    @Published private(set) var proximoDispensado = false
+    static let esperaDoProximo: TimeInterval = 10
+
+    private var ultimoGuardado: Double = -100
+
+    /// Para o monitor: quando a abertura começou e se a queda já foi contada.
+    private var aberturaEm = Date()
+    private var caiuAvisado = false
+    private var indiceVisto = -1
+
+    /// O que está no ar, do jeito que o monitor quer ouvir.
+    private var noAr: (tipo: Telemetria.Tipo, titulo: String, url: URL?, fonte: Int, fontes: Int)? {
+        if playingFile != nil {
+            let i = min(fileSourceIndex, max(fileSources.count - 1, 0))
+            return (.vod, playingFileName, fileSources.indices.contains(i) ? fileSources[i] : nil, i + 1, fileSources.count)
+        }
+        guard let channel = selectedChannel, !channel.variants.isEmpty else { return nil }
+        let i = min(ProxyServer.shared.variantIndex(channel), channel.variants.count - 1)
+        return (.live, channel.name, channel.variants[i].url, i + 1, channel.variants.count)
+    }
+
+    /// Onde o que está tocando parou. De cinco em cinco segundos, que é o
+    /// bastante para não perder nada e pouco o bastante para não escrever em
+    /// disco a cada quadro.
+    private func guardarProgresso(forcado: Bool = false) {
+        guard playingFile != nil, !chaveArquivo.isEmpty, duration > 0 else { return }
+        guard forcado || abs(position - ultimoGuardado) >= 5 else { return }
+        ultimoGuardado = position
+        Progresso.salvar(chaveArquivo, posicao: position, duracao: duration)
+    }
+    /// Posição e duração do arquivo, para a barra de progresso. Um canal ao
+    /// vivo não tem duração, e é por isso que a barra só aparece no arquivo.
+    @Published var duration: Double = 0
+    @Published var position: Double = 0
+    /// Enquanto a pessoa arrasta, o relógio do player não manda na barra: ela
+    /// pularia de volta a cada segundo e seria impossível mirar.
+    @Published var scrubbing = false
+
+    // Tracks
+    @Published var audioChoices: [MediaChoice] = []
+    @Published var subtitleChoices: [MediaChoice] = []
+    @Published var qualityChoices: [MediaChoice] = [
+        MediaChoice(id: "auto", title: "Automática")
+    ]
+    @Published var selectedAudio: String?
+    @Published var selectedSubtitle: String?
+    @Published var selectedQuality = "auto"
+
+    var selectedAudioTitle: String {
+        audioChoices.first(where: { $0.id == selectedAudio })?.title ?? "Padrão"
+    }
+
+    var selectedSubtitleTitle: String {
+        subtitleChoices.first(where: { $0.id == selectedSubtitle })?.title ?? "Desligado"
+    }
+
+    var selectedQualityTitle: String {
+        qualityChoices.first(where: { $0.id == selectedQuality })?.title ?? "Automática"
+    }
+
+    let player = AVPlayer()
+
+    /// Multi tela: um segundo canal ao lado do principal. Só uma das duas
+    /// telas está ativa por vez — é ela que tem som e que a lista e o teclado
+    /// trocam. Ver MultiTela.swift.
+    let segunda = SegundaTela()
+    @Published var multiTela = false
+    @Published var segundaAtiva = false
+
+    /// O ao vivo foi pedido com o acervo aberto: fica para quando ele fechar,
+    /// em vez de tocar escondido atrás da grade.
+    var aoVivoPendente = false
+
+    private var pip: AVPictureInPictureController?
+    private weak var surface: PlayerLayerView?
+    private var itemObservers: [NSKeyValueObservation] = []
+    private var playerObservers: [NSKeyValueObservation] = []
+    private var notificationTokens: [NSObjectProtocol] = []
+    private var statsTimer: Timer?
+    private var watchdog: Timer?
+    private var stalledSince: Date?
+    /// Último ponto do relógio do player, e quando ele andou pela última vez.
+    /// Relógio andando é imagem saindo — não importa o que o estado diga.
+    private var ultimoRelogio: Double = -1
+    private var reconnectAttempt = 0
+    /// Se a fonte atual chegou a entregar imagem desde que o canal abriu.
+    /// Enquanto não chegou, uma falha significa fonte ruim, não rede ruim.
+    private var playedSinceOpen = false
+    private var ultimoPulo = Date.distantPast
+    private var retomou = false
+    private var sourcesTried = 0
+    /// Fontes do arquivo no ar, em ordem. O mesmo filme vem das duas listas.
+    private var fileSources: [URL] = []
+    private var fileSourceIndex = 0
+    /// Rótulos legíveis de cada fonte do arquivo no ar (sem servidor ou endereço).
+    @Published private(set) var fileSourceLabels: [String] = []
+    private var fileBaseDetail: String = ""
+    /// Se a fonte atual já foi tentada pelo atalho local.
+    private var fonteViaProxy = false
+    /// A fonte em que a série no ar vem tocando; vale só para esta sessão.
+    private var fontePreferida: FontePreferida.Memoria?
+
+    /// Um master HLS publicado como `.txt` precisa passar pelo proxy de
+    /// playlists desde o primeiro pedido. Servi-lo direto faz o AVFoundation
+    /// acreditar que é texto; mandá-lo ao proxy de MP4 também não reescreveria
+    /// variantes, áudios, legendas e segmentos relativos.
+    private func fonteDeArquivo(_ origem: URL) -> (url: URL, peloProxy: Bool) {
+        guard origem.pathExtension.lowercased() == "txt" else { return (origem, false) }
+        let canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
+                            source: origem)
+        ProxyServer.shared.register(canal)
+        return (ProxyServer.shared.link(for: canal), true)
+    }
+
+    private var sleepAssertion: NSObjectProtocol?
+    private var audioGroup: AVMediaSelectionGroup?
+    private var subtitleGroup: AVMediaSelectionGroup?
+    private var audioOptions: [String: AVMediaSelectionOption] = [:]
+    private var subtitleOptions: [String: AVMediaSelectionOption] = [:]
+    private var qualityBitrates: [String: Double] = [:]
+
+    /// Extra line-up, present only after the code is typed. Deliberately not
+    /// persisted: closing the app locks it again, so the next person to open it
+    /// sees the same list as everyone else.
+    private(set) var restrictedUnlocked = false
+    /// Lista restrita em uso: a publicada em `restritos.txt`, ou a de fábrica.
+    private var restritos: [Channel] = []
+    private var typed = ""
+    private var typedAt = Date.distantPast
+
+    private override init() {
+        // Antes de qualquer leitura de disco: a primeira execução desta versão
+        // apaga as listas que as anteriores guardaram (ver `Migracao`).
+        Migracao.executarSeNecessario()
+        super.init()
+        restritos = RemoteCatalog.restritosEmCache()
+        channels = MinhasListas.juntar(FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels()))
+        favorites = Store.favorites()
+        volume = Store.volume()
+        for c in channels { ProxyServer.shared.register(c) }
+        player.automaticallyWaitsToMinimizeStalling = true
+        // Required for the AirPlay picker to offer receivers rather than only
+        // mirroring; the proxy advertises a LAN URL the receiver can reach.
+        player.allowsExternalPlayback = true
+        applyVolume()
+        observePlayer()
+        setupRemoteCommands()
+        // Abre no canal que estava no ar quando o app fechou, como a TV.
+        let ultimo = UserDefaults.standard.string(forKey: "ultimoCanal")
+        selection = channels.first { $0.name == ultimo }?.id ?? channels.first?.id
+        EPGService.shared.load(channels: channels)
+        refreshCatalog()
+        vigiarFontesDesativadas()
+    }
+
+    /// Confere a lista de servidores desligados de dez em dez minutos — ela
+    /// só vai à rede quando a guardada passou de uma hora (ver
+    /// `FontesDesativadas.validade`).
+    ///
+    /// Desligar um provedor no painel tem que valer sem ninguém fechar o app:
+    /// quem está assistindo quando a fonte morre é justamente quem precisa que
+    /// ela suma. Quando a lista muda, a lista de canais é remontada na hora.
+    private func vigiarFontesDesativadas() {
+        Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                if await FontesDesativadas.atualizar() {
+                    self?.refreshCatalog()
+                }
+                try? await Task.sleep(nanoseconds: 600 * 1_000_000_000)
+            }
+        }
+    }
+
+    /// Picks up the published list without disturbing what is on screen: the
+    /// channel being watched keeps playing if it survived the update.
+    private func refreshCatalog() {
+        // Sem endereço dos canais não há pedido de rede nenhum.
+        guard Enderecos.canais != nil else { return }
+        Task { @MainActor in
+            guard let fresh = await RemoteCatalog.fetch() else {
+                Log.shared.write("lista publicada indisponível — usando a que já estava")
+                return
+            }
+            Log.shared.write("lista publicada: \(fresh.count) canais")
+            let playing = selectedChannel?.name
+            if let novos = await RemoteCatalog.baixarRestritos() { trocarRestritos(novos) }
+            let extra = restrictedUnlocked ? restritos : []
+            // O que o painel desligou some aqui, antes de a lista chegar à
+            // tela: canal sem nenhuma fonte não abriria mesmo.
+            await FontesDesativadas.atualizar()
+            let updated = MinhasListas.juntar(FontesDesativadas.peneirar(fresh + Store.customChannels() + extra))
+            guard updated != channels else { return }
+
+            channels = updated
+            for c in channels { ProxyServer.shared.register(c) }
+            if let playing, let same = channels.first(where: { $0.name == playing }) {
+                if same.id != selection { selection = same.id }
+            } else if selection == nil || !channels.contains(where: { $0.id == selection }) {
+                selection = channels.first?.id
+            }
+            EPGService.shared.load(channels: channels)
+        }
+    }
+
+    /// O endereço dos canais foi salvo, trocado ou apagado (Ajustes > Listas).
+    ///
+    /// Os arquivos antigos já foram apagados do disco; aqui a lista na tela
+    /// volta ao que o disco tem (nada) e, havendo endereço, a nova é buscada.
+    /// O que o usuário adicionou à mão (`Store.customChannels`) fica.
+    func recarregarListas() {
+        restritos = RemoteCatalog.restritosEmCache()
+        let extra = restrictedUnlocked ? restritos : []
+        channels = MinhasListas.juntar(FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels() + extra))
+        for c in channels { ProxyServer.shared.register(c) }
+        if selection == nil || !channels.contains(where: { $0.id == selection }) {
+            let antes = selection
+            selection = channels.first?.id
+            // Lista vazia: nada para tocar, e o canal antigo não pode ficar no ar.
+            if selection == nil, antes != nil { stop() }
+        }
+        EPGService.shared.load(channels: channels)
+        refreshCatalog()
+    }
+
+    // MARK: - Library
+
+    /// A lista dividida como na tela: favoritos à frente, depois cada
+    /// categoria com os seus, em ordem alfabética dentro do grupo.
+    var gruposDeCanais: [(categoria: Categoria, canais: [Channel])] {
+        let base = search.isEmpty
+            ? channels
+            : channels.filter { $0.name.localizedCaseInsensitiveContains(search) }
+        let ordenados = base.sorted {
+            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+        }
+        var favoritos: [Channel] = []
+        var porCategoria: [Categoria: [Channel]] = [:]
+        for canal in ordenados {
+            if isFavorite(canal) { favoritos.append(canal) }
+            else { porCategoria[Categoria.de(canal), default: []].append(canal) }
+        }
+        var out: [(categoria: Categoria, canais: [Channel])] = []
+        if !favoritos.isEmpty { out.append((.favoritos, favoritos)) }
+        for categoria in Categoria.allCases where categoria != .favoritos {
+            if let lista = porCategoria[categoria], !lista.isEmpty {
+                out.append((categoria, lista))
+            }
+        }
+        return out
+    }
+
+    /// A mesma lista em fila única, na ordem em que aparece na tela: é o que o
+    /// teclado percorre, e passar de um grupo para o outro tem de seguir o que
+    /// se vê.
+    var visibleChannels: [Channel] { gruposDeCanais.flatMap(\.canais) }
+
+    var selectedChannel: Channel? { channels.first { $0.id == selection } }
+
+    func isFavorite(_ c: Channel) -> Bool { favorites.contains(c.source.absoluteString) }
+
+    func toggleFavorite(_ c: Channel) {
+        let key = c.source.absoluteString
+        if favorites.contains(key) { favorites.remove(key) } else { favorites.insert(key) }
+        Store.setFavorites(favorites)
+    }
+
+    func addChannels(_ new: [Channel], persist: Bool = true) {
+        var added: [Channel] = []
+        for c in new where !channels.contains(where: { $0.id == c.id }) {
+            ProxyServer.shared.register(c)
+            channels.append(c)
+            added.append(c)
+        }
+        if persist, !added.isEmpty { Store.appendCustom(added) }
+        Log.shared.write("adicionados \(added.count) canal(is)")
+        if selection == nil { selection = channels.first?.id }
+    }
+
+    func removeChannel(_ c: Channel) {
+        channels.removeAll { $0.id == c.id }
+        Store.removeCustom(c)
+        if selection == c.id { selection = channels.first?.id }
+    }
+
+    func step(_ delta: Int) {
+        let list = visibleChannels
+        guard !list.isEmpty else { return }
+        // Na multi tela o passo vale para a tela ativa.
+        let naSegunda = multiTela && segundaAtiva
+        let atual = naSegunda ? (segunda.canal?.id ?? selection) : selection
+        let idx = list.firstIndex { $0.id == atual } ?? 0
+        let next = (idx + delta + list.count) % list.count
+        if naSegunda { tocarNaSegunda(list[next]) } else { selection = list[next].id }
+    }
+
+    // MARK: - Playback
+
+    func play() {
+        guard let channel = selectedChannel else { return }
+        // Com o acervo aberto o ao vivo não toca: fica para quando ele fechar.
+        if VodEstado.shared.secao != nil {
+            aoVivoPendente = true
+            return
+        }
+        aoVivoPendente = false
+        guardarProgresso(forcado: true)
+        UserDefaults.standard.set(channel.name, forKey: "ultimoCanal")
+        episodioNoAr = nil
+        fontePreferida = nil
+        painelEpisodios = false
+        marcas = nil
+        zerarLegendasExternas()
+        proximoDesde = nil
+        playingFile = nil
+        chaveArquivo = ""
+        duration = 0
+        position = 0
+        let link = ProxyServer.shared.link(for: channel)
+        generatedLink = link
+        status = "carregando…"
+        reconnectAttempt = 0
+        playedSinceOpen = false
+        sourcesTried = 0
+        Log.shared.write("abrindo \(channel.name) — \(link.absoluteString)")
+        load(link, channel: channel)
+        aberturaEm = Date()
+        caiuAvisado = false
+        if let n = noAr {
+            indiceVisto = n.fonte - 1
+            Telemetria.shared.comecou(.live, n.titulo, url: n.url, fonte: n.fonte)
+        }
+    }
+
+    /// Encerra qualquer arquivo de VOD (filme/série) em reprodução e retorna
+    /// imediatamente ao canal de TV ao vivo ativo.
+    func voltarAoVivo() {
+        guardarProgresso(forcado: true)
+        stop()
+        playingFile = nil
+        playingFileName = ""
+        playingFileDetail = ""
+        chaveArquivo = ""
+        episodioNoAr = nil
+        painelEpisodios = false
+        fileSources = []
+        fileSourceIndex = 0
+        fileSourceLabels = []
+        fileBaseDetail = ""
+        aoVivoPendente = false
+        if let canal = canalAtivo ?? channels.first(where: { $0.id == selection }) ?? channels.first {
+            if selection != canal.id {
+                selection = canal.id
+            } else {
+                play()
+            }
+        } else {
+            play()
+        }
+    }
+
+    /// Toca um arquivo — filme ou episódio — em vez de um canal.
+    ///
+    /// Vai direto ao endereço, sem passar pelo proxy: um mp4 progressivo o
+    /// AVFoundation lê sozinho, e o proxy só existe para reescrever playlist e
+    /// remontar o que ele recusa. O provedor responde 302 para uma URL com
+    /// token, e o redirecionamento o próprio AVFoundation segue.
+    ///
+    /// A seleção de canal fica como está, de propósito: a lista lateral é uma
+    /// List ligada a ela, e zerá-la fazia a própria lista devolver um canal —
+    /// que entrava por cima do filme antes do primeiro quadro.
+    func playFile(_ urls: [URL], indiceInicial: Int = 0, rotulos: [String] = [],
+                  nome: String, detalhe: String = "", detalheBase: String? = nil, chave: String = "") {
+        guard !urls.isEmpty else { return }
+        let indice = urls.indices.contains(indiceInicial) ? indiceInicial : 0
+        let primeira = urls[indice]
+        guardarProgresso(forcado: true)
+        aoVivoPendente = false
+        episodioNoAr = episodioPendente
+        episodioPendente = nil
+        // Outra série (ou um filme): a fonte lembrada deixa de valer.
+        if fontePreferida?.serie != episodioNoAr?.serie { fontePreferida = nil }
+        marcas = nil
+        proximoDesde = nil
+        proximoDispensado = false
+        if let ep = episodioNoAr, let tmdb = Generos.id(ep.serie, serie: true) {
+            let (t, n) = (ep.temporada, ep.numero)
+            Task { @MainActor [weak self] in
+                let achadas = await Pulos.buscar(tmdb: tmdb, temporada: t, episodio: n)
+                guard let self, self.episodioNoAr == ep else { return }
+                self.marcas = achadas
+            }
+        }
+        zerarLegendasExternas()
+        if let ep = episodioNoAr, let tmdb = Generos.id(ep.serie, serie: true) {
+            buscarLegendasExternas(tmdb: tmdb, serie: true, temporada: ep.temporada, episodio: ep.numero)
+        } else if episodioNoAr == nil, let tmdb = Generos.id(nome, serie: false) {
+            buscarLegendasExternas(tmdb: tmdb, serie: false, temporada: 0, episodio: 0)
+        }
+        chaveArquivo = chave
+        ultimoGuardado = -100
+        fileSources = urls
+        fileSourceIndex = indice
+        fileSourceLabels = rotulos
+        fileBaseDetail = detalheBase ?? detalhe
+        playingFileName = nome
+        let preparada = fonteDeArquivo(primeira)
+        fonteViaProxy = preparada.peloProxy
+        playingFile = preparada.url
+        retomou = false
+        playingFileDetail = detalheAtualDoArquivo(detalheInicial: detalhe)
+        duration = 0
+        position = 0
+        generatedLink = preparada.url
+        status = "carregando…"
+        reconnectAttempt = 0
+        playedSinceOpen = false
+        sourcesTried = 0
+        sourceCount = urls.count
+        sourceIndex = indice
+        sourceHost = primeira.host ?? ""
+        Log.shared.write("abrindo \(nome) — \(primeira.absoluteString)")
+        load(preparada.url, channel: nil)
+        aberturaEm = Date()
+        caiuAvisado = false
+        Telemetria.shared.comecou(.vod, nome, url: primeira, fonte: indice + 1)
+    }
+
+    private func detalheAtualDoArquivo(detalheInicial: String? = nil) -> String {
+        if fileSourceLabels.indices.contains(fileSourceIndex), !fileSourceLabels[fileSourceIndex].isEmpty {
+            let rotulo = fileSourceLabels[fileSourceIndex]
+            return fileBaseDetail.isEmpty ? rotulo : "\(fileBaseDetail) · \(rotulo)"
+        }
+        if let d = detalheInicial, !d.isEmpty { return d }
+        return fileBaseDetail
+    }
+
+    /// Rótulo legível da fonte `indice` do arquivo no ar (sem servidor ou URL).
+    func rotuloDaFonteDoArquivo(_ indice: Int) -> String {
+        if fileSourceLabels.indices.contains(indice), !fileSourceLabels[indice].isEmpty {
+            return fileSourceLabels[indice]
+        }
+        guard fileSources.indices.contains(indice) else { return "Fonte \(indice + 1)" }
+        let url = fileSources[indice].absoluteString
+        if let q = Vod.qualidade(de: url)?.uppercased() {
+            return "Fonte \(indice + 1) · \(q)"
+        }
+        return "Fonte \(indice + 1)"
+    }
+
+    /// Onde o próximo arquivo aberto deve começar, em segundos, no lugar do
+    /// ponto guardado. É o "começar em" do Saimo Connect.
+    var inicioPedido: Double?
+
+    /// O endereço de origem do arquivo no ar (sem o atalho local).
+    var fonteDoArquivoNoAr: URL? {
+        fileSources.indices.contains(fileSourceIndex) ? fileSources[fileSourceIndex] : nil
+    }
+
+    /// Troca diretamente para a fonte `indice` do arquivo no ar, mantendo o ponto.
+    func escolherFonteDoArquivo(_ indice: Int) {
+        guard playingFile != nil, fileSources.indices.contains(indice) else { return }
+        if indice == fileSourceIndex, isPlaying { return }
+        let retomar = position
+        fileSourceIndex = indice
+        let proxima = fileSources[fileSourceIndex]
+        let preparada = fonteDeArquivo(proxima)
+        fonteViaProxy = preparada.peloProxy
+        playingFile = preparada.url
+        generatedLink = preparada.url
+        sourceIndex = fileSourceIndex
+        sourceHost = proxima.host ?? ""
+        playingFileDetail = detalheAtualDoArquivo()
+        playedSinceOpen = false
+        retomou = true
+        reconnectAttempt = 0
+        status = "carregando…"
+        Log.shared.write("\(playingFileName): fonte \(fileSourceIndex + 1) de \(fileSources.count)")
+        load(preparada.url, channel: nil)
+        if retomar > 5 { seekQuandoPuder(retomar) }
+    }
+
+    /// Troca a fonte do arquivo no ar pela seguinte (ou anterior), do mesmo
+    /// ponto. É o "trocar fonte" do Saimo Connect num filme ou episódio.
+    func trocarFonteDoArquivo(_ delta: Int) {
+        guard playingFile != nil, fileSources.count > 1 else { return }
+        let proximoIndice = ((fileSourceIndex + delta) % fileSources.count + fileSources.count) % fileSources.count
+        escolherFonteDoArquivo(proximoIndice)
+    }
+
+    func playVariant(_ channel: Channel, index: Int) {
+        ProxyServer.shared.forceVariant(channel, index)
+        sourceIndex = index
+        if selection != channel.id {
+            selection = channel.id
+        } else {
+            play()
+        }
+    }
+
+    private func load(_ link: URL, channel: Channel?) {
+        tearDownItemObservers()
+
+        let asset = AVURLAsset(url: link, options: [
+            // O "Accept" vai junto porque há origem que recusa quem não manda
+            // nenhum — o EmbedPlayer, dos doramas e animes novos, responde 200
+            // com "security error" no lugar da playlist.
+            "AVURLAssetHTTPHeaderFieldsKey": [
+                "User-Agent": Upstream.userAgent,
+                "Accept": "*/*",
+            ]
+        ])
+        let item = AVPlayerItem(asset: asset)
+        if channel != nil {
+            configurarLiveZeroDelay(item)
+        } else {
+            item.preferredForwardBufferDuration = 6
+        }
+        applyQuality(to: item)
+
+        itemObservers.append(item.observe(\.status, options: [.new]) { [weak self] it, _ in
+            Task { @MainActor in self?.itemStatusChanged(it) }
+        })
+        itemObservers.append(item.observe(\.presentationSize, options: [.new]) { [weak self] it, _ in
+            Task { @MainActor in
+                let s = it.presentationSize
+                if s.width > 0 { self?.stats.resolution = "\(Int(s.width))×\(Int(s.height))" }
+            }
+        })
+        itemObservers.append(item.observe(\.currentMediaSelection, options: [.initial, .new]) { [weak self] it, _ in
+            Task { @MainActor in self?.syncSelectedMediaOptions(for: it) }
+        })
+
+        let center = NotificationCenter.default
+        notificationTokens.append(center.addObserver(
+            forName: .AVPlayerItemPlaybackStalled, object: item, queue: .main) { [weak self] _ in
+                Task { @MainActor in
+                    self?.stats.stalls += 1
+                    Log.shared.write("stall detectado")
+                }
+            })
+        notificationTokens.append(center.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
+                Task { @MainActor in self?.terminouArquivo() }
+            })
+        notificationTokens.append(center.addObserver(
+            forName: .AVPlayerItemFailedToPlayToEndTime, object: item, queue: .main) { [weak self] _ in
+                Task { @MainActor in self?.scheduleReconnect(reason: "falha ao reproduzir") }
+            })
+        notificationTokens.append(center.addObserver(
+            forName: .AVPlayerItemNewErrorLogEntry, object: item, queue: .main) { [weak self] _ in
+                Task { @MainActor in
+                    if let e = item.errorLog()?.events.last {
+                        Log.shared.write("erro HLS: \(e.errorComment ?? "\(e.errorStatusCode)")")
+                    }
+                    _ = self
+                }
+            })
+
+        ultimoRelogio = -1
+        player.replaceCurrentItem(with: item)
+        player.rate = rate
+        isPlaying = true
+        startTimers()
+        loadMediaOptions(for: asset, item: item)
+        if let channel {
+            TocandoAgora.shared.aoVivo(channel)
+        } else {
+            TocandoAgora.shared.arquivo(nome: playingFileName, episodio: episodioNoAr)
+        }
+        preventSleep(true)
+    }
+
+    private func itemStatusChanged(_ item: AVPlayerItem) {
+        switch item.status {
+        case .readyToPlay:
+            syncSelectedMediaOptions(for: item)
+            if !playedSinceOpen, let n = noAr {
+                Telemetria.shared.tocou(n.tipo, n.titulo, url: n.url, fonte: n.fonte,
+                                        ms: Int(Date().timeIntervalSince(aberturaEm) * 1000))
+            }
+            status = "tocando"
+            reconnectAttempt = 0
+            sourcesTried = 0
+            playedSinceOpen = true
+            stalledSince = nil
+            if selectedChannel != nil && zeroDelay != "off" {
+                jumpToLive()
+            }
+            // Volta ao ponto em que parou, uma vez só por abertura. O ponto
+            // pedido pelo celular (Saimo Connect) vale mais que o guardado.
+            if playingFile != nil, !retomou, !chaveArquivo.isEmpty || inicioPedido != nil {
+                retomou = true
+                let ponto = inicioPedido ?? Progresso.posicao(chaveArquivo)
+                inicioPedido = nil
+                if ponto > 0 { seekQuandoPuder(ponto) }
+            }
+            Log.shared.write("pronto — reproduzindo")
+        case .failed:
+            let msg = item.error?.localizedDescription ?? "erro desconhecido"
+            Log.shared.write("item falhou: \(msg)")
+            scheduleReconnect(reason: msg)
+        default:
+            break
+        }
+    }
+
+    // MARK: - Pular abertura e próximo episódio
+
+    /// O trecho que dá para pular agora, se houver.
+    var puloNaTela: Pulos.Trecho? {
+        guard playingFile != nil else { return nil }
+        return marcas?.em(position, duracao: duration)
+    }
+
+    func pularTrecho() {
+        guard let trecho = puloNaTela else { return }
+        seek(to: trecho.fim ?? max(duration - 1, 0))
+    }
+
+    /// O episódio seguinte, quando o cartão dele está à vista.
+    var proximoNaTela: (episodio: Episodio, resta: Int)? {
+        guard let desde = proximoDesde, !proximoDispensado,
+              let seguinte = episodioNoAr?.seguinte() else { return nil }
+        let resta = max(1, Int((Self.esperaDoProximo - Date().timeIntervalSince(desde)).rounded(.up)))
+        return (seguinte, resta)
+    }
+
+    func dispensarProximo() { proximoDispensado = true }
+
+    @discardableResult
+    func tocarProximo() -> Bool {
+        guard let seguinte = episodioNoAr?.seguinte() else { return false }
+        tocarEpisodio(seguinte)
+        return true
+    }
+
+    /// Troca o episódio no ar por outro da mesma série, pelo mesmo caminho do
+    /// próximo episódio: legendas, pulos e progresso seguem valendo.
+    func tocarEpisodio(_ escolhido: Episodio) {
+        guard let ep = episodioNoAr else { return }
+        let rotulo = escolhido.versao == "leg" ? "Legendado" : "Dublado"
+        let urls = fontesPreferidas(serie: ep.serie, urls: escolhido.urls)
+        let total = urls.count
+        let rotulos = urls.enumerated().map { idx, u -> String in
+            let selo = Vod.qualidade(de: u).map { " · \($0.uppercased())" } ?? ""
+            return "\(rotulo)\(selo) · Fonte \(idx + 1) de \(total)"
+        }
+        let base = "Temporada \(escolhido.temporada), episódio \(escolhido.numero)"
+        episodioPendente = EpisodioNoAr(serie: ep.serie, temporada: escolhido.temporada,
+                                        numero: escolhido.numero, versao: escolhido.versao, lista: ep.lista)
+        playFile(urls.compactMap(URL.init(string:)), indiceInicial: 0, rotulos: rotulos,
+                 nome: ep.serie,
+                 detalhe: rotulos.first.map { "\(base) · \($0)" } ?? "\(base) · \(rotulo)",
+                 detalheBase: base,
+                 chave: Progresso.chaveEpisodio(ep.serie, escolhido.temporada, escolhido.numero))
+    }
+
+    /// Guarda a fonte que está de fato no ar (a escolhida, a de fábrica ou a
+    /// que o player desceu sozinho) como a preferida para o resto da série.
+    private func lembrarFonteNoAr() {
+        guard let ep = episodioNoAr, playingFile != nil,
+              fileSources.indices.contains(fileSourceIndex) else { return }
+        let url = fileSources[fileSourceIndex].absoluteString
+        // A posição é na lista do próprio episódio, não na que foi reordenada.
+        let doEpisodio = ep.lista.first {
+            $0.temporada == ep.temporada && $0.numero == ep.numero && $0.versao == ep.versao
+        }?.urls ?? []
+        let posicao = doEpisodio.firstIndex { URL(string: $0)?.absoluteString == url } ?? fileSourceIndex
+        fontePreferida = FontePreferida.Memoria(
+            serie: ep.serie, host: FontePreferida.host(de: url), posicao: posicao)
+    }
+
+    /// As fontes do próximo episódio da série no ar, com a de sempre na frente.
+    /// Sem nada lembrado (ou noutra série), devolve a lista como veio.
+    func fontesPreferidas(serie: String, urls: [String]) -> [String] {
+        if episodioNoAr?.serie == serie { lembrarFonteNoAr() }
+        guard let m = fontePreferida, m.serie == serie else { return urls }
+        return FontePreferida.ordenar(urls, host: m.host, posicao: m.posicao)
+    }
+
+    /// Se há fonte lembrada para esta série.
+    func fonteLembrada(_ serie: String) -> Bool { fontePreferida?.serie == serie }
+
+    /// A cada volta do relógio: sobe o cartão nos créditos e segue sozinho.
+    private func acompanharEpisodio() {
+        guard episodioNoAr?.seguinte() != nil, !proximoDispensado, playedSinceOpen else { return }
+        // Os créditos marcados; sem marca, os últimos 30 s de um episódio.
+        let creditos = marcas?.creditos ?? (duration > 300 ? duration - 30 : .infinity)
+        if position >= creditos, proximoDesde == nil {
+            proximoDesde = Date()
+        } else if position < creditos - 5, proximoDesde != nil {
+            proximoDesde = nil
+        }
+        if let desde = proximoDesde, Date().timeIntervalSince(desde) >= Self.esperaDoProximo, isPlaying {
+            tocarProximo()
+        }
+    }
+
+    /// O arquivo chegou ao fim. Nos primeiros segundos é fonte quebrada, não
+    /// fim de filme: desce para a próxima. Episódio emenda no seguinte.
+    private func terminouArquivo() {
+        guard playingFile != nil else { return }
+        let cedo = position < 30 || (duration > 0 && duration < 120)
+        if cedo, fileSourceIndex + 1 < fileSources.count {
+            playedSinceOpen = false
+            scheduleReconnect(reason: "terminou em \(Int(position)) s")
+            return
+        }
+        tocarProximo()
+    }
+
+    /// Ao vivo não pausa: só filme e série têm pausa.
+    var podePausar: Bool { playingFile != nil }
+
+    func togglePlayPause() {
+        if isPlaying && !podePausar { return }
+        if isPlaying {
+            player.pause()
+            isPlaying = false
+            status = "pausado"
+            preventSleep(false)
+        } else if player.currentItem != nil {
+            player.rate = rate
+            isPlaying = true
+            status = "tocando"
+            preventSleep(true)
+        } else {
+            play()
+        }
+        contarVideo()
+        avisarTocandoAgora()
+    }
+
+    /// O monitor só conta o tempo com o vídeo andando de verdade.
+    private func contarVideo() {
+        let altura = Int(player.currentItem?.presentationSize.height ?? 0)
+        Telemetria.shared.video(
+            rodando: playedSinceOpen,
+            pausado: !isPlaying,
+            carregando: isPlaying && player.timeControlStatus != .playing,
+            pulou: Date().timeIntervalSince(ultimoPulo) < 3,
+            qualidade: altura > 0 ? "\(altura)p" : nil)
+    }
+
+    func stop() {
+        Telemetria.shared.parou()
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+        tearDownItemObservers()
+        stopTimers()
+        isPlaying = false
+        status = "parado"
+        preventSleep(false)
+        TocandoAgora.shared.limpar()
+    }
+
+    func reload() {
+        Log.shared.write("recarregando fluxo")
+        play()
+    }
+
+    /// Jumps to the live edge of the sliding window.
+    func jumpToLive() {
+        if multiTela && segundaAtiva { segunda.irAoVivo(); return }
+        guard let item = player.currentItem else { return }
+        if zeroDelay == "equilibrado",
+           let range = item.seekableTimeRanges.last?.timeRangeValue {
+            let edge = CMTimeRangeGetEnd(range)
+            let alvo = CMTimeSubtract(edge, CMTime(seconds: 3.0, preferredTimescale: 600))
+            player.seek(to: alvo, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+                Task { @MainActor in
+                    self?.player.rate = self?.rate ?? 1
+                    self?.isPlaying = true
+                }
+            }
+        } else {
+            // agressivo: ponta máxima ao vivo (.positiveInfinity no AVPlayer)
+            player.seek(to: .positiveInfinity) { [weak self] _ in
+                Task { @MainActor in
+                    self?.player.rate = self?.rate ?? 1
+                    self?.isPlaying = true
+                }
+            }
+        }
+        Log.shared.write("pulou para o ao vivo (\(zeroDelay))")
+    }
+
+    // MARK: - Reconnect
+
+    private func avisarQueCaiu() {
+        guard !caiuAvisado, let n = noAr else { return }
+        caiuAvisado = true
+        Telemetria.shared.caiu(n.tipo, n.titulo, fontes: n.fontes)
+    }
+
+    private func scheduleReconnect(reason: String) {
+        if let n = noAr {
+            Telemetria.shared.falhou(n.tipo, n.titulo, url: n.url, fonte: n.fonte, detalhe: String(reason.prefix(200)))
+        }
+        if let arquivo = playingFile {
+            // Algumas origens respondem com um `Content-Range` que termina no
+            // fim do arquivo mesmo quando mandam só o pedaço pedido, e o
+            // AVFoundation para antes do primeiro quadro. O proxy local refaz o
+            // cabeçalho, então vale repetir a mesma fonte por ele antes de
+            // descartá-la — de outro modo dois quintos do acervo ficariam fora.
+            if !playedSinceOpen, !fonteViaProxy,
+               fileSourceIndex < fileSources.count,
+               let host = fileSources[fileSourceIndex].host, host != ProxyServer.shared.advertisedHost {
+                fonteViaProxy = true
+                let pelaCasa = ProxyServer.shared.vodLink(for: fileSources[fileSourceIndex])
+                playingFile = pelaCasa
+                status = "tentando pelo atalho local…"
+                Log.shared.write("\(playingFileName): \(reason) — repetindo pelo proxy local")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    guard let self, self.playingFile == pelaCasa else { return }
+                    self.load(pelaCasa, channel: nil)
+                }
+                return
+            }
+
+            // Enquanto o arquivo não entregou nada, é fonte ruim: desce para a
+            // seguinte antes de insistir na mesma.
+            if !playedSinceOpen, fileSources.count > 1, sourcesTried + 1 < fileSources.count {
+                sourcesTried += 1
+                fileSourceIndex = (fileSourceIndex + 1) % fileSources.count
+                let proxima = fileSources[fileSourceIndex]
+                let preparada = fonteDeArquivo(proxima)
+                fonteViaProxy = preparada.peloProxy
+                playingFile = preparada.url
+                sourceIndex = fileSourceIndex
+                sourceHost = proxima.host ?? ""
+                playingFileDetail = detalheAtualDoArquivo()
+                Telemetria.shared.comecou(.vod, playingFileName, url: proxima, fonte: fileSourceIndex + 1, nova: false)
+                status = "tentando a fonte \(fileSourceIndex + 1) de \(fileSources.count)…"
+                Log.shared.write("\(playingFileName): \(reason) — indo para a fonte \(fileSourceIndex + 1)")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                    guard let self, self.playingFile == preparada.url else { return }
+                    self.load(preparada.url, channel: nil)
+                }
+                return
+            }
+            if !playedSinceOpen { avisarQueCaiu() }
+            reconnectAttempt += 1
+            guard reconnectAttempt <= 4 else {
+                status = "falhou: \(reason)"
+                return
+            }
+            let retomar = position
+            status = "reconectando…"
+            Log.shared.write("\(playingFileName): \(reason) — tentando de novo")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                guard let self, self.playingFile == arquivo else { return }
+                self.load(arquivo, channel: nil)
+                if retomar > 5 { self.seek(to: retomar) }
+            }
+            return
+        }
+        guard let channel = selectedChannel else { return }
+
+        // Enquanto o canal não tocou nenhuma vez, o problema é a fonte, não a
+        // rede: em vez de insistir na mesma com espera crescente, desce para a
+        // seguinte de imediato. Só depois de rodar a lista inteira é que faz
+        // sentido esperar e tentar tudo de novo.
+        if !playedSinceOpen, channel.variants.count > 1, sourcesTried + 1 < channel.variants.count {
+            sourcesTried += 1
+            let next = (ProxyServer.shared.variantIndex(channel) + 1) % channel.variants.count
+            ProxyServer.shared.forceVariant(channel, next)
+            indiceVisto = next
+            Telemetria.shared.comecou(.live, channel.name, url: channel.variants[next].url, fonte: next + 1, nova: false)
+            status = "tentando a fonte \(next + 1) de \(channel.variants.count)…"
+            Log.shared.write("\(channel.name): \(reason) — indo para a fonte \(next + 1)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                // Sem item no player é porque o ao vivo foi parado no meio.
+                guard let self, self.player.currentItem != nil,
+                      let channel = self.selectedChannel else { return }
+                self.load(ProxyServer.shared.link(for: channel), channel: channel)
+            }
+            return
+        }
+
+        if !playedSinceOpen { avisarQueCaiu() }
+        reconnectAttempt += 1
+        guard reconnectAttempt <= 8 else {
+            status = "falhou: \(reason)"
+            Log.shared.write("desisti após 8 tentativas")
+            return
+        }
+        let delay = min(pow(1.6, Double(reconnectAttempt)), 20)
+        status = "reconectando (\(reconnectAttempt))…"
+        Log.shared.write("reconectando em \(String(format: "%.1f", delay))s — \(reason)")
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, self.player.currentItem != nil,
+                  let channel = self.selectedChannel else { return }
+            self.load(ProxyServer.shared.link(for: channel), channel: channel)
+        }
+    }
+
+    /// A duração só existe depois de o item carregar; retomar antes disso
+    /// cairia no zero.
+    private func seekQuandoPuder(_ segundos: Double) {
+        guard let item = player.currentItem else { return }
+        let total = item.duration.seconds
+        if total.isFinite, total > 0 {
+            // A duração publicada só é lida no tique de um segundo, e o seek
+            // depende dela: sem preenchê-la aqui, a retomada seria descartada
+            // por "duração zero" justamente na abertura.
+            duration = total
+            seek(to: segundos)
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            self?.seekQuandoPuder(segundos)
+        }
+    }
+
+    /// Vai para um ponto do arquivo. Tolerância zero para o quadro cair onde a
+    /// pessoa soltou, e não no ponto-chave mais próximo, que num filme pode
+    /// estar dez segundos adiante.
+    /// Anda no filme sem sair dele, mesmo antes de a duração ser conhecida.
+    func pular(_ segundos: Double) {
+        guard playingFile != nil else { return }
+        let atual = player.currentTime().seconds
+        let base = atual.isFinite ? atual : position
+        seek(to: max(0, base + segundos))
+    }
+
+    func seek(to seconds: Double) {
+        guard playingFile != nil, duration > 0 else { return }
+        let alvo = CMTime(seconds: max(0, min(seconds, duration)), preferredTimescale: 600)
+        position = seconds
+        ultimoPulo = Date()
+        player.seek(to: alvo, toleranceBefore: .zero, toleranceAfter: .zero)
+        avisarTocandoAgora()
+    }
+
+    // MARK: - Timers
+
+    private func startTimers() {
+        stopTimers()
+        statsTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.refreshStats() }
+        }
+        watchdog = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.checkStall() }
+        }
+    }
+
+    private func stopTimers() {
+        statsTimer?.invalidate(); statsTimer = nil
+        watchdog?.invalidate(); watchdog = nil
+    }
+
+    /// O proxy só decide a fonte quando o player pede a playlist, então a
+    /// escolha é lida de lá a cada segundo em vez de adivinhada aqui.
+    private func refreshSource() {
+        if playingFile != nil {
+            sourceCount = max(fileSources.count, 1)
+            sourceIndex = fileSourceIndex
+            isLoadingSource = player.timeControlStatus != .playing
+            return
+        }
+        guard let channel = selectedChannel else { return }
+        let index = ProxyServer.shared.variantIndex(channel)
+        let variant = channel.variants[min(index, channel.variants.count - 1)]
+        // O proxy trocou de fonte sozinho: a anterior falhou no meio do caminho.
+        if indiceVisto >= 0, indiceVisto != index, indiceVisto < channel.variants.count {
+            Telemetria.shared.falhou(.live, channel.name, url: channel.variants[indiceVisto].url,
+                                     fonte: indiceVisto + 1, detalhe: "o proxy trocou de fonte")
+            Telemetria.shared.comecou(.live, channel.name, url: variant.url, fonte: index + 1, nova: false)
+        }
+        indiceVisto = index
+        if sourceIndex != index { sourceIndex = index }
+        if sourceCount != channel.variants.count { sourceCount = channel.variants.count }
+        let host = variant.url.host ?? ""
+        if sourceHost != host { sourceHost = host }
+        let loading = !isPlaying || player.timeControlStatus != .playing
+        if isLoadingSource != loading { isLoadingSource = loading }
+    }
+
+    private func refreshStats() {
+        refreshSource()
+        contarVideo()
+        guard let item = player.currentItem else { return }
+        if playingFile != nil {
+            let total = item.duration.seconds
+            duration = total.isFinite && total > 0 ? total : 0
+            if !scrubbing {
+                let atual = player.currentTime().seconds
+                position = atual.isFinite ? atual : 0
+            }
+            guardarProgresso()
+            acompanharEpisodio()
+        }
+        avisarTocandoAgora()
+        // presentationSize only fires once the first frame is decoded, and the
+        // KVO can land before the layer is ready, so re-read it each tick.
+        let size = item.presentationSize
+        if size.width > 0 {
+            stats.resolution = "\(Int(size.width))×\(Int(size.height))"
+        }
+        if let e = item.accessLog()?.events.last {
+            stats.observedBitrate = e.observedBitrate
+            stats.indicatedBitrate = e.indicatedBitrate
+            stats.droppedFrames = max(stats.droppedFrames, e.numberOfDroppedVideoFrames)
+        }
+        if let buffered = item.loadedTimeRanges.last?.timeRangeValue {
+            let end = CMTimeGetSeconds(CMTimeRangeGetEnd(buffered))
+            stats.bufferedAhead = max(0, end - CMTimeGetSeconds(item.currentTime()))
+        }
+        if let seekable = item.seekableTimeRanges.last?.timeRangeValue {
+            let edge = CMTimeGetSeconds(CMTimeRangeGetEnd(seekable))
+            stats.behindLive = max(0, edge - CMTimeGetSeconds(item.currentTime()))
+        }
+        if selectedChannel != nil && isPlaying && player.timeControlStatus == .playing {
+            aplicarLiveCatchUp(item)
+        }
+    }
+
+    /// AVPlayer keeps "waiting to play" forever on a dead live source; reconnect instead.
+    ///
+    /// O estado sozinho mente: numa transmissão ao vivo o player entra em
+    /// `waitingToPlayAtSpecifiedRate` a cada respiro do buffer, e tratar isso
+    /// como queda trocava a fonte com o canal vivo na tela. Quem decide aqui é
+    /// o relógio do player: enquanto ele anda, sai imagem, e não há queda —
+    /// só depois de ele ficar parado por tempo demais é que vale reconectar.
+    private func checkStall() {
+        guard isPlaying else { stalledSince = nil; ultimoRelogio = -1; return }
+
+        let agora = player.currentTime().seconds
+        if agora.isFinite, agora > ultimoRelogio + 0.25 {
+            ultimoRelogio = agora
+            stalledSince = nil
+            return
+        }
+        // Relógio para trás é linha do tempo nova — fonte trocada por baixo ou
+        // um pulo no arquivo. Recomeça a contagem em vez de acusar travamento.
+        if agora.isFinite {
+            if agora < ultimoRelogio - 1 { ultimoRelogio = agora; stalledSince = nil; return }
+            ultimoRelogio = max(ultimoRelogio, agora)
+        }
+
+        guard player.timeControlStatus == .waitingToPlayAtSpecifiedRate else {
+            stalledSince = nil
+            return
+        }
+        guard let since = stalledSince else { stalledSince = Date(); return }
+
+        // Uma fonte que nunca entregou imagem some rápido da frente. Já a que
+        // estava tocando ganha meio minuto: quem está assistindo prefere um
+        // engasgo longo a ser jogado para outra origem sem precisar.
+        let limite: TimeInterval = playedSinceOpen ? 30 : 8
+        guard Date().timeIntervalSince(since) > limite else { return }
+        stalledSince = nil
+        scheduleReconnect(reason: playedSinceOpen ? "travado sem dados"
+                                                  : "fonte não entregou imagem")
+    }
+
+    // MARK: - Audio / subtitles
+
+    private func loadMediaOptions(for asset: AVURLAsset, item: AVPlayerItem) {
+        Task { @MainActor in
+            audioChoices = []; subtitleChoices = []
+            qualityChoices = [MediaChoice(id: "auto", title: "Automática")]
+            audioOptions = [:]; subtitleOptions = [:]
+            qualityBitrates = [:]
+            audioGroup = try? await asset.loadMediaSelectionGroup(for: .audible)
+            subtitleGroup = try? await asset.loadMediaSelectionGroup(for: .legible)
+            guard player.currentItem === item else { return }
+            if let g = audioGroup {
+                audioChoices = g.options.enumerated().map { indice, opcao in
+                    let id = "audio:\(indice)"
+                    audioOptions[id] = opcao
+                    return MediaChoice(id: id, title: tituloDaFaixa(opcao, indice: indice,
+                                                                    total: g.options.count))
+                }
+                if let atual = item.currentMediaSelection.selectedMediaOption(in: g),
+                   let indice = g.options.firstIndex(of: atual) {
+                    selectedAudio = "audio:\(indice)"
+                }
+            }
+            if let g = subtitleGroup {
+                subtitleChoices = [MediaChoice(id: "__off__", title: "Desligado")]
+                    + g.options.enumerated().map { indice, opcao in
+                        let id = "subtitle:\(indice)"
+                        subtitleOptions[id] = opcao
+                        return MediaChoice(id: id, title: tituloDaFaixa(opcao, indice: indice,
+                                                                        total: g.options.count))
+                    }
+                if let atual = item.currentMediaSelection.selectedMediaOption(in: g),
+                   let indice = g.options.firstIndex(of: atual) {
+                    selectedSubtitle = "subtitle:\(indice)"
+                } else {
+                    selectedSubtitle = "__off__"
+                }
+            }
+            if let variantes = try? await asset.load(.variants), player.currentItem === item {
+                var porAltura: [Int: Double] = [:]
+                for variante in variantes {
+                    guard let video = variante.videoAttributes else { continue }
+                    let altura = Int(video.presentationSize.height.rounded())
+                    guard altura > 0 else { continue }
+                    porAltura[altura] = max(porAltura[altura] ?? 0,
+                                            variante.peakBitRate ?? 0)
+                }
+                let disponiveis = porAltura.keys.sorted(by: >).map { altura in
+                    let quatroK = altura >= 2000 ? " · 4K" : ""
+                    let taxa = (porAltura[altura] ?? 0) > 0
+                        ? String(format: " · %.1f Mbps", (porAltura[altura] ?? 0) / 1_000_000)
+                        : ""
+                    return MediaChoice(id: "\(altura)", title: "\(altura)p\(quatroK)\(taxa)")
+                }
+                qualityChoices = [MediaChoice(id: "auto", title: "Automática")] + disponiveis
+                qualityBitrates = Dictionary(uniqueKeysWithValues: porAltura.map {
+                    (String($0.key), $0.value)
+                })
+                if !qualityChoices.contains(where: { $0.id == selectedQuality }) {
+                    selectedQuality = "auto"
+                }
+                // Na abertura do item os bitrates ainda não estavam
+                // disponíveis; reaplica agora com a tabela completa.
+                applyQuality(to: item)
+            }
+            syncSelectedMediaOptions(for: item)
+        }
+    }
+
+    /// Mantém o menu ligado à seleção que o AVPlayer realmente aceitou.
+    /// A confirmação pode chegar alguns instantes depois do clique, sobretudo
+    /// em HLS com faixas alternativas carregadas por playlists filhas.
+    private func syncSelectedMediaOptions(for item: AVPlayerItem) {
+        guard player.currentItem === item else { return }
+        let selection = item.currentMediaSelection
+        if let group = audioGroup {
+            if let option = selection.selectedMediaOption(in: group),
+               let index = group.options.firstIndex(of: option) {
+                selectedAudio = "audio:\(index)"
+            }
+        }
+        if let group = subtitleGroup {
+            if let option = selection.selectedMediaOption(in: group),
+               let index = group.options.firstIndex(of: option) {
+                selectedSubtitle = "subtitle:\(index)"
+            } else {
+                selectedSubtitle = "__off__"
+            }
+        }
+    }
+
+    private func tituloDaFaixa(_ opcao: AVMediaSelectionOption,
+                               indice: Int, total: Int) -> String {
+        let nome = opcao.displayName.isEmpty ? "Faixa \(indice + 1)" : opcao.displayName
+        let idioma = opcao.locale?.localizedString(forLanguageCode: opcao.locale?.language.languageCode?.identifier ?? "")
+        let base = idioma.map { nome.localizedCaseInsensitiveContains($0) ? nome : "\(nome) · \($0)" } ?? nome
+        return total > 1 && base == "Desconhecido" ? "\(base) \(indice + 1)" : base
+    }
+
+    func selectAudio(_ id: String) {
+        guard let g = audioGroup, let item = player.currentItem,
+              let opt = audioOptions[id] else { return }
+        player.appliesMediaSelectionCriteriaAutomatically = false
+        item.select(opt, in: g)
+        selectedAudio = id
+        Log.shared.write("áudio escolhido: \(selectedAudioTitle)")
+        confirmMediaSelection(on: item)
+    }
+
+    // MARK: - Legendas do OpenSubtitles
+
+    func zerarLegendasExternas() {
+        legendaBusca?.cancel()
+        legendaDownload?.cancel()
+        legendasExt = []
+        legendaExt = nil
+        falasExt = []
+        legendaAtraso = 0
+        legendaAviso = nil
+    }
+
+    /// Busca a lista do título (uma consulta pequena) e, se a pessoa já
+    /// escolhera um idioma antes, liga a primeira versão dele sozinho.
+    func buscarLegendasExternas(tmdb: Int, serie: Bool, temporada: Int, episodio: Int) {
+        legendaBusca?.cancel()
+        legendaBusca = Task { @MainActor [weak self] in
+            let lista = await Legendas.de(tmdb: tmdb, serie: serie, temporada: temporada, episodio: episodio)
+            guard let self, !Task.isCancelled, !lista.isEmpty else { return }
+            self.legendasExt = lista
+            let idioma = Legendas.idiomaGuardado
+            if !idioma.isEmpty, self.legendaExt == nil,
+               let primeira = lista.first(where: { $0.idioma == idioma }) {
+                self.escolherLegendaExterna(primeira, guardar: false)
+            }
+        }
+    }
+
+    func escolherLegendaExterna(_ opcao: Legendas.Opcao?, guardar: Bool = true) {
+        legendaDownload?.cancel()
+        guard let opcao else {
+            legendaExt = nil
+            falasExt = []
+            legendaAviso = nil
+            legendaAtraso = 0
+            if guardar { Legendas.idiomaGuardado = "" }
+            return
+        }
+        legendaAviso = "Baixando a legenda…"
+        legendaDownload = Task { @MainActor [weak self] in
+            let falas = await Legendas.baixar(opcao)
+            guard let self, !Task.isCancelled else { return }
+            guard let falas else {
+                self.legendaAviso = "Não foi possível baixar esta legenda. Tente outra versão."
+                return
+            }
+            self.falasExt = falas
+            self.legendaExt = opcao
+            self.legendaAtraso = 0
+            self.legendaAviso = nil
+            if guardar { Legendas.idiomaGuardado = opcao.idioma }
+            // Uma legenda por vez: a do próprio vídeo, se estava ligada, sai.
+            if let atual = self.selectedSubtitle, atual != "__off__" {
+                self.selectSubtitle("__off__", limparExterna: false)
+            }
+            Log.shared.write("legenda externa: \(opcao.rotulo) — \(falas.count) falas")
+        }
+    }
+
+    /// Atraso (positivo) ou adianto (negativo) da legenda externa, em segundos.
+    func definirAtrasoLegenda(_ segundos: Double) {
+        legendaAtraso = (segundos * 100).rounded() / 100
+    }
+
+    func ajustarAtrasoLegenda(_ delta: Double) { definirAtrasoLegenda(legendaAtraso + delta) }
+
+    /// A fala externa que está no ar em [t] (segundos do player).
+    func legendaExternaEm(_ t: Double) -> String? {
+        guard legendaExt != nil, t.isFinite else { return nil }
+        return Legendas.fala(em: t - legendaAtraso, nas: falasExt)
+    }
+
+    func selectSubtitle(_ id: String, limparExterna: Bool = true) {
+        // Uma legenda por vez: escolher uma das do vídeo tira a do OpenSubtitles.
+        if limparExterna, legendaExt != nil { escolherLegendaExterna(nil, guardar: id == "__off__") }
+        guard let g = subtitleGroup, let item = player.currentItem else { return }
+        player.appliesMediaSelectionCriteriaAutomatically = false
+        if id == "__off__" {
+            item.select(nil, in: g)
+        } else if let opt = subtitleOptions[id] {
+            item.select(opt, in: g)
+        }
+        selectedSubtitle = id
+        Log.shared.write("legenda escolhida: \(selectedSubtitleTitle)")
+        confirmMediaSelection(on: item)
+    }
+
+    private func confirmMediaSelection(on item: AVPlayerItem) {
+        Task { @MainActor [weak self, weak item] in
+            try? await Task.sleep(nanoseconds: 250_000_000)
+            guard let self, let item else { return }
+            self.syncSelectedMediaOptions(for: item)
+        }
+    }
+
+    /// Limita a variante escolhida pelo AVPlayer sem transformar a qualidade
+    /// numa fonte separada. Assim um master HLS com 360p/720p/1080p continua
+    /// adaptativo até o teto escolhido e volta a subir quando a rede melhora.
+    func selectQuality(_ id: String) {
+        guard qualityChoices.contains(where: { $0.id == id }) else { return }
+        selectedQuality = id
+        if let item = player.currentItem {
+            applyQuality(to: item)
+            Log.shared.write("qualidade escolhida: \(selectedQualityTitle)")
+        }
+    }
+
+    private func applyQuality(to item: AVPlayerItem) {
+        guard let height = Double(selectedQuality) else {
+            item.preferredMaximumResolution = .zero
+            item.preferredPeakBitRate = 0
+            return
+        }
+        // 16:9 é apenas o teto pedido; conteúdo 4:3 continua preservando seu
+        // aspecto. O AVPlayer escolhe a variante real mais próxima abaixo dele.
+        item.preferredMaximumResolution = CGSize(width: height * 16 / 9, height: height)
+        // O teto de resolução sozinho é apenas uma preferência para o
+        // AVPlayer. O bitrate da variante torna a troca efetiva no próximo
+        // segmento sem abandonar a adaptação automática abaixo desse teto.
+        let peak = qualityBitrates[selectedQuality] ?? 0
+        item.preferredPeakBitRate = peak > 0 ? peak * 1.05 : 0
+    }
+
+    private func configurarLiveZeroDelay(_ item: AVPlayerItem) {
+        player.automaticallyWaitsToMinimizeStalling = true
+        switch zeroDelay {
+        case "equilibrado":
+            item.preferredForwardBufferDuration = 2.5
+            item.automaticallyPreservesTimeOffsetFromLive = true
+            item.configuredTimeOffsetFromLive = CMTime(seconds: 4.0, preferredTimescale: 600)
+        case "agressivo":
+            item.preferredForwardBufferDuration = 1.2
+            item.automaticallyPreservesTimeOffsetFromLive = true
+            item.configuredTimeOffsetFromLive = CMTime(seconds: 2.0, preferredTimescale: 600)
+        default:
+            item.preferredForwardBufferDuration = 6.0
+            item.automaticallyPreservesTimeOffsetFromLive = false
+            item.configuredTimeOffsetFromLive = .invalid
+        }
+    }
+
+    private func aplicarLiveCatchUp(_ item: AVPlayerItem) {
+        guard zeroDelay != "off" else {
+            if player.rate != 1.0 { player.rate = 1.0 }
+            return
+        }
+
+        guard let seekable = item.seekableTimeRanges.last?.timeRangeValue else { return }
+        let edge = CMTimeGetSeconds(CMTimeRangeGetEnd(seekable))
+        let current = CMTimeGetSeconds(item.currentTime())
+        guard edge.isFinite, current.isFinite else { return }
+        let behind = max(0, edge - current)
+
+        // Se ficou muito para trás (mais que 1 segmento), pula direto para o ao vivo
+        let maxDelayParaPulo: Double = zeroDelay == "agressivo" ? 5.0 : 10.0
+        if behind > maxDelayParaPulo {
+            jumpToLive()
+            return
+        }
+
+        // Guarda Anti-Starvation: se o buffer à frente estiver crítico (< 0.6s), trava em 1.0x imediatamente
+        if stats.bufferedAhead < 0.6 {
+            if player.rate != 1.0 { player.rate = 1.0 }
+            return
+        }
+
+        // Aceleração suave de catch-up
+        let targetDelay: Double = zeroDelay == "agressivo" ? 1.5 : 3.5
+        let maxRate: Float = zeroDelay == "agressivo" ? 1.08 : 1.04
+
+        if behind > targetDelay + 0.8 {
+            if player.rate != maxRate {
+                player.rate = maxRate
+            }
+        } else if behind <= targetDelay + 0.2 {
+            if player.rate != 1.0 {
+                player.rate = 1.0
+            }
+        }
+    }
+
+    func aplicarZeroDelay() {
+        Historico.shared.limpar()
+        guard let item = player.currentItem, selectedChannel != nil else { return }
+        configurarLiveZeroDelay(item)
+        if zeroDelay != "off" {
+            jumpToLive()
+        } else {
+            player.rate = 1.0
+        }
+    }
+
+    // MARK: - Window / PiP
+
+    func attach(surface: PlayerLayerView) {
+        self.surface = surface
+        guard AVPictureInPictureController.isPictureInPictureSupported() else {
+            Log.shared.write("PiP não suportado neste Mac")
+            return
+        }
+        let controller = AVPictureInPictureController(playerLayer: surface.playerLayer)
+        controller?.delegate = self
+        pip = controller
+        playerObservers.append(
+            controller!.observe(\.isPictureInPicturePossible, options: [.initial, .new]) { [weak self] c, _ in
+                // Lido aqui, na thread do aviso: o controlador não pode ir
+                // junto para a principal, só o valor.
+                let possivel = c.isPictureInPicturePossible
+                Task { @MainActor in self?.isPiPPossible = possivel }
+            })
+        applyAlwaysOnTop()
+    }
+
+    func togglePiP() {
+        guard let pip else { return }
+        if pip.isPictureInPictureActive { pip.stopPictureInPicture() } else { pip.startPictureInPicture() }
+    }
+
+    func toggleFullScreen() {
+        surface?.window?.toggleFullScreen(nil)
+    }
+
+    var isFullScreen: Bool {
+        surface?.window?.styleMask.contains(.fullScreen) ?? false
+    }
+
+    private func applyAlwaysOnTop() {
+        let level: NSWindow.Level = alwaysOnTop ? .floating : .normal
+        surface?.window?.level = level
+        for w in NSApp.windows where !(w is NSPanel) && w.styleMask.contains(.titled) {
+            w.level = level
+        }
+    }
+
+    func openInExternalPlayer() {
+        guard let link = generatedLink else { return }
+        NSWorkspace.shared.open(link)
+    }
+
+    func copyLink() {
+        guard let link = generatedLink else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(link.absoluteString, forType: .string)
+        Log.shared.write("link copiado")
+    }
+
+    /// Exports every generated link as an .m3u playlist for other players.
+    func exportPlaylist() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "saimo.m3u"
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        var out = "#EXTM3U\n"
+        for c in channels {
+            out += "#EXTINF:-1,\(c.name)\n\(ProxyServer.shared.link(for: c).absoluteString)\n"
+        }
+        try? out.write(to: url, atomically: true, encoding: .utf8)
+        Log.shared.write("playlist exportada: \(url.lastPathComponent)")
+    }
+
+    // MARK: - System integration
+
+    func applyVolume() {
+        // Na multi tela só a tela ativa tem som. Enquanto a segunda não tem
+        // canal, o som continua com a principal.
+        var somNaSegunda = multiTela && segundaAtiva && segunda.canal != nil
+        let ganho: Float = audioInteligente ? 1.25 : 1.0
+        player.volume = min(1.0, Float(volume) * ganho)
+        var mudo = isMuted || silenciadoPelaAbertura
+        // O celular escolheu de qual tela o Mac toca o som (ou calou o Mac),
+        // por exemplo para ouvir a outra no fone.
+        if let fixo = somDoConnect {
+            if fixo == "mute" { mudo = true }
+            else if multiTela { somNaSegunda = fixo == "1" && segunda.canal != nil }
+        }
+        player.isMuted = mudo || somNaSegunda
+        segunda.aplicarSom(volume: min(1.0, volume * Double(ganho)), mudo: mudo || !somNaSegunda)
+        Store.setVolume(volume)
+    }
+
+    func nudgeVolume(_ delta: Double) {
+        volume = min(1, max(0, volume + delta))
+        if volume > 0 { isMuted = false }
+    }
+
+    private func observePlayer() {
+        playerObservers.append(player.observe(\.timeControlStatus, options: [.new]) { [weak self] p, _ in
+            Task { @MainActor in
+                guard let self else { return }
+                switch p.timeControlStatus {
+                case .playing: self.status = "tocando"; self.isPlaying = true
+                case .paused: if self.status != "parado" { self.status = "pausado" }
+                case .waitingToPlayAtSpecifiedRate: self.status = "aguardando dados…"
+                @unknown default: break
+                }
+            }
+        })
+    }
+
+    private func setupRemoteCommands() {
+        let c = MPRemoteCommandCenter.shared()
+        c.togglePlayPauseCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.togglePlayPause() }; return .success
+        }
+        c.playCommand.addTarget { [weak self] _ in
+            Task { @MainActor in if self?.isPlaying == false { self?.togglePlayPause() } }; return .success
+        }
+        c.pauseCommand.addTarget { [weak self] _ in
+            Task { @MainActor in if self?.isPlaying == true { self?.togglePlayPause() } }; return .success
+        }
+        // Só no filme e no episódio: o TocandoAgora desliga estes no ao vivo.
+        c.changePlaybackPositionCommand.addTarget { [weak self] evento in
+            guard let alvo = (evento as? MPChangePlaybackPositionCommandEvent)?.positionTime
+            else { return .commandFailed }
+            Task { @MainActor in self?.seek(to: alvo) }; return .success
+        }
+        c.skipForwardCommand.preferredIntervals = [10]
+        c.skipForwardCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.pular(10) }; return .success
+        }
+        c.skipBackwardCommand.preferredIntervals = [10]
+        c.skipBackwardCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.pular(-10) }; return .success
+        }
+        c.nextTrackCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.step(1) }; return .success
+        }
+        c.previousTrackCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.step(-1) }; return .success
+        }
+    }
+
+    /// Posição, duração e pausa para a Central de Controle (TocandoAgora.swift).
+    private func avisarTocandoAgora() {
+        TocandoAgora.shared.tique(posicao: position, duracao: duration, tocando: isPlaying,
+                                  velocidade: rate,
+                                  canal: playingFile == nil ? selectedChannel : nil)
+    }
+
+    private func preventSleep(_ on: Bool) {
+        if on {
+            guard sleepAssertion == nil else { return }
+            sleepAssertion = ProcessInfo.processInfo.beginActivity(
+                options: [.idleDisplaySleepDisabled, .userInitiated],
+                reason: "reproduzindo vídeo")
+        } else if let token = sleepAssertion {
+            ProcessInfo.processInfo.endActivity(token)
+            sleepAssertion = nil
+        }
+    }
+
+    /// Bare-key shortcuts (Space, F, M, arrows) that a menu item cannot own
+    /// without stealing keystrokes from the search field.
+    func installKeyMonitor() {
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            if event.modifierFlags.intersection([.command, .control, .option]) != [] { return event }
+            if NSApp.keyWindow?.firstResponder is NSTextView { return event }
+
+            let handled: Bool = MainActor.assumeIsolated {
+                if let digits = event.charactersIgnoringModifiers,
+                   digits.count == 1, digits.allSatisfy(\.isNumber) {
+                    self.typeDigit(digits)
+                    return true
+                }
+                // Esc fecha o painel de episódios antes de qualquer outra coisa.
+                if event.keyCode == 53, self.painelEpisodios {
+                    self.painelEpisodios = false
+                    return true
+                }
+                switch event.keyCode {
+                case 49:  self.togglePlayPause(); return true                 // space
+                case 126: self.nudgeVolume(0.05); return true                 // up
+                case 125: self.nudgeVolume(-0.05); return true                // down
+                // Num filme a seta é o que ela é em qualquer player: dez
+                // segundos para trás ou para frente. Trocar de canal só faz
+                // sentido quando o que está no ar é canal.
+                case 123:                                                     // left
+                    if self.playingFile != nil { self.pular(-10) } else { self.step(-1) }
+                    return true
+                case 124:                                                     // right
+                    if self.playingFile != nil { self.pular(10) } else { self.step(1) }
+                    return true
+                default: break
+                }
+                switch event.charactersIgnoringModifiers?.lowercased() {
+                case "f": self.toggleFullScreen(); return true
+                case "m": self.isMuted.toggle(); return true
+                case "p": self.togglePiP(); return true
+                case "l": self.jumpToLive(); return true
+                case "i": self.showStats.toggle(); return true
+                case "e":
+                    guard self.episodioNoAr != nil, VodEstado.shared.secao == nil else { return false }
+                    self.painelEpisodios.toggle()
+                    return true
+                default: return false
+                }
+            }
+            return handled ? nil : event
+        }
+    }
+
+    // MARK: - Code
+
+    /// Digits typed in a row. Nothing on screen reacts to them, so a wrong code
+    /// looks exactly like nothing happening — which is the point.
+    private func typeDigit(_ digit: String) {
+        if Date().timeIntervalSince(typedAt) > 2 { typed = "" }
+        typedAt = Date()
+        typed = String((typed + digit).suffix(8))
+        if typed.hasSuffix(Self.code) {
+            typed = ""
+            setRestricted(!restrictedUnlocked)
+        }
+    }
+
+    private static let code = "1010"
+
+    /// Lista restrita nova chegou: troca, e se estiver destravado, troca na tela.
+    private func trocarRestritos(_ novos: [Channel]) {
+        let antes = restritos
+        guard novos.map(\.name) != antes.map(\.name) || novos.map(\.id) != antes.map(\.id) else { return }
+        restritos = novos
+        guard restrictedUnlocked else { return }
+        let antigos = Set(antes.map(\.id))
+        channels = channels.filter { !antigos.contains($0.id) } + novos
+        for c in novos { ProxyServer.shared.register(c) }
+    }
+
+    private func setRestricted(_ unlocked: Bool) {
+        guard unlocked != restrictedUnlocked, !restritos.isEmpty else { return }
+        restrictedUnlocked = unlocked
+        // Trancar com um desses no ar deixaria o nome à vista na tela; volta
+        // para o primeiro canal comum antes de sumir com a lista.
+        let restrictedIDs = Set(restritos.map(\.id))
+        let leaving = selection.map { restrictedIDs.contains($0) } ?? false
+        let base = channels.filter { !restrictedIDs.contains($0.id) }
+        channels = base + (unlocked ? restritos : [])
+        for c in channels { ProxyServer.shared.register(c) }
+        if !unlocked, leaving { selection = channels.first?.id }
+        objectWillChange.send()
+    }
+
+    private func tearDownItemObservers() {
+        itemObservers.forEach { $0.invalidate() }
+        itemObservers.removeAll()
+        notificationTokens.forEach { NotificationCenter.default.removeObserver($0) }
+        notificationTokens.removeAll()
+    }
+}
+
+extension PlayerModel: AVPictureInPictureControllerDelegate {
+    nonisolated func pictureInPictureControllerDidStartPictureInPicture(_ c: AVPictureInPictureController) {
+        Task { @MainActor in self.isPiPActive = true; Log.shared.write("PiP ativo") }
+    }
+
+    nonisolated func pictureInPictureControllerDidStopPictureInPicture(_ c: AVPictureInPictureController) {
+        Task { @MainActor in self.isPiPActive = false; Log.shared.write("PiP encerrado") }
+    }
+
+    nonisolated func pictureInPictureController(_ c: AVPictureInPictureController,
+                                                failedToStartPictureInPictureWithError error: Error) {
+        Task { @MainActor in Log.shared.write("PiP falhou: \(error.localizedDescription)") }
+    }
+}
+
+
+/// Um episódio no ar e a lista da série, para achar o seguinte.
+struct EpisodioNoAr: Equatable {
+    let serie: String
+    let temporada: Int
+    let numero: Int
+    let versao: String
+    let lista: [Episodio]
+
+    /// O episódio seguinte, de preferência na mesma versão (dublado/legendado).
+    func seguinte() -> Episodio? {
+        let depois = lista.filter { ($0.temporada, $0.numero) > (temporada, numero) }
+        guard let chave = depois.map({ ($0.temporada, $0.numero) }).min(by: <) else { return nil }
+        let candidatos = depois.filter { ($0.temporada, $0.numero) == chave }
+        return candidatos.first { $0.versao == versao } ?? candidatos.first
+    }
+
+    var temporadas: [Int] { Set(lista.map(\.temporada)).sorted() }
+
+    /// Um por número, na versão do que está no ar quando ela existe.
+    func episodios(da temporada: Int) -> [Episodio] {
+        let daqui = lista.filter { $0.temporada == temporada }
+        return Set(daqui.map(\.numero)).sorted().compactMap { n in
+            let candidatos = daqui.filter { $0.numero == n }
+            return candidatos.first { $0.versao == versao } ?? candidatos.first
+        }
+    }
+}
