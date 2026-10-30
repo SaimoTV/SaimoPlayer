@@ -137,6 +137,12 @@ if [ -x "../Saimo-TV/scripts/montar_tv.sh" ]; then
   cp "../Saimo-TV/build/tv/SaimoTV-LG.ipk" "build/release/SaimoTV-LG.ipk"
 fi
 
+if [ -x "../SaimoRoku/build.sh" ]; then
+  echo "==> montando o canal Roku"
+  ( cd ../SaimoRoku && ./build.sh >/dev/null )
+  cp "../SaimoRoku/dist/SaimoTV-Roku.zip" "build/release/SaimoTV-Roku.zip"
+fi
+
 echo "==> conferindo as assinaturas"
 APKSIGNER=$(ls "$HOME"/Library/Android/sdk/build-tools/*/apksigner | tail -1)
 for apk in build/release/*.apk; do
@@ -192,7 +198,8 @@ def arq(nome):
             "bytes": f.stat().st_size, "sha256": h.hexdigest()}
 arquivos = {k: arq(n) for k, n in [("tvbox", "SaimoTV.apk"), ("celular", "SaimoCell.apk"),
                                     ("mac", "SaimoTV.dmg"), ("windows", "SaimoTV-Windows.zip"),
-                                    ("tizen", "SaimoTV-Samsung.wgt"), ("webos", "SaimoTV-LG.ipk")]}
+                                    ("tizen", "SaimoTV-Samsung.wgt"), ("webos", "SaimoTV-LG.ipk"),
+                                    ("roku", "SaimoTV-Roku.zip")]}
 doc = {"versao": versao, "tag": f"v{versao}",
        "publicadoEm": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
        "notas": notas.read_text(encoding="utf-8") if notas.exists() else "",
@@ -207,7 +214,7 @@ gh release create "v$versao" --repo "$REPO_DOWNLOADS" \
   build/release/SaimoTV.dmg build/release/SaimoTV.apk \
   build/release/SaimoTV-Windows.zip \
   build/release/versao.json \
-  $(ls build/release/SaimoTV-Samsung.wgt build/release/SaimoTV-LG.ipk 2>/dev/null || true) \
+  $(ls build/release/SaimoTV-Samsung.wgt build/release/SaimoTV-LG.ipk build/release/SaimoTV-Roku.zip 2>/dev/null || true) \
   ${cell:-}
 
 # Endereço fixo que os apps leem: o versao.json sai pelo Cloudflare Pages (conta nova, Saimo.tv.gs),
