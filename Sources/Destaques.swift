@@ -38,10 +38,8 @@ enum Destaques {
         var id: String { titulo }
     }
 
-    private static var endereco: URL? { Enderecos.filmes("destaques.txt") }
-
-    /// Endereço apagado ou trocado: some o que estava em memória.
-    static func esquecer() { emMemoria = nil }
+    private static let endereco = URL(
+        string: Enderecos.filmes + "destaques.txt")!
     /// Validade curta (15 minutos) para que novas atualizações apareçam rapidamente
     /// no app sem atrasos de 24h.
     private static let validade: TimeInterval = 15 * 60
@@ -64,7 +62,6 @@ enum Destaques {
     }
 
     private static func texto() async -> String? {
-        guard let endereco else { return nil }
         let local = arquivo
         if let atributos = try? FileManager.default.attributesOfItem(atPath: local.path),
            let quando = atributos[.modificationDate] as? Date,

@@ -16,13 +16,11 @@ import AppKit
 /// quebra, que vale de todo mundo.
 @MainActor
 final class Telemetria {
-    /// Telemetria desligada (2.5.4): nenhum envio, nem quebra.
-    static let desligada = true
     static let shared = Telemetria()
 
     enum Tipo: String { case live, vod }
 
-    private let base = URL(string: "https://saimo-tv.pages.dev/api/online/v1")!
+    private let base = URL(string: "https://saimo-monitor.gabrielsaimo68.workers.dev/v1")!
     private let plataforma = "mac"
     /// Zapeando, cada canal que passa não vira batida: só quem ficou.
     private let minimoParaContar: TimeInterval = 20
@@ -289,8 +287,6 @@ final class Telemetria {
     private func enviar(_ rota: String, _ corpo: [String: Any], esperar: Bool = false,
                         resposta: (@MainActor @Sendable ([String: Any]?) -> Void)? = nil) {
         // Fora da amostra só o relatório de quebra sai.
-        // Telemetria desligada (2.5.4): nada sai do Mac, nem quebra.
-        guard !Self.desligada else { return }
         guard naAmostra || (rota == "event" && corpo["type"] as? String == "crash") else { return }
         var corpo = corpo
         corpo["deviceId"] = id

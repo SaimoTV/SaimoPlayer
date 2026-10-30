@@ -69,9 +69,9 @@ struct ChannelListView: View {
                             Menu("Escolher Fonte") {
                                 ForEach(Array(channel.variants.enumerated()), id: \.offset) { index, variant in
                                     // Como no TV Box: o nome da fonte (a temporada, nos
-                                    // canais 24h) ou o número e a qualidade. Nunca o servidor.
+                                    // canais 24h) ou o número, a qualidade e o servidor.
                                     let qualidade = variant.label == "Qualidade não informada" ? nil : variant.label
-                                    Button(([variant.nome ?? "Fonte \(index + 1)"] + [qualidade].compactMap { $0 })
+                                    Button(([variant.nome ?? "Fonte \(index + 1)"] + [qualidade, servidor(variant.url)].compactMap { $0 })
                                         .joined(separator: " · ")) {
                                         model.playVariant(channel, index: index)
                                     }
@@ -183,10 +183,14 @@ extension ChannelListView {
 
 @MainActor
 enum ChannelListActions {
-    /// Agora cria uma lista em "Minhas listas" (leitor completo, com logo,
-    /// grupo, referer, fontes juntas); `model` fica só pela assinatura antiga.
     static func importList(into model: PlayerModel) {
-        MinhasListasAcoes.importarArquivo()
+        let panel = NSOpenPanel()
+        panel.allowsOtherFileTypes = true
+        panel.allowsMultipleSelection = false
+        panel.message = "Selecione uma lista .m3u / .m3u8"
+        guard panel.runModal() == .OK, let url = panel.url,
+              let text = try? String(contentsOf: url, encoding: .utf8) else { return }
+        model.addChannels(M3UList.parse(text))
     }
 
     static func addByURL(into model: PlayerModel) {
@@ -212,7 +216,7 @@ enum ChannelListActions {
         guard alert.runModal() == .alertFirstButtonReturn,
               let url = URL(string: urlField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)),
               url.scheme != nil else { return }
-        let name = nameField.stringValue.isEmpty ? "Novo canal" : nameField.stringValue
+        let name = nameField.stringValue.isEmpty ? (url.host ?? "Novo canal") : nameField.stringValue
         model.addChannels([Channel(name: name, source: url)])
     }
 }
@@ -428,3 +432,8 @@ final class SidebarWindowController: NSObject, NSWindowDelegate {
     }
 }
 
+/// O nome do servidor de uma fonte ("cdn.exemplo.com"), sem o "www.".
+private func servidor(_ url: URL) -> String? {
+    guard let host = url.host, !host.isEmpty else { return nil }
+    return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+}

@@ -86,6 +86,18 @@ with open(p, "w", encoding="utf-8") as f:
     f.write("\n")
 PY
   fi
+  if [ -f "../Saimo-TV/tv-native/package.json" ]; then
+    python3 - "../Saimo-TV/tv-native/package.json" "$versao" <<'PY'
+import sys, json
+p, v = sys.argv[1], sys.argv[2]
+with open(p, "r", encoding="utf-8") as f:
+    d = json.load(f)
+d["version"] = v
+with open(p, "w", encoding="utf-8") as f:
+    json.dump(d, f, indent=2)
+    f.write("\n")
+PY
+  fi
   shift
 else
   versao=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST")
@@ -198,20 +210,6 @@ gh release create "v$versao" --repo "$REPO_DOWNLOADS" \
   $(ls build/release/SaimoTV-Samsung.wgt build/release/SaimoTV-LG.ipk 2>/dev/null || true) \
   ${cell:-}
 
-# A ponte: o mesmo release no GitHub antigo (SAIMO_REPO_LEGADO="dono/repo"). Os apps
-# até a 2.3.x procuram a atualização lá; esta versão já aponta para o endereço novo,
-# e a partir dela eles passam a atualizar por `saimo-downloads`.
-if [ -n "${SAIMO_REPO_LEGADO:-}" ]; then
-  echo "==> ponte: $SAIMO_REPO_LEGADO"
-  GH_TOKEN="$(gh auth token -u "${SAIMO_REPO_LEGADO%%/*}")" gh release create "v$versao" --repo "$SAIMO_REPO_LEGADO" \
-    --title "Saimo TV $versao" \
-    --notes-file "$notas" \
-    $extra \
-    build/release/SaimoTV.dmg build/release/SaimoTV.apk \
-    build/release/SaimoTV-Windows.zip \
-    ${cell:-}
-fi
-
 # Endereço fixo que os apps leem: o versao.json sai pelo Cloudflare Pages (conta nova, Saimo.tv.gs),
 # não pelo GitHub. Os arquivos para baixar continuam no release acima.
 if [ -z "${extra:-}" ] && [ -d ../SaimoCatalogos ]; then
@@ -223,21 +221,7 @@ if [ -z "${extra:-}" ] && [ -d ../SaimoCatalogos ]; then
   ( cd ../SaimoCatalogos && bash scripts/montar_publico.sh canais >/dev/null \
     && XDG_CONFIG_HOME="${SAIMO_CF_CONFIG:-$HOME/Library/Application Support/SaimoTV/wrangler-novo}" \
        CLOUDFLARE_ACCOUNT_ID="${SAIMO_CF_CONTA:-e074091e48d179d86d956620fc8fa5f6}" \
-       npx wrangler pages deploy publico/canais --project-name canais-saimo --branch main --commit-dirty=true >/dev/null
-    # Endereço antigo (apps de antes da 2.4.1), na mesma conta.
-    XDG_CONFIG_HOME="${SAIMO_CF_CONFIG:-$HOME/Library/Application Support/SaimoTV/wrangler-novo}" \
-       CLOUDFLARE_ACCOUNT_ID="${SAIMO_CF_CONTA:-e074091e48d179d86d956620fc8fa5f6}" \
-       npx wrangler pages deploy publico/canais --project-name saimo-canais --branch main --commit-dirty=true >/dev/null </dev/null || true )
-fi
-
-# Ponte: apps 2.3.x ainda procuram atualização no GitHub antigo.
-# (Com SAIMO_REPO_LEGADO definido, o bloco de cima já fez isso.)
-LEGADO="gabrielsaimo/SaimoPlayer"
-if [ -z "${SAIMO_REPO_LEGADO:-}" ] && [ -z "${extra:-}" ] && T_LEG="$(gh auth token -u "${LEGADO%%/*}" 2>/dev/null)"; then
-  echo "==> ponte: $LEGADO"
-  GH_TOKEN="$T_LEG" gh release create "v$versao" --repo "$LEGADO" --title "Saimo TV $versao" \
-    --notes-file "$notas" build/release/SaimoCell.apk build/release/SaimoTV-Windows.zip \
-    build/release/SaimoTV.apk build/release/SaimoTV.dmg build/release/versao.json >/dev/null || true
+       npx wrangler pages deploy publico/canais --project-name canais-saimo --branch main --commit-dirty=true >/dev/null )
 fi
 
 echo "pronto: https://github.com/$REPO_DOWNLOADS/releases/tag/v$versao"

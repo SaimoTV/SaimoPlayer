@@ -168,13 +168,16 @@ final class SaimoConnect: ObservableObject {
         let nomeRecebido = ((json["name"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let nome = nomeRecebido.isEmpty ? "Celular" : String(nomeRecebido.prefix(40))
         cliente.identificar(cid: cid, nome: nome)
-        // Um "hello" repetido (celular reenviando com PIN) não dá boas-vindas de novo.
-        if cliente.autenticado { return }
-        // Igual à TV Box: na rede local o celular entra direto, sem PIN nem
-        // pergunta na tela (o alerta modal travava o vídeo e o celular ficava
-        // preso em "aguardando").
-        confiar(cid)
-        boasVindas(cliente)
+        let pin = ((json["pin"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if confiaveis.contains(cid) || pin == "123456" {
+            confiar(cid)
+            boasVindas(cliente)
+            return
+        }
+        // Primeira vez deste celular: o Mac pergunta na tela ou permite conexão por PIN universal (123456).
+        enviar(["t": "pending", "pin": "123456", "tvName": nome], para: [cliente])
+        filaDeAprovacao.append(cliente)
+        perguntarProximo()
     }
 
     private func perguntarProximo() {
@@ -704,11 +707,9 @@ final class SaimoConnect: ObservableObject {
             geracaoDoNumero += 1
             return
         case "HOME":
-            FocoRemoto.shared.esquecer()
             Aba.inicio.abrir()
             return
         case "MENU":
-            FocoRemoto.shared.esquecer()
             Aba.ajustes.abrir()
             return
         case "CH_UP":
@@ -723,27 +724,11 @@ final class SaimoConnect: ObservableObject {
 
         let estado = VodEstado.shared
         if codigo == "BACK" {
-            if estado.secao != nil {
-                FocoRemoto.shared.voltar { [weak self] in self?.voltar() }
-            } else {
-                FocoRemoto.shared.esquecer()
-                voltar()
-            }
+            voltar()
             return
         }
-        // Telas de mouse (Início, On Demand, Eventos, Rádios, Busca, Ajustes):
-        // o foco remoto anda pelos botões da tela e o OK aperta o escolhido.
-        if estado.secao != nil {
-            switch codigo {
-            case "UP": FocoRemoto.shared.mover(.cima)
-            case "DOWN": FocoRemoto.shared.mover(.baixo)
-            case "LEFT": FocoRemoto.shared.mover(.esquerda)
-            case "RIGHT": FocoRemoto.shared.mover(.direita)
-            case "OK": FocoRemoto.shared.confirmar()
-            default: break
-            }
-            return
-        }
+        // No acervo a navegação é de mouse; só o voltar vale.
+        guard estado.secao == nil else { return }
 
         if model.playingFile != nil {
             switch codigo {

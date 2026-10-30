@@ -70,6 +70,12 @@ final class Historico: @unchecked Sendable {
     private var reguas: [String: Regua] = [:]
     private let lock = NSLock()
 
+    func limpar() {
+        lock.lock()
+        reguas.removeAll()
+        lock.unlock()
+    }
+
     private init() {}
 
     /// Marcas que descrevem a lista inteira, não um trecho.
@@ -220,35 +226,16 @@ final class Historico: @unchecked Sendable {
             }
             restante -= lido.dur
         }
-        let limiteSegs: Int
-        let janelaMs: Int64
-        switch Preferencias.zeroDelay {
-        case "agressivo":
-            limiteSegs = 2
-            janelaMs = 14_000
-        case "equilibrado":
-            limiteSegs = 4
-            janelaMs = 28_000
-        default:
-            limiteSegs = 20
-            janelaMs = Self.guardaMs
-        }
         if let ultimaSeq = regua.trechos.keys.max(), let ultimo = regua.trechos[ultimaSeq] {
-            let corte = ultimo.inicioMs + ultimo.duracaoMs - janelaMs
-            while regua.trechos.count > limiteSegs || (regua.trechos.count > 2 && regua.trechos[regua.trechos.keys.min()!]!.inicioMs < corte) {
-                guard let primeiraSeq = regua.trechos.keys.min() else { break }
+            let corte = ultimo.inicioMs + ultimo.duracaoMs - Self.guardaMs
+            while regua.trechos.count > lidos.count,
+                  let primeiraSeq = regua.trechos.keys.min(),
+                  let primeiro = regua.trechos[primeiraSeq], primeiro.inicioMs < corte {
                 regua.trechos.removeValue(forKey: primeiraSeq)
             }
         }
         reguas = reguas.filter { agora - $0.value.vistaEm <= Self.esqueceMs }
         return escreverLista(regua)
-    }
-
-    /// Limpa o histórico em cache (ex: ao ligar ou desligar Zero Delay).
-    func limpar() {
-        lock.lock()
-        reguas.removeAll()
-        lock.unlock()
     }
 
     private func escreverLista(_ regua: Regua) -> String {
@@ -257,7 +244,7 @@ final class Historico: @unchecked Sendable {
         let maior = trechos.map(\.duracaoMs).max() ?? 0
         let alvo = max(regua.alvoS, Int((Double(maior) / 1000).rounded(.up)))
         var sb = "#EXTM3U\n"
-        for l in regua.cabecalho where !l.hasPrefix("#EXT-X-TARGETDURATION") && !l.hasPrefix("#EXT-X-START") { sb += l + "\n" }
+        for l in regua.cabecalho where !l.hasPrefix("#EXT-X-TARGETDURATION") { sb += l + "\n" }
         sb += "#EXT-X-TARGETDURATION:\(alvo)\n"
         sb += "#EXT-X-MEDIA-SEQUENCE:\(primeiro.seq)\n"
         sb += "#EXT-X-DISCONTINUITY-SEQUENCE:\(primeiro.sequenciaDesc - (primeiro.descontinuidade ? 1 : 0))\n"

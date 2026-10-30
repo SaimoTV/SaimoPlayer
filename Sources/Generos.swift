@@ -15,12 +15,8 @@ import Foundation
 @MainActor
 enum Generos {
 
-    private static var endereco: URL? { Enderecos.filmes("fichas.txt") }
-
-    /// Endereço apagado ou trocado: some o que estava em memória.
-    static func esquecer() {
-        mapa = [:]; capas = [:]; ids = [:]; porId = [:]; todos = []
-    }
+    private static let endereco = URL(
+        string: Enderecos.filmes + "fichas.txt")!
 
     /// "f|Nome" ou "s|Nome" -> os gêneros dele.
     private static var mapa: [String: [String]] = [:]
@@ -41,34 +37,45 @@ enum Generos {
 
     static var prontos: Bool { !mapa.isEmpty }
 
-    private static func chave(_ titulo: String, serie: Bool) -> String {
-        (serie ? "s|" : "f|") + titulo
+    private static func chavesCandidatas(_ titulo: String, serie: Bool) -> [String] {
+        let prefixo = serie ? "s|" : "f|"
+        let sAno = semAno(titulo)
+        var chaves = [prefixo + titulo, prefixo + sAno]
+        let variacoes = [
+            titulo.replacingOccurrences(of: #",\s*"#, with: ", ", options: .regularExpression),
+            titulo.replacingOccurrences(of: #",\s*"#, with: ",", options: .regularExpression),
+            titulo.replacingOccurrences(of: #":\s*"#, with: ": ", options: .regularExpression),
+            sAno.replacingOccurrences(of: #",\s*"#, with: ", ", options: .regularExpression),
+            sAno.replacingOccurrences(of: #",\s*"#, with: ",", options: .regularExpression),
+        ]
+        for v in variacoes where !v.isEmpty {
+            chaves.append(prefixo + v)
+        }
+        return chaves
     }
 
     /// Os gêneros de um título.
-    ///
-    /// A chave é o nome como o acervo o escreve — e o acervo escreve o ano
-    /// dentro do nome do filme, mas guarda o da série num campo à parte. Quem
-    /// chama nem sempre sabe de qual dos dois veio, então procura-se o nome
-    /// como ele chegou e, não achando, sem o ano.
     static func de(_ titulo: String, serie: Bool) -> [String] {
-        if let achados = mapa[chave(titulo, serie: serie)] { return achados }
-        return mapa[chave(semAno(titulo), serie: serie)] ?? []
+        for c in chavesCandidatas(titulo, serie: serie) {
+            if let achados = mapa[c] { return achados }
+        }
+        return []
     }
 
     /// O pôster de um título, pelo id que o gerador já resolveu.
-    ///
-    /// Antes a capa era procurada pelo nome no TMDB, a cada abertura: lento, e
-    /// errado quando dois filmes se chamam igual. Agora o endereço vem pronto
-    /// do mesmo arquivo dos gêneros. Quem não tem ficha fica sem capa, e a tela
-    /// põe uma marca no lugar.
     static func capa(_ titulo: String, serie: Bool) -> String? {
-        capas[chave(titulo, serie: serie)] ?? capas[chave(semAno(titulo), serie: serie)]
+        for c in chavesCandidatas(titulo, serie: serie) {
+            if let cAchada = capas[c] { return cAchada }
+        }
+        return nil
     }
 
     /// O id do TMDB de um título, quando o gerador o resolveu.
     static func id(_ titulo: String, serie: Bool) -> Int? {
-        ids[chave(titulo, serie: serie)] ?? ids[chave(semAno(titulo), serie: serie)]
+        for c in chavesCandidatas(titulo, serie: serie) {
+            if let idAchado = ids[c] { return idAchado }
+        }
+        return nil
     }
 
     /// O título do acervo que corresponde a um id do TMDB, se houver.
@@ -93,7 +100,7 @@ enum Generos {
 
     /// Baixa a lista uma vez por abertura, e guarda em disco para a seguinte.
     static func carregar() async {
-        if prontos || carregando || endereco == nil { return }
+        if prontos || carregando { return }
         carregando = true
         defer { carregando = false }
 
@@ -158,7 +165,6 @@ enum Generos {
     }
 
     private static func baixado() async -> String? {
-        guard let endereco else { return nil }
         var pedido = URLRequest(url: endereco)
         pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
         pedido.setValue("*/*", forHTTPHeaderField: "Accept")

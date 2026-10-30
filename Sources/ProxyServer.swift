@@ -98,11 +98,11 @@ final class ProxyServer: @unchecked Sendable {
             if ext.hasPrefix("ts") || ext.hasPrefix("m2t") {
                 verdict = true
                 lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
-            } else if let headRes = try? Upstream.shared.fetch(variant.url, method: "HEAD", referer: variant.referer),
+            } else if let headRes = try? Upstream.shared.fetch(variant.url, method: "HEAD", referer: variant.referer, agente: variant.userAgent),
                       headRes.contentType.lowercased().contains("video/mp2t") {
                 verdict = true
                 lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
-            } else if let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer) {
+            } else if let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent) {
                 let text = String(decoding: res.body.prefix(64_000), as: UTF8.self).lowercased()
                 verdict = text.contains("hvc1") || text.contains("hev1")
                 // O CODECS só existe na playlist mestre. Quem serve a playlist
@@ -308,7 +308,7 @@ final class ProxyServer: @unchecked Sendable {
         if segments[2].hasPrefix("manifest") {
             do {
                 let active = variant(channel)
-                let res = try Upstream.shared.fetch(active.url, referer: active.referer)
+                let res = try Upstream.shared.fetch(active.url, referer: active.referer, agente: active.userAgent)
                 let xml = normaliseMPD(String(decoding: res.body, as: UTF8.self),
                                        source: res.finalURL)
                 send(fd, status: 200,
@@ -409,10 +409,10 @@ final class ProxyServer: @unchecked Sendable {
             let origin = targetURL.scheme.flatMap { s in
                 targetURL.host.map { "\(s)://\($0)/" }
             }
-            let res = try Upstream.shared.fetch(targetURL, referer: active.referer ?? origin)
+            let res = try Upstream.shared.fetch(targetURL, referer: active.referer ?? origin, agente: active.userAgent)
             guard (200...299).contains(res.status) else {
                 Log.shared.write("upstream \(res.status) em \(targetURL.lastPathComponent)")
-                if isSegment { anotarFalha(de: targetURL) }
+                if isSegment && targetURL.host != active.url.host { anotarFalha(de: targetURL) }
                 send(fd, status: res.status, headers: [:], body: res.body,
                      headOnly: method == "HEAD")
                 return
@@ -534,7 +534,7 @@ final class ProxyServer: @unchecked Sendable {
             return Payload(contentType: "application/vnd.apple.mpegurl", body: Data(text.utf8))
         }
 
-        guard let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer),
+        guard let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent),
               (200...299).contains(res.status),
               res.body.prefix(7) == Data("#EXTM3U".utf8)
         else { return nil }

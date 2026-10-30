@@ -1,6 +1,6 @@
 import Foundation
 
-/// O anúncio da versão mais nova, lido de `versao.json` (ver `Atualizacao.enderecoDoAnuncio`).
+/// O anúncio da versão mais nova, lido de `versao.json` (ver `Enderecos.canais`).
 ///
 /// Nada aqui sabe de dono ou repositório: o endereço do instalador vem no
 /// próprio JSON e só é aceito se tiver cara de download de release do GitHub.

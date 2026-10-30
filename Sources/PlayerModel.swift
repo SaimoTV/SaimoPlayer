@@ -277,7 +277,7 @@ final class PlayerModel: NSObject, ObservableObject {
         Migracao.executarSeNecessario()
         super.init()
         restritos = RemoteCatalog.restritosEmCache()
-        channels = MinhasListas.juntar(FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels()))
+        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels())
         favorites = Store.favorites()
         volume = Store.volume()
         for c in channels { ProxyServer.shared.register(c) }
@@ -331,7 +331,7 @@ final class PlayerModel: NSObject, ObservableObject {
             // O que o painel desligou some aqui, antes de a lista chegar à
             // tela: canal sem nenhuma fonte não abriria mesmo.
             await FontesDesativadas.atualizar()
-            let updated = MinhasListas.juntar(FontesDesativadas.peneirar(fresh + Store.customChannels() + extra))
+            let updated = FontesDesativadas.peneirar(fresh + Store.customChannels() + extra)
             guard updated != channels else { return }
 
             channels = updated
@@ -353,7 +353,7 @@ final class PlayerModel: NSObject, ObservableObject {
     func recarregarListas() {
         restritos = RemoteCatalog.restritosEmCache()
         let extra = restrictedUnlocked ? restritos : []
-        channels = MinhasListas.juntar(FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels() + extra))
+        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels() + extra)
         for c in channels { ProxyServer.shared.register(c) }
         if selection == nil || !channels.contains(where: { $0.id == selection }) {
             let antes = selection

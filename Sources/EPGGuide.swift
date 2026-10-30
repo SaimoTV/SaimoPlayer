@@ -38,12 +38,8 @@ struct EPGGuideView: View {
         VStack(spacing: 0) {
             header
             Divider()
-            if channels.isEmpty {
-                SemListaView(secao: .canais, antes: { dismiss() })
-            } else {
-                grid
-                if let selected { detail(selected) }
-            }
+            grid
+            if let selected { detail(selected) }
         }
         .frame(minWidth: 900, minHeight: 560)
         .background(.background)

@@ -279,8 +279,6 @@ struct FileiraView: View {
 
     @State private var primeiro: String?
     @State private var sobre = false
-    /// Onde a fileira está na janela, para o foco do controle remoto achar qual rolar.
-    @State private var quadro: CGRect = .zero
 
     private var largura: CGFloat {
         switch fila.tipo {
@@ -327,23 +325,8 @@ struct FileiraView: View {
             .scrollIndicators(.hidden)
             .scrollPosition(id: $primeiro, anchor: .leading)
             .overlay { setas }
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { quadro = $0 }
         }
         .onHover { sobre = $0 }
-        .onReceive(NotificationCenter.default.publisher(for: .focoRemotoAndarFileira)) { aviso in
-            guard let y = aviso.userInfo?["y"] as? CGFloat, let passo = aviso.userInfo?["passo"] as? Int,
-                  quadro.minY <= y, y <= quadro.maxY else { return }
-            andar(passo)
-        }
-    }
-
-    /// Uma página para o lado: o mesmo que a seta faz.
-    private func andar(_ passo: Int) {
-        let ids = fila.cartoes.map(\.id)
-        let atual = primeiro.flatMap { ids.firstIndex(of: $0) } ?? 0
-        let pagina = 4
-        let alvo = min(max(atual + passo * pagina, 0), max(ids.count - 1, 0))
-        withAnimation(.easeInOut(duration: 0.35)) { primeiro = ids[alvo] }
     }
 
     @ViewBuilder
@@ -364,7 +347,11 @@ struct FileiraView: View {
 
     private func seta(_ simbolo: String, passo: Int) -> some View {
         Button {
-            andar(passo)
+            let ids = fila.cartoes.map(\.id)
+            let atual = primeiro.flatMap { ids.firstIndex(of: $0) } ?? 0
+            let pagina = 4
+            let alvo = min(max(atual + passo * pagina, 0), max(ids.count - 1, 0))
+            withAnimation(.easeInOut(duration: 0.35)) { primeiro = ids[alvo] }
         } label: {
             Image(systemName: simbolo)
                 .font(.system(size: 16, weight: .bold))

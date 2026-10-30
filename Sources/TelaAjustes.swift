@@ -8,15 +8,13 @@ enum Preferencias {
     private static let chaveUpscaling    = "ajustes.upscaling"
     private static let chaveFillScreen   = "ajustes.fillScreen"
     private static let chaveAlwaysOnTop  = "ajustes.alwaysOnTop"
-    private static let chaveShowStats        = "ajustes.showStats"
-    private static let chaveIsMuted          = "ajustes.isMuted"
+    private static let chaveShowStats    = "ajustes.showStats"
+    private static let chaveIsMuted      = "ajustes.isMuted"
+    private static let chaveDetachedList = "ajustes.detachedList"
     private static let chaveAudioInteligente = "ajustes.audioInteligente"
     private static let chaveZeroDelay        = "ajustes.zeroDelay"
-    private static let chaveDetachedList     = "ajustes.detachedList"
 
-    static let upscalingMudou        = Notification.Name("SaimoUpscalingMudou")
-    static let audioInteligenteMudou = Notification.Name("SaimoAudioInteligenteMudou")
-    static let zeroDelayMudou        = Notification.Name("SaimoZeroDelayMudou")
+    static let upscalingMudou = Notification.Name("SaimoUpscalingMudou")
 
     private static var arquivoURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
@@ -94,35 +92,19 @@ enum Preferencias {
         set { gravar(chaveIsMuted, newValue) }
     }
 
-    /// Áudio Inteligente: normaliza dinamicamente o volume entre diferentes fontes e canais.
-    static var audioInteligente: Bool {
-        get { lerBool(chaveAudioInteligente, padrao: true) }
-        set {
-            gravar(chaveAudioInteligente, newValue)
-            NotificationCenter.default.post(name: audioInteligenteMudou, object: nil)
-        }
-    }
-
-    /// Zero Delay: sincronização ultrarrápida com a ponta ao vivo ("off", "equilibrado", "agressivo").
-    static var zeroDelay: String {
-        get { lerString(chaveZeroDelay, padrao: "off") }
-        set {
-            gravar(chaveZeroDelay, newValue)
-            NotificationCenter.default.post(name: zeroDelayMudou, object: nil)
-        }
-    }
-
     static var detachedList: Bool {
         get { lerBool(chaveDetachedList) }
         set { gravar(chaveDetachedList, newValue) }
     }
 
-    static func rotuloZeroDelay(_ modo: String) -> String {
-        switch modo {
-        case "equilibrado": return "Equilibrado (baixa latência com anti-travamento)"
-        case "agressivo":   return "Agressivo (máximo ao vivo possível)"
-        default:            return "Desligado (padrão)"
-        }
+    static var audioInteligente: Bool {
+        get { lerBool(chaveAudioInteligente, padrao: true) }
+        set { gravar(chaveAudioInteligente, newValue) }
+    }
+
+    static var zeroDelay: String {
+        get { lerString(chaveZeroDelay, padrao: "equilibrado") }
+        set { gravar(chaveZeroDelay, newValue) }
     }
 
     static func rotuloUpscaling(_ modo: String) -> String {
@@ -140,7 +122,6 @@ struct TelaAjustes: View {
     @ObservedObject var model: PlayerModel
     @ObservedObject private var epg = EPGService.shared
     @ObservedObject private var connect = SaimoConnect.shared
-    @ObservedObject private var listas = ListasEstado.shared
 
     private var versao: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
@@ -165,16 +146,6 @@ struct TelaAjustes: View {
                         }
                         alternador("Preencher a tela", "Corta as bordas em vez de mostrar faixas pretas",
                                    icone: "rectangle.arrowtriangle.2.outward", valor: $model.fillScreen)
-                        linha("Zero Delay (Ao Vivo)", Preferencias.rotuloZeroDelay(model.zeroDelay),
-                               icone: "bolt.badge.clock") {
-                            switch model.zeroDelay {
-                            case "off": model.zeroDelay = "equilibrado"
-                            case "equilibrado": model.zeroDelay = "agressivo"
-                            default: model.zeroDelay = "off"
-                            }
-                        }
-                        alternador("Áudio Inteligente", "Nivela o volume entre canais e fontes diferentes",
-                                   icone: "waveform.badge.magnifyingglass", valor: $model.audioInteligente)
                         alternador("Manter à frente", "A janela fica por cima das outras",
                                    icone: "pin.fill", valor: $model.alwaysOnTop)
                         alternador("Estatísticas do vídeo", "Resolução, bitrate e buffer no canto da imagem",
@@ -193,36 +164,8 @@ struct TelaAjustes: View {
                                    icone: "sidebar.leading", valor: $model.detachedList)
                     }
 
-                    secao("Listas") {
-                        linha("Lista de canais", listas.canais ?? "Desligada", icone: "tv") {
-                            listas.editando = true
-                        }
-                        linha("Lista de filmes e séries", listas.filmes ?? "Desligada", icone: "film.stack") {
-                            listas.editando = true
-                        }
-                        linha("Restaurar padrão", "Volta aos endereços de fábrica", icone: "arrow.counterclockwise") {
-                            Links.restaurarPadrao()
-                        }
-                        if listas.canais != nil {
-                            linha("Desligar a lista de canais", "Remove canais, rádios e guia deste Mac",
-                                  icone: "trash") {
-                                Links.aplicar(Links.planejar(canais: "", filmes: listas.filmes ?? ""))
-                            }
-                        }
-                        if listas.filmes != nil {
-                            linha("Desligar a lista de filmes e séries", "Remove a lista de filmes e séries deste Mac",
-                                  icone: "trash") {
-                                Links.aplicar(Links.planejar(canais: listas.canais ?? "", filmes: ""))
-                            }
-                        }
-                    }
-
-                    secao("Minhas listas") {
-                        MinhasListasConteudo()
-                    }
-
                     secao("Canais") {
-                        linha("Importar lista .m3u", "Cria uma lista em Minhas listas a partir de um arquivo", icone: "square.and.arrow.down") {
+                        linha("Importar lista .m3u", "Junta os canais de um arquivo à lista", icone: "square.and.arrow.down") {
                             ChannelListActions.importList(into: model)
                         }
                         linha("Adicionar canal por endereço", "Cole o URL de um fluxo .m3u8", icone: "link.badge.plus") {
@@ -269,9 +212,6 @@ struct TelaAjustes: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollIndicators(.hidden)
-        }
-        .sheet(isPresented: $listas.editando) {
-            FormularioListasView { listas.editando = false }
         }
     }
 
