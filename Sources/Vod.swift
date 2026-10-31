@@ -94,7 +94,10 @@ enum Vod {
     /// índice sem as linhas `base:` deixou todo filme com endereço quebrado.
     /// Guardar a versão junto e limpar a pasta quando ela muda evita que o
     /// formato velho envenene o novo.
-    private static let versaoCache = "4"
+    private static let versaoCache = "5"
+
+    /// Validade do cache local das fatias antes de buscar da rede (3 horas).
+    private static let cacheTTL: TimeInterval = 3 * 3600
 
     static func indice() async -> [Gaveta] {
         conferirVersao()
@@ -366,19 +369,36 @@ enum Vod {
         try? versaoCache.write(to: marca, atomically: true, encoding: .utf8)
     }
 
+    /// Apaga todo o cache local do VOD em disco e força recarregamento.
+    static func limparCache() {
+        let arquivos = (try? FileManager.default.contentsOfDirectory(
+            at: pasta, includingPropertiesForKeys: nil)) ?? []
+        for arquivo in arquivos {
+            try? FileManager.default.removeItem(at: arquivo)
+        }
+        indiceBuscaSuja = true
+    }
+
     private static func gaveta(_ letra: String) -> String {
         letra == "#" ? "%23" : letra
     }
 
-    /// Conteúdo do arquivo, do disco quando já foi baixado. O catálogo muda de
-    /// vez em quando e nunca no meio de uma navegação, então o que está em
-    /// disco serve: poupa a rede e faz a segunda visita abrir na hora.
+    /// Conteúdo do arquivo, do disco quando já foi baixado e ainda dentro da validade (TTL).
+    /// Se passou do tempo ou o arquivo não existe, busca da rede. Se a rede falhar,
+    /// usa o arquivo local como reserva offline.
     private static func arquivo(_ nome: String) async -> String? {
         let local = pasta.appendingPathComponent(nome.replacingOccurrences(of: "%23", with: "hash"))
-        if let texto = try? String(contentsOf: local, encoding: .utf8), !texto.isEmpty {
+        let attrs = try? FileManager.default.attributesOfItem(atPath: local.path)
+        let modDate = attrs?[.modificationDate] as? Date
+        let valido = modDate.map { Date().timeIntervalSince($0) < cacheTTL } ?? false
+
+        if valido, let texto = try? String(contentsOf: local, encoding: .utf8), !texto.isEmpty {
             return texto
         }
-        return await baixar(nome)
+        if let baixado = await baixar(nome) {
+            return baixado
+        }
+        return try? String(contentsOf: local, encoding: .utf8)
     }
 
     /// Busca o arquivo na rede e guarda em disco.

@@ -316,7 +316,7 @@ final class PlayerModel: NSObject, ObservableObject {
 
     /// Picks up the published list without disturbing what is on screen: the
     /// channel being watched keeps playing if it survived the update.
-    private func refreshCatalog() {
+    func refreshCatalog() {
         // Sem endereço dos canais não há pedido de rede nenhum.
         guard Enderecos.canais != nil else { return }
         Task { @MainActor in

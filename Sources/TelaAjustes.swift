@@ -122,6 +122,7 @@ struct TelaAjustes: View {
     @ObservedObject var model: PlayerModel
     @ObservedObject private var epg = EPGService.shared
     @ObservedObject private var connect = SaimoConnect.shared
+    @State private var catalogoAtualizado = false
 
     private var versao: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
@@ -196,6 +197,18 @@ struct TelaAjustes: View {
                     }
 
                     secao("Sistema") {
+                        linha("Atualizar Catálogo e Fontes",
+                              catalogoAtualizado ? "✓ Catálogo e fontes atualizados com sucesso!" : "Recarrega filmes, séries e novas fontes da nuvem",
+                              icone: "arrow.clockwise") {
+                            Vod.limparCache()
+                            model.refreshCatalog()
+                            EPGService.shared.refresh(channels: model.channels)
+                            withAnimation { catalogoAtualizado = true }
+                            Task {
+                                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                                withAnimation { catalogoAtualizado = false }
+                            }
+                        }
                         linha("Procurar atualização", "v\(versao)", icone: "arrow.down.circle") {
                             Atualizacao.shared.procurar(manual: true)
                         }

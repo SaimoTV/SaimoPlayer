@@ -29,7 +29,41 @@
 #
 # Uma linha por campo, no formato "chave: valor".
 #
-#   canal: A&E
+#   canal:    começa um canal novo
+#   logo:     imagem do canal (opcional)
+#   categoria: em que seção da lista o canal entra (opcional); sem ela a
+#             seção sai do nome do canal
+#   fonte:    acrescenta uma fonte; a primeira é a preferida e o player desce
+#             para a seguinte quando ela falha
+#   referer:  cabeçalho Referer exigido por alguns CDNs
+#   agente:   User-Agent exigido por alguns CDNs
+#   chave:    ClearKey das fontes DASH, no formato KID:CHAVE em hexadecimal
+#
+# referer, agente e chave pertencem à fonte imediatamente acima delas.
+# Linhas em branco e linhas começadas por # são ignoradas.
+# SAIMO TV — LISTA DE CANAIS
+# 408 canais · 17/09/2026
+#
+# Os apps baixam este arquivo ao abrir, então trocar um link aqui basta: nada
+# precisa ser recompilado nem reinstalado.
+#
+# Uma linha por campo, no formato "chave: valor".
+#
+#   canal:    começa um canal novo
+#   logo:     imagem do canal (opcional)
+#   categoria: em que seção da lista o canal entra (opcional); sem ela a
+#             seção sai do nome do canal
+#   fonte:    acrescenta uma fonte; a primeira é a preferida e o player desce
+#             para a seguinte quando ela falha
+#   referer:  cabeçalho Referer exigido por alguns CDNs
+#   agente:   User-Agent exigido por alguns CDNs
+#   chave:    ClearKey das fontes DASH, no formato KID:CHAVE em hexadecimal
+#
+# referer, agente e chave pertencem à fonte imediatamente acima delas.
+# Linhas em branco e linhas começadas por # são ignoradas.
+
+
+canal: A&E
 categoria: Documentários
 logo: https://img.faz-o-eli.online/ae.png
 
@@ -37,7 +71,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/96493ea395f0a100c8c428cfab4e62c1/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/23be18920cdcdc1eb6729b8ceb681ddc/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -80,7 +114,6 @@ qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDg4Lm0zdTg.m3u8
 qualidade: SD
 
-
 canal: Adult Swim
 categoria: Variedades
 logo: https://img.faz-o-eli.online/adultswim.png
@@ -93,7 +126,7 @@ fonte: https://aws.s13-s1001604.lat/stream/1167fe66d918c2b48a68300d5dd8d4ca/adul
 qualidade: HD · 1280x720
 referer: https://meufut.top/adultswim
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b8e3e7ddce4aaa483d6d886e85bb22fa/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/4e9781f263de1a112edbe79fe22954fb/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -143,7 +176,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/520fe2c3a0380456b223a5a9d4484ae0/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2e69f9683043c20e4c75052300993e73/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -201,7 +234,7 @@ fonte: https://aws.s13-s1001604.lat/stream/b334d79db281e34cdadd49b0feff5c9d/anim
 qualidade: HD · 1280x720
 referer: https://meufut.top/animal-planet
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/df56c58b1793d9b1387e8beabdcdbcc2/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/df34edd591b7a3fe71c8b4d0f604edec/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -302,7 +335,7 @@ fonte: https://aws.s13-s1001604.lat/stream/f20eee8ca370156a3e6ee41459384861/cart
 qualidade: HD · 1280x720
 referer: https://meufut.top/cartoon-network
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/bca334e39d7bf0659411fcf5b4330f30/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/1a224e0e724d204f531dfd3ebce036c7/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -382,7 +415,7 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/cnnbrasil/cnnbrasil.m
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDY0Lm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/84d3b4ecf5e96f6a0dd0cf88d718d419/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/8516bdb1bede4f392c04be9baadf9cad/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -520,7 +553,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://amg00716-globo-amg00716c1-tcl-br-9495.playouts.now.amagi.tv/playlist1080p.m3u8
 qualidade: FHD · 1920x1080
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/1987c7ad148950abf3225c048a8def0e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/d497e13fa32772035b4bb102eb59345b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -561,7 +594,7 @@ fonte: https://aws.s13-s1001604.lat/stream/f40b5972e5f78e715aaf2034cdaac946/glob
 qualidade: HD · 1280x720
 referer: https://meufut.top/globo-news
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/20346c1aac8334a22c9de251363a0bfd/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/1d49751ad6321e8ff85a799403dd935d/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -625,7 +658,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/94b2673727e8dd4dccf66f14a0c7e372/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/93b09e18a7a40658917f9371af1917dc/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -690,7 +723,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/d3cedef3ff9fd0b6d2246d099ca7cab1/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/ba2f84e097c9338740b1b53e7a6dbf51/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -760,7 +793,7 @@ fonte: https://aws.s13-s1001604.lat/stream/575a47cf188e44f46687363629749b7f/hist
 qualidade: HD · 1280x720
 referer: https://meufut.top/history
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/1be2cc43a1cf4fa3d728bb77f987f4e8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/80645d00789c8cfd66b9aeb4935679c9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -832,7 +865,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/4cc63469780b0fa7844bfc1066a209c2/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f1f141c8e99dbf331f6bec2062492fdc/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -930,7 +963,7 @@ fonte: https://aws.s13-s1001604.lat/stream/4449454c379f5034e01629ff759af317/mega
 qualidade: HD · 1280x720
 referer: https://meufut.top/megapix
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/35d03eda74b272f2c590a70b910e5a85/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/d6cfdd5c161ee25044a492c294e45792/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -996,7 +1029,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/83cfaa27160e3de565d5aae8939d0401/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f8445497778e39bc57222349bab6a0f9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1056,6 +1089,10 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2a10c76a605e6ae57314143274105dbd/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460212.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/3460213.m3u8
@@ -1078,6 +1115,10 @@ logo: https://img.faz-o-eli.online/premiere.png
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere3/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b47bf30e2d4e9a0b1fec75b38a6f88ce/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460215.m3u8
 qualidade: HD · 1280x720
@@ -1102,6 +1143,10 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/cc953f911687374324c97a6c58ef4ddc/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460218.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/81616.m3u8
@@ -1122,6 +1167,10 @@ logo: https://img.faz-o-eli.online/premiere.png
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere5/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/fd0acb095a9d613834adc85a65d76cdc/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460221.m3u8
 qualidade: HD · 1280x720
@@ -1221,6 +1270,10 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/98bfb465f3926669e1b49ac57a1a016a/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460210.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/3460211.m3u8
@@ -1299,7 +1352,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/sonychannel/sonychannel.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/4f7ceb7feaf16213168cb87deec99571/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/5208c53e04ad0b277d132f7228225251/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1352,7 +1405,7 @@ fonte: https://aws.s13-s1001604.lat/stream/f809a47c8a40c3642b96a3df2c2e563c/spor
 qualidade: HD · 1280x720
 referer: https://meufut.top/sportv
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/28c4466935f28e4878361c54f7e95f4d/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/d9fd66488d2e28e482b4e415ff39071f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1423,7 +1476,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/f338b67c7f1aef24c8fa6b567f6b0dfb/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0a2bfc3cb32fb1b9030bca6fcc2cb962/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1478,7 +1531,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/2dc61f6f03fc18e56cfba3bbf0bcc2e4/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/bff569f3c7b88fbe1b3f30db2b1691f7/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1539,7 +1592,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b5d17b701f53b4115e5ed61229ebbf3f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2dc70a9a15d502e329e7c58fcc17ea17/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1584,7 +1637,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a0590991feb653e1f1f47f12a9177492/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f6b4213108fa6f7255ebc1c772e93c73/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1659,7 +1712,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/telecinepipoca.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/efaf71f5d4ef808b765545564af7af73/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/72268625170adfa371b0e0cfd0ae2716/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1721,7 +1774,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/telecinepremium.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/df3a375edb1561520a4fa4367fe9e9f8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/7defdfa9e9a16af6379a33dd63fc8b60/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1848,7 +1901,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/warnertv.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/ea9f7bba027130e5f1abec0cb9e89d4d/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/50ac240b52915ff597e72b8480da72f5/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1913,7 +1966,7 @@ fonte: https://aws.s13-s1001604.lat/stream/25c389d4965f4166247f2280886f5cba/glob
 qualidade: HD · 1280x720
 referer: https://meufut.top/globo
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/1addb4e64acee8ce86ee17175f1337d0/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2783993644d9ef88f8940b42c9a05e73/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -1961,7 +2014,7 @@ fonte: https://aws.s13-s1001604.lat/stream/06fb008bc2fe2c3944c72e0c3ca551d4/cart
 qualidade: HD · 1280x720
 referer: https://meufut.top/cartoonito
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/419f875e1761b08c5c330ca9bf5a8bdd/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0aa35aeb15e6f2fbf314d5da4de7c97c/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2020,7 +2073,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://138.204.86.4:8080/CINEMAX/index.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/23400562cf812c98ea21acc645a22b0e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/099df65ab9e349201f7833f762013a08/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2075,7 +2128,7 @@ fonte: https://aws.s13-s1001604.lat/stream/abda9d242318532ccceeb60faa73e3cf/disc
 qualidade: HD · 1280x720
 referer: https://meufut.top/discovery-channel
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/f8086d888e8f183db340876b91edf102/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/bc4715d7a2f1f3c494bf3ab2b2d09fc1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2162,7 +2215,7 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/discoverykids/discove
 qualidade: Qualidade não informada
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDA3Lm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/74dd81ca462cd23a8eaf97d1bfbf82da/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/d64dff8f39b9375d07801d6f871c468a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2222,7 +2275,7 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/discoverytheather/dis
 qualidade: Qualidade não informada
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDMwLm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/ad6187ae55a52a61f99cf6491afb8887/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/98cf15621d9b7b07a7238dfb90b57302/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2281,7 +2334,7 @@ fonte: https://aws.s13-s1001604.lat/stream/48cae3919e89e385e3789102c01f9a97/espn
 qualidade: HD · 1280x720 @ 60fps
 referer: https://meufut.top/espn
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/fffc0adf2a670ceaf937a1b17dc988b2/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/dc52f2fafd736b651dfc41113e2b27a1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2355,7 +2408,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://138.204.86.4:8080/ESPN2_HD/index.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a906735f7bb7b94dcb14e01dfeea1857/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/80f31e36b2f21ef662628a2f35b0d54f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2411,7 +2464,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://45.162.64.114/ESPN_4/index.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/2a9b867363d5bbda045663006b4a67ad/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/65aee9c1c747ba7e324f286799446704/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2477,7 +2530,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a1b5b161ebacb31b4a661a6c7416e07b/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/a09a9659eacbb2141e34bff2b46441ef/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2531,7 +2584,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/c18ff6086a59f7bfe0083ee71107ac31/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/5c5a26b525c01f5c98758247e3933740/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2583,7 +2636,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/13a51a4214029139528c8d2f78f9558e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/c84ecf97c2980f0759dd5a98733ba80a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2657,7 +2710,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/ce58c755a25f43c28231532735b1a067/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/9b19a02919dfa8a7297562b483889672/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2721,7 +2774,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e3bda0ecccbddba22df181b3537faf66/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b2cce3fdd2794b5e5cda5d1a64295bc3/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2783,7 +2836,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://138.204.86.4:8080/HBO_MUNDI_HD/index.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/013b88ab3854cbd572ca59d57d51fa2a/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/3307c3414fa83db53e1a38e3d28a33bf/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2850,7 +2903,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/74782f33f4ba4697caca209699a4aeef/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/7ca1bf85e7ff0430ef1a4fc0462b4332/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -2922,7 +2975,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/717a919ca268e53f5b71e83261e3a47a/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b08e44be876fe7e1c380373e72dfb937/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3129,7 +3182,7 @@ logo: https://mondrian.claro.com.br/channels/inverse/record-tv.png
 fonte: https://dadinhodetapioca.fun/play/record.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/ed5ff3876f8c71e478df1a0de8c9f4dd/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/fda271996d7bdeba132cff6c4fcb0d7f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3154,7 +3207,7 @@ fonte: https://aws.s13-s1001604.lat/stream/167cfc64b5af287be1f19fb996d5c7ac/spac
 qualidade: HD · 1280x720
 referer: https://meufut.top/space
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/73f1bb26a715631450dcde6c3f5b2e25/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/cc42b9fd246333262309f545f9b00436/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3209,7 +3262,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/tnt.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/1f5b7cda48d408bfaed1d7fc79692ed8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/985c51c46f8450e05c8f9b1a8bba465c/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3281,7 +3334,7 @@ fonte: https://aws.s13-s1001604.lat/stream/53cae8d46c86aceec5a3928339017e1b/tnts
 qualidade: HD · 1280x720
 referer: https://meufut.top/tnt-series
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/8d46b082d95e23b8dc9064eba7133ba9/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/10d32422b6b3da4b77cf7a5d1497eef4/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3349,7 +3402,7 @@ fonte: https://aws.s13-s1001604.lat/stream/ed870f00aff7cf8192af3737e301669f/univ
 qualidade: HD · 1280x720
 referer: https://meufut.top/universal-tv
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e0d98dd670cae57c2ab5e458ccc5da95/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f6c50593d37029d295cd4d2358f97962/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3422,7 +3475,7 @@ fonte: http://138.204.86.4:8080/DISCOVERY_TURBO_HD/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDM0Lm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/2ed958b30e3a5277483a1833876def40/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/e2c0fb289a8ed9a0d834c77f6850c5da/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3516,7 +3569,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/telecinefun/telecinefun.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a4bae13b3ae168adc65fe8682d346166/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/1fb08d736b48b597be516148e9debdf5/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3582,7 +3635,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/telecinecult.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/d97636d15fd623e1bdbb62712be64894/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b7291288a166cb829b447929ca84ab2d/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3646,7 +3699,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/telecinetouch.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b4c08747f7ca85835c833880b4699da8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/84a191f4d2ae011d84fd2045da18cf8c/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3760,6 +3813,10 @@ logo: https://img.faz-o-eli.online/tlc.png
 fonte: https://dadinhodetapioca.fun/play/tlc.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/9f0c37974f120a15a97de16615be0cd3/error.txt
+qualidade: Qualidade não informada
+referer: https://w7.embedtv.cc/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/tlc/tlc.m3u8
 qualidade: Qualidade não informada
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTM4Lm0zdTg.m3u8
@@ -3853,7 +3910,7 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://dadinhodetapioca.fun/play/tntnovelas.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/0b5347c553068def3186e3897b5b9f74/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0657b81497c278ac47cd644ffb868fb8/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3913,7 +3970,7 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/discoveryscience/disc
 qualidade: Qualidade não informada
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDI2Lm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/cbad202827f6f0c22ac64ca164b1fd4b/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2b9af82c0427291a214becf487c5a3cf/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -3966,7 +4023,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/67e0136764a2f0ab59ae2bf50c0359a6/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/4869535342a6c1ee391f50758acb0973/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4024,10 +4081,6 @@ logo: https://img.faz-o-eli.online/tcm.png
 
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/tcm/tcm.m3u8
 qualidade: Qualidade não informada
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/8b95411116ffb58ecdcc1423264e17ae/error.txt
-qualidade: Qualidade não informada
-referer: https://w7.embedtv.cc/
-agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzQ1Lm0zdTg.m3u8
 qualidade: FHD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9124.m3u8
@@ -4054,7 +4107,7 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/bandnews/bandnews.m3u
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDYwLm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/82879f5c97ad6e7701cf3e3294f9942e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/08663c8dbf79f570cd61cb47d6b5844f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4117,7 +4170,7 @@ qualidade: HD · 1280x720
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/bandsports/bandsports.m3u8
 qualidade: HD · 1280x720
 fonte: https://16-5-0-235.sslip.io/bandsports/index.m3u8
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/4bb1588222705f7283fd7378cdaa3e91/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/146dfa420c0e75a18125c7856cfb3bbf/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4278,7 +4331,7 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://138.204.86.4:8080/ESPN3_HD/index.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/d2da0184bdaa7fd0e9190d83e3fef245/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0bb5d50b0d06e64ed81ca9676f2d5bc9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4356,10 +4409,6 @@ referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://45.162.64.114/RECORD_NEWS/index.m3u8
 qualidade: FHD · 1920x1080
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/734c04d1e65f8d4892c026ff63d548bd/error.txt
-qualidade: Qualidade não informada
-referer: https://w7.embedtv.cc/
-agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://rnw-rn-samsungtvplus.otteravision.com/rnw/rn/rnw_rn.m3u8
 qualidade: HD · 1280x720
 fonte: https://stream.ads.ottera.tv/playlist.m3u8?network_id=5431
@@ -4451,7 +4500,7 @@ fonte: https://cdn.live.br1.jmvstream.com/w/LVW-9716/LVW9716_HbtQtezcaw/playlist
 qualidade: FHD · 1920x1080
 referer: https://meufut.top/aparecida
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a01573d28c004305e2d3f7994a006ed6/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/a65fc58af91fca58e7f64b0b29cfbe9b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4541,7 +4590,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/fa012de62db9be62ec76ba4e0f61d4f1/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/19bbe11f2bec074d0cc1c20175470b91/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4639,7 +4688,7 @@ fonte: https://aws.s13-s1001604.lat/stream/ab55903cd13c40853a7fead247e75e80/xspo
 qualidade: HD · 1280x720
 referer: https://meufut.top/xsports
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/507165d6cb5ec1aae904c3bac51fb912/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0737fc77b349e0127d94cba53865faa4/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4740,7 +4789,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/5fe32b765e023375246f45e9c62705b8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/aafa63dd51a9aa70285813b54106671a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4800,7 +4849,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e1c4d01b113b9643ac7b07af70788f27/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/80eb7cdec1b74300555c9e06dd806f5d/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4843,7 +4892,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/7167f0a6b33961791ae47f7b4f6cd3d3/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/baa77c350f3e362009d70e86f600bc97/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -4968,10 +5017,6 @@ agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, lik
 fonte: https://video09.logicahost.com.br/paieterno/paieterno/playlist.m3u8
 qualidade: FHD · 1920x1080
 referer: https://meufut.top/tv-pai-eterno
-agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/0ac4ef1cc61d4dde788c3dc083d7554e/error.txt
-qualidade: Qualidade não informada
-referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://45.162.64.114/TV_PAI_ETERNO/index.m3u8
 qualidade: HD · 1280x720
@@ -5225,7 +5270,7 @@ fonte: http://45.162.64.114/DISCOVERY_H_H/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/discoveryhh/discoveryhh.m3u8
 qualidade: Qualidade não informada
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/bb197fc4cdab838284959cfc218ee032/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b9c86c97d385d2d854f4d5e27a538e94/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -5779,7 +5824,7 @@ fonte: https://aws.s13-s1001604.lat/stream/7d57bfa6e9334f879ac96923e91f97f4/comb
 qualidade: HD · 1280x720
 referer: https://meufut.top/combate
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/50ec742af7cd0ee7847299f25b819045/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/14a77f714d10e2c89a76ecb769a3b539/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -5935,10 +5980,6 @@ canal: SportyNet 01
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b01f718698f4ffdaf039ed3ade05c9cb/error.txt
-qualidade: Qualidade não informada
-referer: https://w7.embedtv.cc/
-agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://64.31.23.207:80/59471019/60849037/3460158.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/3460269.m3u8
@@ -6124,7 +6165,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e03eeb50a456f940d08cbe055635fefb/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2b389bbadb98884329ad472d89ba7c22/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6175,7 +6216,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e2a170293a63f0467a11472aa541b67d/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/fb34a578db091767dea42f7d620267fc/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6355,7 +6396,7 @@ canal: Band RJ
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/band.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9a952a862b6307d6080014f48e43034f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/8bfc0f9336024f03a44cdcb939825835/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6469,7 +6510,7 @@ fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/8cb22687872b742561cb04bf2262d64e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/20adbedd8e3cb163f772eca29c070327/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6582,7 +6623,7 @@ fonte: https://aws.s13-s1001604.lat/stream/8975189bb51c75df99a767cdecf542d0/food
 qualidade: HD · 1280x720
 referer: https://meufut.top/foodnetwork
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/d02a957026a97af8a9a747fe4a327a75/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/78d5cdf864f5f7547a405f11cd132f54/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6693,7 +6734,7 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/137144.m3u8
 qualidade: SD · 640x480
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/137145.m3u8
 qualidade: SD · 640x480
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/bcbdd48d6883fe1c77f99de6e5f5455f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/134d8f920e4037d5a1e25a709603cfd3/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6724,7 +6765,7 @@ fonte: https://aws.s13-s1001604.lat/stream/52e5b4e936ba314127ebe4742e6ae12f/24h_
 qualidade: HD · 1280x720
 referer: https://meufut.top/dragon-ball-z
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/d247ded86f9ac8ae46ee45b6e2702476/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/812d46852b8822bd84244d570700cc6b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6741,7 +6782,7 @@ canal: 24H Naruto Clássico
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/6737cee56410ce8152726dcedc419bc1/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/eb04714b7fb02f9da6e3f86d6ccfbbbe/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6756,7 +6797,7 @@ fonte: https://aws.s13-s1001604.lat/stream/2efddc40d3e9b9d781d88441ec82e8ce/24h_
 qualidade: HD · 1280x720
 referer: https://meufut.top/os-simpsons
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/6a7b2d43e9e53f85e5fda6d16ce3a9cc/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/c6f6407775bd420d1e8c6e3ceb80201e/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6905,7 +6946,7 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/136821.m3u8
 qualidade: SD · 640x480
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_picapau/24h_picapau.m3u8
 qualidade: Qualidade não informada
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/51ed018b8cc243bbea26add3b3b8cac5/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/935a76323903de47f3eda0c3ef287ba2/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6936,7 +6977,7 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/135471.m3u8
 qualidade: HD · 1280x720
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/135472.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a6411fcc6fe2f11a1f1dc62eb526feb3/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/ef0e7e340bb064c57b6d6dadf7f4f032/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -6977,7 +7018,7 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/138822.m3u8
 qualidade: HD · 1280x720
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/138823.m3u8
 qualidade: HD · 1280x720
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/ba6a515dd5f9d556cffe22d052ef828c/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/da94e8f200d1bb7e4fb4a1dffb3cb88a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7021,7 +7062,7 @@ fonte: http://138.204.86.4:8080/DISCOVERY_WORLD_HD/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDM4Lm0zdTg.m3u8
 qualidade: FHD
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/213be021c97c8fdabfd20a78a7504607/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/bd7a4fa2f386621eedd4fdedd2d35a75/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7072,7 +7113,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/565eed44074ec92c16b649c591f6515c/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/ae3d9c57456f77f5ed03a09763969933/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7093,7 +7134,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/280ea84ab0e4c162260ad27d309c6477/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/be6d3f3f47c551fbd2e4ecbdc80b5086/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7106,7 +7147,7 @@ canal: PT - A Bola
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_abola.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/7a378227ace1fe14378efa0b73f6e2d3/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/7799f07e70b9693bde0f740f09d3e046/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7117,7 +7158,7 @@ canal: PT - Benfica TV
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_benficatv.prev.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a07ca23cd49c6e747292a957b82248ee/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/1794a14af884fa41b2fc86d477028f32/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7128,7 +7169,7 @@ canal: PT - Canal 11
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_canal11.prev.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/2a468ebdc639676d87fc551b105857a5/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0c23c918d82aabe3e4b7c1d909c3b9b1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7139,7 +7180,7 @@ canal: PT - Eleven 1
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_eleven1.prev.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/bb924adb53ef2de0187223ac1ba678dc/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/ea323596f00f66073c3bc57d04351df6/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7150,7 +7191,7 @@ canal: PT - Eleven 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_eleven2.prev.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/c09bf054e54779996554741d52226090/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/188b0711f51325b4e4b4c88eecd022e7/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7161,7 +7202,7 @@ canal: PT - Eleven 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/pt_eleven3.prev.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/55839452469dad007a42caf2279eb41f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0ba4ec43346afbdc9dbd45a9e9629091/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7172,7 +7213,7 @@ canal: PT - Sporttv 1
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/738710a8379b311c188e11c56808e7fb/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/62902f8cac801fe67f1a12f7e14f0e19/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7183,7 +7224,7 @@ canal: PT - Sporttv 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/0e5ac6dfd1f419307a5c738f1bfa9a32/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b3d4fc00e23c91bb9cce3dcfad885a07/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7194,7 +7235,7 @@ canal: PT - Sporttv 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/737e12037c6cdcf13def13c374f1229e/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/93ba399bf15cb3167d77731cf90ae81b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7205,7 +7246,7 @@ canal: PT - Sporttv 4
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9582b4d93ebb832d857a160a5cfeb4a2/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/6b6ea30e82010ccb3e7f18927e25b071/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7216,7 +7257,7 @@ canal: PT - Sporttv 5
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/dbc70b317787451de85fdb406e2462a8/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/ea583cf09d10aff4b413f2130cd76da1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7227,7 +7268,7 @@ canal: PT - Sporttv 6
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/85eaa087d03f75f8d31c03d1dddbbab0/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0fca22c27979348231641c2710204418/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7238,7 +7279,7 @@ canal: PT - Sporttv 7
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/2432fc268776c530b472e9f5c0baacdb/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/2443d7da9bc342db7d0228269d996afe/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7286,7 +7327,7 @@ canal: Globo AM
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a87ac78a6280a4dec96f655561273f3f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/19b5c4e3c680d50d371b6096789f1443/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7297,7 +7338,7 @@ canal: Globo CE
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/fa516b073a1bcfae3253db2eaa12163f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/8e93e2a365a62beb9f41a25c87bd23da/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7312,7 +7353,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/277fd134e8229bbb035c8e1b060e5a32/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/d8a713c0dd7053f05ac404f186b07c77/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7323,7 +7364,7 @@ canal: Globo GO
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/cce5fc6dc821be20de867a0bf1f560c1/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/277404a80fc2474166848205d1522ee9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7334,7 +7375,7 @@ canal: Globo PB
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b35e5aee8d03610d0f00caf66074f52f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/49468660fe2031a725c376b4f606d41a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7345,7 +7386,7 @@ canal: Globo PE
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/5f69842c2471a8724578aae47d6d2939/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/61c9ed3534f6a49a8ab75b8b77660385/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7360,7 +7401,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e1f7d5df8db333ede811a59592be9a74/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/83f890d99ddc8c738b2edd1d03d68fa6/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7402,7 +7443,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9c0047f016d9a5b7c750feb867987c6f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/8eae50f858da4085d2a89b1609336d79/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7415,7 +7456,7 @@ logo: https://img.faz-o-eli.online/record.png
 
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/recordgo/recordgo.m3u8
 qualidade: Qualidade não informada
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/57f5b712036ac6a920df45a3dbdfe552/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/c0cc9e8577021794d20e2819683d391a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7438,7 +7479,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/38938220556325693b215e058ed39e4f/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/157765ffaffb87573577e5d89c531ef7/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7457,7 +7498,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/7c5fa44321f796f3900c4d48ee8b412a/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/b25628a73c873f3df50ae65b1c5da3ae/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7485,7 +7526,7 @@ fonte: https://aws.s13-s1001604.lat/stream/0b7ed4f2d49df88f285464007159254d/hgtv
 qualidade: HD · 1280x720
 referer: https://meufut.top/hgtv
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/e523fa1b61a1c1f588c7889c38799b80/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f0ac14720a5225271d026ffaf9336710/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7546,7 +7587,7 @@ fonte: https://aws.s13-s1001604.lat/stream/820fef4ff510e9724f894c3b408b9a93/afaz
 qualidade: HD · 1280x720
 referer: https://meufut.top/a-fazenda-18
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/5b8ec207b51bb5e98a4df0db1b81e1a5/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/5b3536682caab95d11c41aa97c5e5877/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7563,7 +7604,7 @@ canal: A Fazenda 18 2
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9b3b21cd30304fb4eb6681a4e3e330e9/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/613ad72a4c50c31efc80284951ce51df/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7576,7 +7617,7 @@ canal: A Fazenda 18 3
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/04e77d74c78b23da7fe308a71d681c8b/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/015bb7fd450dd282c0200793f9f8f881/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7589,12 +7630,12 @@ canal: A Fazenda 18 4
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/eeb5bfb46a2b1533c44690b9c2fbc179/error.txt
+fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda4/afazenda4.m3u8
+qualidade: Qualidade não informada
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/f55303053d5f70377fe56efd2dc9b448/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda4/afazenda4.m3u8
-qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470064.m3u8
 qualidade: HD · 1280x720
 
@@ -7602,7 +7643,7 @@ canal: A Fazenda 18 5
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/78dd163cdf878bfea79746c2dc580f68/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/0b7cba86fdf5d85890ba618350626b1e/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7630,7 +7671,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/f6f41dd240c6cde58894b94561dfacde/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/e5e1f68fc14bc872d00bf8f5b5b1ab51/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -7657,7 +7698,7 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
-fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/dc9320dc5281e014b646f0e35bec85d4/error.txt
+fonte: https://70658e728e6e4d41997cf0cbe94ee41e.s25-cloudfront-net.lat/stream/16fa123f0c5a03da0abeb4524c27242a/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
@@ -9272,11 +9313,20 @@ qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 
-canal: A&E
-categoria: Filmes e Séries
-logo: https://1.embedcanaisdetv.com/images/aee.png
+canal: Disney+ 04
+categoria: Esportes
+logo: https://1.embedcanaisdetv.com/images/disneyplus.png
 
-fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/aee/index.m3u8
+fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus04/index.m3u8
+qualidade: FHD
+referer: https://embedcanaisdetv.xyz/
+agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+
+canal: Max
+categoria: Esportes
+logo: https://1.embedcanaisdetv.com/images/max.png
+
+fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/max/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
