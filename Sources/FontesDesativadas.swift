@@ -29,6 +29,18 @@ enum FontesDesativadas {
     private static let chaveHosts = "fontesDesativadas.hosts"
     private static let chaveLidoEm = "fontesDesativadas.lidoEm"
 
+    /// Servidores conhecidos que deixaram de funcionar permanentemente.
+    static let mortosPermanentes: Set<String> = [
+        "123flmsfree.com",
+        "vod-limit-media",
+        "froststream.cloutteam.com",
+        "cloutteam.com",
+        "praia13.com",
+        "pub-bda823ef358c448ea310cdf9539f9628.r2.dev",
+        "governosptx.org",
+        "desativado.invalid"
+    ]
+
     /// Lida pelo proxy fora da thread principal e escrita por quem baixa a
     /// lista: uma trava só, para as duas pontas verem sempre o mesmo estado.
     private struct Estado: Sendable {
@@ -40,14 +52,14 @@ enum FontesDesativadas {
     private static func guardado() -> Estado {
         let d = UserDefaults.standard
         var e = Estado()
-        e.hosts = Set(d.stringArray(forKey: chaveHosts) ?? [])
+        e.hosts = Set(d.stringArray(forKey: chaveHosts) ?? []).union(mortosPermanentes)
         let lido = d.double(forKey: chaveLidoEm)
         // Relógio que voltou para trás não prende a lista velha para sempre.
         if lido > 0, lido <= Date().timeIntervalSince1970 { e.lidoEm = Date(timeIntervalSince1970: lido) }
         return e
     }
 
-    private static var hosts: Set<String> { estado.withLock { $0.hosts } }
+    private static var hosts: Set<String> { estado.withLock { $0.hosts.union(mortosPermanentes) } }
     private static var lidoEm: Date { estado.withLock { $0.lidoEm } }
 
     /// Os servidores desligados agora, sem ir à rede.
@@ -70,7 +82,7 @@ enum FontesDesativadas {
               let lista = corpo["desativados"] as? [String]
         else { return false }
 
-        let novos = Set(lista.map { $0.lowercased() })
+        let novos = Set(lista.map { $0.lowercased() }).union(mortosPermanentes)
         UserDefaults.standard.set(novos.sorted(), forKey: chaveHosts)
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: chaveLidoEm)
         let mudou = estado.withLock { atual -> Bool in
@@ -88,7 +100,7 @@ enum FontesDesativadas {
 
     static func desligado(_ url: URL?) -> Bool {
         guard let host = url?.host?.lowercased() else { return false }
-        return hosts.contains(host)
+        return hosts.contains { host.contains($0) }
     }
 
     static func desligado(_ endereco: String) -> Bool {
