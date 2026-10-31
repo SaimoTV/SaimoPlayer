@@ -94,7 +94,7 @@ enum Vod {
     /// índice sem as linhas `base:` deixou todo filme com endereço quebrado.
     /// Guardar a versão junto e limpar a pasta quando ela muda evita que o
     /// formato velho envenene o novo.
-    private static let versaoCache = "6"
+    private static let versaoCache = "7"
 
     /// Validade do cache local das fatias antes de buscar da rede (3 horas).
     private static let cacheTTL: TimeInterval = 3 * 3600
