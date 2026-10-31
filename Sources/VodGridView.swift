@@ -119,7 +119,7 @@ struct VodGridView: View {
     private var conteudo: some View {
         if let serie = estado.serieAberta {
             episodiosDe(serie)
-        } else if let secao = estado.secao, listas.filmes == nil,
+        } else if let secao = estado.secao, !Enderecos.filmesAtivos,
                   [.ondemand, .filmes, .series, .animes, .doramas, .extras].contains(secao) {
             // Sem o endereço dos filmes não há acervo, nem pedido de rede.
             SemListaView(secao: .filmes)

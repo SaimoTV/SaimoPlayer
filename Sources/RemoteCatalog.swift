@@ -9,27 +9,38 @@ import Foundation
 /// missing network never costs the user their channels.
 enum RemoteCatalog {
 
-    private static let base = Enderecos.canais
+    private static var base: String { Enderecos.canais }
     /// The whole catalogue, with ClearKey, Referer and User-Agent. This is the
     /// list that rules: editing this file swaps a link with nothing to rebuild.
-    static let url = URL(string: base + "catalogo.txt")!
+    static var url: URL? {
+        guard Enderecos.canaisAtivos else { return nil }
+        return URL(string: base + "catalogo.txt")
+    }
     /// Extras published separately, as M3U. An M3U has nowhere to keep a key or
     /// a header, so it joins as a spare and never replaces the catalogue.
-    static let extrasURL = URL(string: base + "canais.txt")!
+    static var extrasURL: URL? {
+        guard Enderecos.canaisAtivos else { return nil }
+        return URL(string: base + "canais.txt")
+    }
     /// Os canais que só aparecem depois do código. Publicados à parte para
     /// renomear, tirar ou trocar link sem recompilar — a lista de fábrica
     /// (`restrictedChannels`) fica só de reserva para a primeira abertura sem rede.
-    static let restritosURL = URL(string: base + "restritos.txt")!
+    static var restritosURL: URL? {
+        guard Enderecos.canaisAtivos else { return nil }
+        return URL(string: base + "restritos.txt")
+    }
 
     /// Os restritos que valem agora: o último baixado, ou os de fábrica.
     static func restritosEmCache() -> [Channel] {
+        guard Enderecos.canaisAtivos else { return [] }
         let lidos = read("restritos.txt")
         return comoAdulto(lidos.isEmpty ? restrictedChannels : lidos)
     }
 
     /// Baixa a lista restrita; nulo quando não veio nada aproveitável.
     static func baixarRestritos() async -> [Channel]? {
-        let lidos = await download(restritosURL, into: "restritos.txt")
+        guard let url = restritosURL else { return nil }
+        let lidos = await download(url, into: "restritos.txt")
         return lidos.isEmpty ? nil : comoAdulto(lidos)
     }
 
@@ -44,6 +55,7 @@ enum RemoteCatalog {
 
     /// Whatever is available right now, without touching the network.
     static func cached() -> [Channel] {
+        guard Enderecos.canaisAtivos else { return [] }
         let base = read("catalogo.txt")
         let extras = read("canais.txt")
         guard !base.isEmpty || !extras.isEmpty else { return defaultChannels }
@@ -112,6 +124,7 @@ enum RemoteCatalog {
     /// Downloads the published list. Returns nil when it cannot be read, so the
     /// caller keeps what it already had rather than emptying the list.
     static func fetch() async -> [Channel]? {
+        guard let url = self.url, let extrasURL = self.extrasURL else { return [] }
         async let baixado = download(url, into: "catalogo.txt")
         async let extras = download(extrasURL, into: "canais.txt")
         let (base, publicados) = await (baixado, extras)

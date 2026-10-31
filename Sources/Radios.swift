@@ -55,8 +55,10 @@ final class Radios: ObservableObject {
     private var observadorItem: NSKeyValueObservation?
     private var buscou = false
 
-    private static let endereco = URL(
-        string: Enderecos.canais + "radios.txt")!
+    private static var endereco: URL? {
+        guard Enderecos.canaisAtivos else { return nil }
+        return URL(string: Enderecos.canais + "radios.txt")
+    }
 
     private static var arquivo: URL {
         let pasta = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -80,7 +82,8 @@ final class Radios: ObservableObject {
         }
         guard !buscou else { return }
         buscou = true
-        var pedido = URLRequest(url: Self.endereco)
+        guard let endereco = Self.endereco else { return }
+        var pedido = URLRequest(url: endereco)
         pedido.timeoutInterval = 20
         guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
               let http = resposta as? HTTPURLResponse, (200...299).contains(http.statusCode),

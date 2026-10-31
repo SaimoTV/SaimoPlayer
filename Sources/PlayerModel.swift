@@ -318,7 +318,10 @@ final class PlayerModel: NSObject, ObservableObject {
     /// channel being watched keeps playing if it survived the update.
     func refreshCatalog() {
         // Sem endereço dos canais não há pedido de rede nenhum.
-        guard Enderecos.canais != nil else { return }
+        guard Enderecos.canaisAtivos else {
+            channels = Store.customChannels()
+            return
+        }
         Task { @MainActor in
             guard let fresh = await RemoteCatalog.fetch() else {
                 Log.shared.write("lista publicada indisponível — usando a que já estava")

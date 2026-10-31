@@ -193,7 +193,7 @@ final class Atualizacao: ObservableObject {
     /// Lê `versao.json`. Qualquer falha (rede, JSON, endereço fora da lista)
     /// vira "sem atualização": nunca trava nem derruba o app.
     private func buscar() async -> Versao? {
-        guard let url = URL(string: Enderecos.canais + "versao.json") else { return nil }
+        guard Enderecos.canaisAtivos, let url = URL(string: Enderecos.canais + "versao.json") else { return nil }
         var pedido = URLRequest(url: url)
         pedido.timeoutInterval = 20
         pedido.cachePolicy = .reloadIgnoringLocalCacheData

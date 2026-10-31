@@ -35,7 +35,7 @@ struct Episodio: Identifiable, Hashable {
 /// o download acompanha o clique em vez de contrariá-lo.
 enum Vod {
 
-    private static let base = Enderecos.filmes
+    private static var base: String { Enderecos.filmes }
 
     struct Gaveta: Identifiable, Hashable {
         var letra: String
@@ -100,6 +100,7 @@ enum Vod {
     private static let cacheTTL: TimeInterval = 3 * 3600
 
     static func indice() async -> [Gaveta] {
+        guard Enderecos.filmesAtivos else { return [] }
         conferirVersao()
         guard let texto = await indiceAtual() else { return [] }
         var out: [Gaveta] = []
@@ -182,6 +183,7 @@ enum Vod {
     }
 
     static func filmes(letra: String, reservados: Bool = false) async -> [Filme] {
+        guard Enderecos.filmesAtivos else { return [] }
         let prefixo = reservados ? "reservado" : "filmes"
         guard let texto = await arquivo("\(prefixo)-\(gaveta(letra)).txt") else { return [] }
         return texto.split(separator: "\n").compactMap { linha in
@@ -202,6 +204,7 @@ enum Vod {
     }
 
     static func series(letra: String) async -> [Serie] {
+        guard Enderecos.filmesAtivos else { return [] }
         guard let texto = await arquivo("series-\(gaveta(letra)).txt") else { return [] }
         return texto.split(separator: "\n").compactMap { linha in
             let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
@@ -213,7 +216,7 @@ enum Vod {
 
     /// Animes e doramas já trazem títulos e episódios no mesmo arquivo.
     static func colecao(_ tipo: String) async -> [(Serie, [Episodio])] {
-        guard ["animes", "doramas"].contains(tipo) else { return [] }
+        guard Enderecos.filmesAtivos, ["animes", "doramas"].contains(tipo) else { return [] }
         if bases.isEmpty { _ = await indice() }
         let nome = "redeflix/links-\(tipo).txt"
         // A classificação e os novos episódios mudam semanalmente: rede
@@ -306,6 +309,7 @@ enum Vod {
     /// não pode aparecer numa busca geral.
     @MainActor
     static func todos() async -> [Achado] {
+        guard Enderecos.filmesAtivos else { return [] }
         if indiceBuscaSuja {
             indiceBusca = []
             indiceBuscaSuja = false
@@ -404,7 +408,7 @@ enum Vod {
     /// Busca o arquivo na rede e guarda em disco.
     @discardableResult
     private static func baixar(_ nome: String) async -> String? {
-        guard let url = URL(string: base + nome) else { return nil }
+        guard Enderecos.filmesAtivos, let url = URL(string: base + nome) else { return nil }
         var request = URLRequest(url: url)
         request.timeoutInterval = 25
         request.cachePolicy = .reloadIgnoringLocalCacheData

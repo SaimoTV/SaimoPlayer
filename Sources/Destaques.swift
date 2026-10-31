@@ -38,8 +38,10 @@ enum Destaques {
         var id: String { titulo }
     }
 
-    private static let endereco = URL(
-        string: Enderecos.filmes + "destaques.txt")!
+    private static var endereco: URL? {
+        guard Enderecos.filmesAtivos else { return nil }
+        return URL(string: Enderecos.filmes + "destaques.txt")
+    }
     /// Validade curta (15 minutos) para que novas atualizações apareçam rapidamente
     /// no app sem atrasos de 24h.
     private static let validade: TimeInterval = 15 * 60
@@ -71,6 +73,7 @@ enum Destaques {
             return guardado
         }
 
+        guard let endereco else { return nil }
         var pedido = URLRequest(url: endereco)
         pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
         pedido.setValue("*/*", forHTTPHeaderField: "Accept")

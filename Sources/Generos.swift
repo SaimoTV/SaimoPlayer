@@ -15,8 +15,10 @@ import Foundation
 @MainActor
 enum Generos {
 
-    private static let endereco = URL(
-        string: Enderecos.filmes + "fichas.txt")!
+    private static var endereco: URL? {
+        guard Enderecos.filmesAtivos else { return nil }
+        return URL(string: Enderecos.filmes + "fichas.txt")
+    }
 
     /// "f|Nome" ou "s|Nome" -> os gêneros dele.
     private static var mapa: [String: [String]] = [:]
@@ -165,6 +167,7 @@ enum Generos {
     }
 
     private static func baixado() async -> String? {
+        guard let endereco else { return nil }
         var pedido = URLRequest(url: endereco)
         pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
         pedido.setValue("*/*", forHTTPHeaderField: "Accept")

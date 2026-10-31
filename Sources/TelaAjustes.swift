@@ -123,6 +123,9 @@ struct TelaAjustes: View {
     @ObservedObject private var epg = EPGService.shared
     @ObservedObject private var connect = SaimoConnect.shared
     @State private var catalogoAtualizado = false
+    @State private var urlCanais: String = Enderecos.canais
+    @State private var urlFilmes: String = Enderecos.filmes
+    @State private var statusListas: String? = nil
 
     private var versao: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
@@ -163,6 +166,158 @@ struct TelaAjustes: View {
                         alternador("Lista de canais em janela separada",
                                    "Uma janela ao lado do player, como antes (⇧⌘L)",
                                    icone: "sidebar.leading", valor: $model.detachedList)
+                    }
+
+                    secao("Listas") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Os endereços de onde o app lê os canais e os filmes e séries. Já vêm preenchidos; troque por outros, ou deixe em branco e salve para desligar uma lista (o app fica vazio naquela parte).")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Tema.textoSecundario)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.top, 14)
+                        .padding(.bottom, 6)
+
+                        Divider().background(Color.white.opacity(0.08))
+
+                        // Canais
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Image(systemName: "tv")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Tema.acento)
+                                    .frame(width: 26)
+
+                                Text("Canais")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(.white)
+
+                                Spacer()
+
+                                if !urlCanais.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    Button("Apagar") {
+                                        urlCanais = ""
+                                        salvarListas()
+                                    }
+                                    .buttonStyle(.plain)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(.red.opacity(0.85))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+
+                            TextField("https://canais-saimo.pages.dev/", text: $urlCanais)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(.white)
+                                .padding(9)
+                                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                            Text("Lista de canais, rádios e guia de programação.")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Tema.textoApagado)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+
+                        Divider().background(Color.white.opacity(0.08))
+
+                        // Filmes e séries
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Image(systemName: "film.stack")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Tema.acento)
+                                    .frame(width: 26)
+
+                                Text("Filmes e séries")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(.white)
+
+                                Spacer()
+
+                                if !urlFilmes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    Button("Apagar") {
+                                        urlFilmes = ""
+                                        salvarListas()
+                                    }
+                                    .buttonStyle(.plain)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(.red.opacity(0.85))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+
+                            TextField("https://filmes-saimo.pages.dev/", text: $urlFilmes)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(.white)
+                                .padding(9)
+                                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                            Text("Lista de filmes, séries, animes e doramas.")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Tema.textoApagado)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+
+                        Divider().background(Color.white.opacity(0.08))
+
+                        // Ações de Listas
+                        HStack(spacing: 12) {
+                            Button {
+                                Enderecos.restaurarPadroes()
+                                urlCanais = Enderecos.canais
+                                urlFilmes = Enderecos.filmes
+                                recarregarTudo()
+                                mostrarStatus("✓ Endereços padrão restaurados")
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "arrow.counterclockwise")
+                                    Text("Restaurar padrão")
+                                }
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
+
+                            Spacer()
+
+                            if let status = statusListas {
+                                Text(status)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(status.contains("✓") ? Tema.acento : .orange)
+                                    .transition(.opacity)
+                            }
+
+                            Button {
+                                salvarListas()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "checkmark")
+                                    Text("Salvar")
+                                }
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.black)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 6)
+                                .background(Tema.acento, in: RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 10)
                     }
 
                     secao("Canais") {
@@ -225,6 +380,42 @@ struct TelaAjustes: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollIndicators(.hidden)
+            .onAppear {
+                urlCanais = Enderecos.canais
+                urlFilmes = Enderecos.filmes
+            }
+        }
+    }
+
+    private func salvarListas() {
+        let canaisNorm = Enderecos.normalizar(urlCanais)
+        let filmesNorm = Enderecos.normalizar(urlFilmes)
+
+        let mudou = Enderecos.canais != canaisNorm || Enderecos.filmes != filmesNorm
+
+        Enderecos.canais = canaisNorm
+        Enderecos.filmes = filmesNorm
+        urlCanais = canaisNorm
+        urlFilmes = filmesNorm
+
+        if mudou {
+            recarregarTudo()
+        }
+        mostrarStatus("✓ Listas salvas com sucesso")
+    }
+
+    private func recarregarTudo() {
+        Vod.limparCache()
+        model.refreshCatalog()
+        EPGService.shared.refresh(channels: model.channels)
+        ListasEstado.shared.atualizar()
+    }
+
+    private func mostrarStatus(_ msg: String) {
+        withAnimation { statusListas = msg }
+        Task {
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            withAnimation { statusListas = nil }
         }
     }
 
