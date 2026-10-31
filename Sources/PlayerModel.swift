@@ -646,14 +646,19 @@ final class PlayerModel: NSObject, ObservableObject {
     private func load(_ link: URL, channel: Channel?) {
         tearDownItemObservers()
 
+        var headers: [String: String] = [
+            "User-Agent": Upstream.userAgent,
+            "Accept": "*/*",
+        ]
+        if let host = link.host, host.contains("embedplayer2.xyz") {
+            headers["Referer"] = "https://embedplayer2.xyz/"
+        }
+
         let asset = AVURLAsset(url: link, options: [
             // O "Accept" vai junto porque há origem que recusa quem não manda
             // nenhum — o EmbedPlayer, dos doramas e animes novos, responde 200
             // com "security error" no lugar da playlist.
-            "AVURLAssetHTTPHeaderFieldsKey": [
-                "User-Agent": Upstream.userAgent,
-                "Accept": "*/*",
-            ]
+            "AVURLAssetHTTPHeaderFieldsKey": headers
         ])
         let item = AVPlayerItem(asset: asset)
         if channel != nil {
