@@ -37,6 +37,15 @@ enum FontesDesativadas {
         "cloutteam.com",
         "praia13.com",
         "pub-bda823ef358c448ea310cdf9539f9628.r2.dev",
+        "cdn.hermesnewone.com",
+        "speed2.megafilmeshd9.com",
+        "cdn-sv01.maximaimg.online",
+        "strm15.uqload.vc",
+        "megaembed.com",
+        "clickhost.xyz",
+        "playercdnx.workers.dev",
+        "146.0.32.89",
+        "corruptx.org",
         "governosptx.org",
         "desativado.invalid"
     ]
