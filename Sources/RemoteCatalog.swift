@@ -194,7 +194,8 @@ enum RemoteCatalog {
             case "categoria":
                 categoria = value
             case "fonte":
-                guard let url = URL(string: value) else { continue }
+                let resolved = value.hasPrefix("curtitv://") ? "https://saimo-tv.pages.dev/api/curtitv?stream=" + value.dropFirst(10) : value
+                guard let url = URL(string: resolved) else { continue }
                 variants.append(Variant(url: url))
             case "referer":
                 if !variants.isEmpty { variants[variants.count - 1].referer = value }
