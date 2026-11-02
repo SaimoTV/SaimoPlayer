@@ -66,8 +66,6 @@ canal: A&E
 categoria: Documentários
 logo: https://img.faz-o-eli.online/ae.png
 
-fonte: curtitv://66738
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/aee/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -115,6 +113,8 @@ qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDg4Lm0zdTg.m3u8
 qualidade: SD
 
+fonte: curtitv://66738
+qualidade: FHD
 
 canal: Adult Swim
 categoria: Variedades
@@ -174,8 +174,6 @@ canal: AMC
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/amc.png
 
-fonte: curtitv://66742
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/amc/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -225,13 +223,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1Mjk2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66742
+qualidade: FHD
 
 canal: Animal Planet
 categoria: Documentários
 logo: https://img.faz-o-eli.online/animalplanet.png
 
-fonte: curtitv://66746
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/animalplanet/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -297,13 +295,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDA4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66746
+qualidade: FHD
 
 canal: Band
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: https://aws.s13-s1001604.lat/stream/730ac1333b65dfb93db561cc2a4f2a53/bandsp.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/band
@@ -330,13 +328,13 @@ qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/324376.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://vipwaytvcdn.multtv.tv.br:5444/TVThathi_Band/720p/index.m3u8
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Cartoon Network
 categoria: Infantil
 logo: https://img.faz-o-eli.online/cartoonnetwork.png
 
-fonte: curtitv://66772
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cartoonnetwork/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -400,13 +398,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDAxLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66772
+qualidade: FHD
 
 canal: CNN Brasil
 categoria: Notícias
 logo: https://img.faz-o-eli.online/cnnbrasil.png
 
-fonte: curtitv://66785
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cnnbrasil/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -472,13 +470,13 @@ qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDY2Lm0zdTg.m3u8
 qualidade: SD
 fonte: https://amg01391-sbtinfast-amg01391c4-lg-br-4597.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg01391-addigital-cnnbrasil-lgbr/cb573e1e7b6c608d84c83f60cef24282967b3dcb0e6c886470af4a9765d97800dbe8ae84ae5b910c4c9e1fc061017d360439cd1dd56c49c1da63b820743c4b21fdcde00080dd0d0cb1df11292ca36265299a7369cc350f7bd2ec5a2f803ebe764c53cb017c593f88f258a8744cc59e0a957f39e8fc8b307b24455a9c5a43e6a64ed6abb64244dd6ebfb102488b2f57f38117ced415e9d48746cf128627ec159cc4f196da11d7d28c32f85ee7360d5b762e988421a12e3cdcabf2e3842f1052243c67a4c5b1ec4f268f4b3124929df89e15319753eb5fec5338ae14900fa53d8f79a30aa69b3ec8577e6c23335083d15a7332acedaf99b9415b2cba49c39bbf404ce39f277948895dd9372737da9aa171d49445c6e671c2dc036c70de7d9c9094e523964cde88487292e054d24c634366160b855ceda96cd416ed79bdc21c1bfb2c2eb0b75ade8fd552312d1ac8d01e9c2412b7df8494cc4e15fe204a0aa630821b3265c2623827a535afce752ca8361a89300afe5a1e8956b3ed7fa2e988b346739ef6f36fd323afb903d9f3428e683f520dfab20f57574370d5a137586237930bb49d9aa1440806ede5c4b195006f496a4112298fe5a821cedc8e7953468f0354151e7a209f0ad266c81309517ebb79fd984925d5487157a9cd5670536f84c7a28e81c2b82d9876d0ddf22a203d4d19d31601216b93fbcd6ef4364f716d4ec2684046ae0c4e4dfa9faab4c0d78eaf7b923c8c04fe968932a6a54d2d6641655a4e274dd8/197/1920x1080_7582265/index.m3u8
+fonte: curtitv://66785
+qualidade: FHD
 
 canal: CNN Brasil Money
 categoria: Notícias
 logo: https://mondrian.claro.com.br/channels/inverse/cnn-brasil-money.png
 
-fonte: curtitv://66785
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy8yOTU0ODIubTN1OA.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://amg01391-amg01391c57-amgplt0026.playout.now3.amagi.tv/playlist/amg01391-amg01391c57-amgplt0026/playlist.m3u8
@@ -511,13 +509,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/295486.m3u8
 qualidade: 4K
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/295482.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66785
+qualidade: FHD
 
 canal: E!
 categoria: Variedades
 logo: https://commons.wikimedia.org/wiki/Special:FilePath/E%21_Logo_Flat_2012.svg?width=300
 
-fonte: curtitv://66827
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDk4Lm0zdTg.m3u8
 qualidade: FHD
 fonte: https://video49.mais.uol.com.br/live/4503.mpd
@@ -558,6 +556,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTAwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66827
+qualidade: FHD
 
 canal: GE TV
 categoria: Esportes
@@ -602,8 +602,6 @@ canal: GloboNews
 categoria: Notícias
 logo: https://img.faz-o-eli.online/globonews.png
 
-fonte: curtitv://66850
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globonews/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -667,13 +665,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDcxLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66850
+qualidade: FHD
 
 canal: Globoplay Novelas
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/globonovelas.prev.png
 
-fonte: curtitv://68313
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globoplaynovelas/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -734,13 +732,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTUxLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68313
+qualidade: FHD
 
 canal: GNT
 categoria: Variedades
 logo: https://img.faz-o-eli.online/gnt.png
 
-fonte: curtitv://66915
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/gnt/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -802,13 +800,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTEyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66915
+qualidade: FHD
 
 canal: History
 categoria: Documentários
 logo: https://img.faz-o-eli.online/history.png
 
-fonte: curtitv://66955
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/history/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -880,13 +878,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDUyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66955
+qualidade: FHD
 
 canal: History 2
 categoria: Documentários
 logo: https://img.faz-o-eli.online/history2.png
 
-fonte: curtitv://66955
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/history2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -928,13 +926,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/304498.m3u8
 qualidade: FHD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/304500.m3u8
 qualidade: HD
+fonte: curtitv://66955
+qualidade: FHD
 
 canal: Jovem Pan News
 categoria: Notícias
 logo: https://www.tvlogo.org/brazil/jovem-pan-news-br.png
 
-fonte: curtitv://67121
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/jovempannews/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -978,13 +976,13 @@ qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDc0Lm0zdTg.m3u8
 qualidade: SD
 fonte: https://amg01391-amg01391c3-tcl-spain-5038.playouts.now.amagi.tv/playlist1080-p.m3u8
+fonte: curtitv://67121
+qualidade: FHD
 
 canal: Megapix
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/megapix.png
 
-fonte: curtitv://66965
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/megapix/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1050,13 +1048,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzE5Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66965
+qualidade: FHD
 
 canal: Multishow
 categoria: Variedades
 logo: https://img.faz-o-eli.online/multishow.png
 
-fonte: curtitv://66969
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/multishow/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1112,13 +1110,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTMyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66969
+qualidade: FHD
 
 canal: Premiere 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66979
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1137,13 +1135,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/69028.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/69029.m3u8
 qualidade: HD
+fonte: curtitv://66979
+qualidade: FHD
 
 canal: Premiere 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66983
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere3/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1162,13 +1160,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30051.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9026.m3u8
 qualidade: HD
+fonte: curtitv://66983
+qualidade: FHD
 
 canal: Premiere 4
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66987
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere4/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1185,13 +1183,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108298.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108300.m3u8
 qualidade: HD
+fonte: curtitv://66987
+qualidade: FHD
 
 canal: Premiere 5
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66991
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere5/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1212,13 +1210,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108304.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108306.m3u8
 qualidade: HD
+fonte: curtitv://66991
+qualidade: FHD
 
 canal: Premiere 6
 categoria: Esportes
 logo: https://mondrian.claro.com.br/channels/inverse/premiere.png
 
-fonte: curtitv://66995
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere6/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1241,13 +1239,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108310.m3u8
 qualidade: HD
 fonte: http://45.185.11.126:8000/play/a05j/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66995
+qualidade: FHD
 
 canal: Premiere 7
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66999
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere7/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1268,13 +1266,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/108316.m3u8
 qualidade: HD
 fonte: http://45.185.11.126:8000/play/a05k/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66999
+qualidade: FHD
 
 canal: Premiere 8
 categoria: Esportes
 logo: https://mondrian.claro.com.br/channels/inverse/premiere.png
 
-fonte: curtitv://68303
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiere8/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1291,13 +1289,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9036.m3u8
 qualidade: HD
 fonte: http://45.185.11.126:8000/play/a05l/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://68303
+qualidade: SD
 
 canal: Premiere Clubes
 categoria: Esportes
 logo: https://img.faz-o-eli.online/premiere.png
 
-fonte: curtitv://66975
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/premiereclubes/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1318,13 +1316,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/13583.m3u8
 qualidade: HD · 1280x720
 fonte: http://45.185.11.126:8000/play/a06g/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66975
+qualidade: FHD
 
 canal: SBT
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/sbt.png
 
-fonte: curtitv://67322
-qualidade: SD
 fonte: http://138.204.86.4:8080/SBT_HD/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/490cc63080757904d5fd8a95fd1f34f6/error.txt
@@ -1353,13 +1351,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9084.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30120.m3u8
 qualidade: HD
+fonte: curtitv://67322
+qualidade: SD
 
 canal: SBT News
 categoria: Notícias
 logo: https://mondrian.claro.com.br/channels/inverse/sbt-news.png
 
-fonte: curtitv://68301
-qualidade: FHD
 fonte: https://sbtnews.maissbt.com/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://dai.google.com/linear/hls/event/1XSOdtQ0SH2G8OEmEfGgjQ/master.m3u8
@@ -1373,13 +1371,13 @@ qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMjE0NjU0MS5tM3U4.m3u8
 qualidade: HD
 fonte: https://sbtnews.maissbt.com/3.m3u8
+fonte: curtitv://68301
+qualidade: FHD
 
 canal: Sony Channel
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/sonychannel.png
 
-fonte: curtitv://67014
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sonychannel/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1426,13 +1424,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzI3Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67014
+qualidade: FHD
 
 canal: SporTV
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv.png
 
-fonte: curtitv://67030
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportv/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1503,13 +1501,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30127.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/131132.m3u8
 qualidade: SD · 852x480
+fonte: curtitv://67030
+qualidade: FHD
 
 canal: SporTV 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv2.png
 
-fonte: curtitv://67023
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportv2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1560,13 +1558,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI0NzQwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67023
+qualidade: FHD
 
 canal: SporTV 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv3.png
 
-fonte: curtitv://67026
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportv3/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1623,13 +1621,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI0NzQ0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67026
+qualidade: FHD
 
 canal: Canal OFF
 categoria: Esportes
 logo: https://img.faz-o-eli.online/off.png
 
-fonte: curtitv://67474
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/canaloff/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1670,13 +1668,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/8998.m3u8
 qualidade: HD
 fonte: http://45.185.11.126:8000/play/a07t/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67474
+qualidade: FHD
 
 canal: Telecine Action
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecineaction.png
 
-fonte: curtitv://67041
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tcaction/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1744,13 +1742,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ4Mzc5Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67041
+qualidade: FHD
 
 canal: Telecine Pipoca
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecinepipoca.png
 
-fonte: curtitv://67053
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tcpipoca/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1808,13 +1806,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30141.m3u8
 qualidade: HD
 fonte: http://45.185.11.126:8000/play/a08g/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67053
+qualidade: FHD
 
 canal: Telecine Premium
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecinepremium.png
 
-fonte: curtitv://67057
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tcpremium/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1880,13 +1878,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ4Mzc2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67057
+qualidade: FHD
 
 canal: TV Brasil
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/tv-brasil.png
 
-fonte: curtitv://67424
-qualidade: FHD
 fonte: https://tvbrasil-stream.ebc.com.br/index.m3u8
 qualidade: SD · 576x324
 referer: https://meufut.top/tv-brasil
@@ -1917,6 +1915,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/33013.m3u8
 qualidade: HD · 1280x720
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71816.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67424
+qualidade: FHD
 
 canal: Universal Premiere
 categoria: Filmes e Séries
@@ -1944,8 +1944,6 @@ canal: Warner
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/warnerchannel.png
 
-fonte: curtitv://67111
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/warner/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -1995,6 +1993,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9219.m3u8
 qualidade: FHD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9220.m3u8
 qualidade: HD
+fonte: curtitv://67111
+qualidade: FHD
 
 canal: IMPD
 categoria: Variedades
@@ -2010,8 +2010,6 @@ canal: Globo SP
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://66834
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globosp/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2055,13 +2053,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1168918.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72040.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66834
+qualidade: FHD
 
 canal: Cartoonito
 categoria: Infantil
 logo: https://img.faz-o-eli.online/cartoonito.png
 
-fonte: curtitv://66766
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cartoonito/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2118,13 +2116,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDA1Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66766
+qualidade: FHD
 
 canal: Cinemax
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/cinemax.png
 
-fonte: curtitv://66781
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cinemax/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2173,13 +2171,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzExLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66781
+qualidade: FHD
 
 canal: Discovery Channel
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoverychannel.png
 
-fonte: curtitv://66800
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoverychannel/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2249,13 +2247,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDIwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66800
+qualidade: FHD
 
 canal: Discovery Kids
 categoria: Infantil
 logo: https://img.faz-o-eli.online/discoverykids.png
 
-fonte: curtitv://66808
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoverykids/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2319,13 +2317,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDA5Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66808
+qualidade: FHD
 
 canal: Discovery Theater
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoverytheater.png
 
-fonte: curtitv://66815
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoverytheater/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2385,13 +2383,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDMyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66815
+qualidade: FHD
 
 canal: ESPN
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn.png
 
-fonte: curtitv://68260
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2463,13 +2461,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/598917.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/598918.m3u8
 qualidade: HD
+fonte: curtitv://68260
+qualidade: FHD
 
 canal: ESPN 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn2.png
 
-fonte: curtitv://68277
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2521,13 +2519,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTI0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68277
+qualidade: FHD
 
 canal: ESPN 4
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn4.png
 
-fonte: curtitv://68268
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn4/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2591,13 +2589,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTMyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68268
+qualidade: FHD
 
 canal: ESPN 5
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn5.png
 
-fonte: curtitv://68266
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn5/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2647,13 +2645,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTM2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68266
+qualidade: FHD
 
 canal: ESPN 6
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn6.png
 
-fonte: curtitv://68262
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn6/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2701,13 +2699,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTQwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68262
+qualidade: FHD
 
 canal: HBO
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hbo.png
 
-fonte: curtitv://66929
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbo/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2777,13 +2775,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTQ0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66929
+qualidade: FHD
 
 canal: HBO2
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hbo2.png
 
-fonte: curtitv://66921
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbo2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2843,13 +2841,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTQ4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66921
+qualidade: FHD
 
 canal: HBO Family
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hbofamily.png
 
-fonte: curtitv://66925
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbofamily/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2905,13 +2903,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTUyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66925
+qualidade: FHD
 
 canal: HBO Mundi
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hbomundi.png
 
-fonte: curtitv://66933
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbomundi/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -2976,13 +2974,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTU2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66933
+qualidade: FHD
 
 canal: HBO Plus
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hboplus.png
 
-fonte: curtitv://66937
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hboplus/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3050,13 +3048,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTYwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66937
+qualidade: FHD
 
 canal: HBO Pop
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/hbopop.png
 
-fonte: curtitv://66941
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbopop/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3128,13 +3126,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTY0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66941
+qualidade: FHD
 
 canal: HBO Signature
 categoria: Filmes e Séries
 logo: https://mondrian.claro.com.br/channels/inverse/hbo-signature.png
 
-fonte: curtitv://66945
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hbosignature/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3196,13 +3194,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTY4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66945
+qualidade: FHD
 
 canal: HBO Xtreme
 categoria: Filmes e Séries
 logo: https://mondrian.claro.com.br/channels/inverse/hbo-xtreme.png
 
-fonte: curtitv://66949
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/hboxtreme/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3264,13 +3262,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTcyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66949
+qualidade: FHD
 
 canal: Record
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/record-tv.png
 
-fonte: curtitv://67317
-qualidade: FHD
 fonte: https://dadinhodetapioca.fun/play/record.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
@@ -3286,13 +3284,13 @@ fonte: http://79.127.238.228:14057
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/35842.m3u8
 qualidade: HD
+fonte: curtitv://67317
+qualidade: FHD
 
 canal: Space
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/space.png
 
-fonte: curtitv://67018
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/space/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3344,13 +3342,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzMxLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67018
+qualidade: FHD
 
 canal: TNT
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/tnt.png
 
-fonte: curtitv://67069
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tnt/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3417,13 +3415,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzUwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67069
+qualidade: FHD
 
 canal: TNT Séries
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/tntseries.png
 
-fonte: curtitv://67074
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tntseries/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3487,13 +3485,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzU4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67074
+qualidade: FHD
 
 canal: Universal TV
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/universaltv.png
 
-fonte: curtitv://67104
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/universaltv/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3550,13 +3548,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzYyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67104
+qualidade: FHD
 
 canal: Discovery Turbo
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoveryturbo.png
 
-fonte: curtitv://66819
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoveryturbo/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3629,13 +3627,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDM2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66819
+qualidade: FHD
 
 canal: USA Network
 categoria: Filmes e Séries
 logo: https://mondrian.claro.com.br/channels/inverse/usa.png
 
-fonte: curtitv://67033
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/usa/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3662,13 +3660,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72340.m3u8
 qualidade: HD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/72341.m3u8
 qualidade: SD
+fonte: curtitv://67033
+qualidade: FHD
 
 canal: Telecine Fun
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecinefun.png
 
-fonte: curtitv://67049
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tcfun/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3729,13 +3727,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ4Mzg1Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67049
+qualidade: FHD
 
 canal: Telecine Cult
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecinecult.png
 
-fonte: curtitv://67045
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tccult/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3795,13 +3793,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ4MzgyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67045
+qualidade: FHD
 
 canal: Telecine Touch
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/telecinetouch.png
 
-fonte: curtitv://67061
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tctouch/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3867,6 +3865,8 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72366.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ4MzkwLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67061
+qualidade: FHD
 
 canal: SONY Movies
 categoria: Filmes e Séries
@@ -3885,17 +3885,15 @@ canal: Globo
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/globo.png
 
-fonte: curtitv://66834
-qualidade: FHD
 fonte: http://138.204.86.4:8080/GLOBO_HD/index.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66834
+qualidade: FHD
 
 canal: Tooncast
 categoria: Infantil
 logo: https://mondrian.claro.com.br/channels/inverse/tooncast.png
 
-fonte: curtitv://67077
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tooncast/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -3919,13 +3917,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9150.m3u8
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDMzLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67077
+qualidade: FHD
 
 canal: TLC
 categoria: Variedades
 logo: https://img.faz-o-eli.online/tlc.png
 
-fonte: curtitv://67065
-qualidade: FHD
 fonte: https://dadinhodetapioca.fun/play/tlc.html
 qualidade: FHD
 referer: https://dadinhodetapioca.fun/
@@ -3971,13 +3969,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/8754.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72371.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67065
+qualidade: FHD
 
 canal: Arte 1
 categoria: Variedades
 logo: https://mondrian.claro.com.br/channels/inverse/arte1.png
 
-fonte: curtitv://66750
-qualidade: FHD
 fonte: http://45.162.64.114/ARTE1/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://45.177.114.115/ARTE1/index.m3u8
@@ -4012,13 +4010,13 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71777.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMTQ1NDM3Mi5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://66750
+qualidade: FHD
 
 canal: TNT Novelas
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/tntnovelas.png
 
-fonte: curtitv://67037
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tntnovelas/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4068,13 +4066,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzU0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67037
+qualidade: FHD
 
 canal: Discovery Science
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoveryscience.png
 
-fonte: curtitv://66811
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoveryscience/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4132,13 +4130,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDI4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66811
+qualidade: FHD
 
 canal: AXN
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/axn.png
 
-fonte: curtitv://66752
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/axn/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4194,13 +4192,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzAwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66752
+qualidade: FHD
 
 canal: TCM
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/tcm.png
 
-fonte: curtitv://67285
-qualidade: FHD
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/tcm/tcm.m3u8
 qualidade: Qualidade não informada
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/8b95411116ffb58ecdcc1423264e17ae/error.txt
@@ -4215,13 +4213,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzQ3Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67285
+qualidade: FHD
 
 canal: Band News
 categoria: Notícias
 logo: https://img.faz-o-eli.online/bandnews.png
 
-fonte: curtitv://66756
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/bandnews/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4273,13 +4271,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDYyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66756
+qualidade: FHD
 
 canal: BAND SPORTS HD
 categoria: Esportes
 logo: https://img.faz-o-eli.online/bandsports.png
 
-fonte: curtitv://66760
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/bandsports/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4344,13 +4342,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/26724.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71801.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66760
+qualidade: FHD
 
 canal: RedeTV!
 categoria: TV Aberta
 logo: https://www.tvlogo.org/brazil/rede-tv-br.png
 
-fonte: curtitv://67433
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/redetv/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4365,13 +4363,13 @@ fonte: https://tv01.zas.media:1936/redetvparana/redetvparana/chunklist_w10746345
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDczLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67433
+qualidade: FHD
 
 canal: TV Cultura
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/cultura.png
 
-fonte: curtitv://67429
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tvcultura/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4402,6 +4400,8 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/71854.m3u8
 qualidade: SD
 fonte: https://5b33b873179a2.streamlock.net:1443/live/livestream/playlist.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67429
+qualidade: FHD
 
 canal: Terra Viva
 categoria: Variedades
@@ -4459,8 +4459,6 @@ canal: ESPN 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/espn3.png
 
-fonte: curtitv://68258
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/espn3/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4518,13 +4516,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTI4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://68258
+qualidade: FHD
 
 canal: TV Gazeta
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/tv-gazeta.png
 
-fonte: curtitv://67456
-qualidade: FHD
 fonte: http://45.162.64.114/GAZETA/index.m3u8
 qualidade: FHD · 1920x1080
 fonte: http://45.162.64.114/TV_GAZETA/index.m3u8
@@ -4536,13 +4534,13 @@ qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU5MDExLm0zdTg.m3u8
 qualidade: HD
 fonte: https://video08.logicahost.com.br/tvc21/tvc21/chunklist_w930922724.m3u8
+fonte: curtitv://67456
+qualidade: FHD
 
 canal: Record News
 categoria: Notícias
 logo: https://mondrian.claro.com.br/channels/inverse/recordnews.png
 
-fonte: curtitv://67004
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recordnews/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4598,13 +4596,13 @@ qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDc4Lm0zdTg.m3u8
 qualidade: SD
 fonte: https://run-rnw-rn.otteravision.com/rnw/rn/rnw_rn_720p_high.m3u8
+fonte: curtitv://67004
+qualidade: FHD
 
 canal: Canção Nova
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/cancaonova.png
 
-fonte: curtitv://67439
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cancaonova/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4633,13 +4631,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/117824.m3u8
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQwNTY4Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67439
+qualidade: FHD
 
 canal: TV Aparecida
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/tv-aparecida.png
 
-fonte: curtitv://67086
-qualidade: HD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tvaparecida/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4686,13 +4684,13 @@ fonte: https://cdn.jmvstream.com/w/LVW-9716/LVW9716_HbtQtezcaw/playlist.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQwNTc5Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67086
+qualidade: HD
 
 canal: Rede Vida
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/redevida.png
 
-fonte: curtitv://67012
-qualidade: HD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/redevida/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4731,13 +4729,13 @@ fonte: https://d12e4o88jd8gex.cloudfront.net/out/v1/cea3de0b76ac4e82ab8ee0fd3f17
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQwNTc1Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67012
+qualidade: HD
 
 canal: Discovery ID
 categoria: Documentários
 logo: https://mondrian.claro.com.br/channels/inverse/investigacao-discovery.png
 
-fonte: curtitv://66959
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoveryid/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4785,13 +4783,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/8934.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30172.m3u8
 qualidade: HD
+fonte: curtitv://66959
+qualidade: FHD
 
 canal: Fish TV
 categoria: Esportes
 logo: https://mondrian.claro.com.br/channels/inverse/fish-tv.png
 
-fonte: curtitv://67503
-qualidade: FHD
 fonte: http://45.162.64.114/FISH_TV/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTAyLm0zdTg.m3u8
@@ -4822,6 +4820,8 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71928.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTA0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67503
+qualidade: FHD
 
 canal: Box Kids TV
 categoria: Infantil
@@ -4834,8 +4834,6 @@ canal: X Sports
 categoria: Esportes
 logo: https://img.faz-o-eli.online/xsports.png
 
-fonte: curtitv://68293
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/xsports/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4879,13 +4877,13 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/340450.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMTgxMTcyOS5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://68293
+qualidade: FHD
 
 canal: N SPORTS
 categoria: Esportes
 logo: https://mondrian.claro.com.br/channels/inverse/nsports.png
 
-fonte: curtitv://67599
-qualidade: HD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/nsports/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4899,13 +4897,13 @@ qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU3ODA4Lm0zdTg.m3u8
 qualidade: HD
 fonte: https://ogc-nsprt-tcl-roku-syndication.otteravision.com/ogc/nsprt/nsprt_720p.m3u8
+fonte: curtitv://67599
+qualidade: HD
 
 canal: Music Box Brazil
 categoria: Variedades
 logo: https://img.faz-o-eli.online/musicboxbrazil.png
 
-fonte: curtitv://67406
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy83MjE4NC5tM3U4.m3u8
 qualidade: FHD
 fonte: http://168.197.104.22/MUSIC/index.m3u8
@@ -4940,13 +4938,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72187.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72184.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67406
+qualidade: FHD
 
 canal: Band SP
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/bandsp/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -4991,26 +4989,26 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMjIwNjc4OS5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band RS
 categoria: TV Aberta
 logo: https://mondrian.claro.com.br/channels/inverse/band.png
 
-fonte: curtitv://67484
-qualidade: SD
 fonte: http://64.31.23.207:80/59471019/60849037/324368.m3u8
 qualidade: FHD · 1920x1080
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/72575.m3u8
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvODE2MDI2Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67484
+qualidade: SD
 
 canal: SBT SP
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/sbt.png
 
-fonte: curtitv://67322
-qualidade: SD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sbtsp/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5049,13 +5047,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/77964.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/77963.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67322
+qualidade: SD
 
 canal: Record SP
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/record.png
 
-fonte: curtitv://67317
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recordsp/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5088,13 +5086,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/12888.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/38065.m3u8
 qualidade: HD
+fonte: curtitv://67317
+qualidade: FHD
 
 canal: Canal Rural
 categoria: Variedades
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/canal-rural-br.png
 
-fonte: curtitv://67472
-qualidade: FHD
 fonte: http://170.83.49.66:8083/CANALRURALHD/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://186.219.52.187/canal_rural/index.m3u8
@@ -5127,13 +5125,13 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/178512.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDY0Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67472
+qualidade: FHD
 
 canal: Agro Mais
 categoria: Variedades
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/agro-mais-br.png
 
-fonte: curtitv://67421
-qualidade: FHD
 fonte: http://45.162.64.114/AGROMAIS/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy83MTc2NC5tM3U4.m3u8
@@ -5166,26 +5164,26 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/71767.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71764.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67421
+qualidade: FHD
 
 canal: CNT
 categoria: TV Aberta
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/rede-cnt-br.png
 
-fonte: curtitv://67136
-qualidade: SD
 fonte: http://45.162.64.114/CNT/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://168.197.104.22/CNT/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://170.83.49.66:8083/REDECNTHD/index.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67136
+qualidade: SD
 
 canal: TV Pai Eterno
 categoria: Variedades
 logo: https://img.faz-o-eli.online/tvpaieterno.png
 
-fonte: curtitv://67092
-qualidade: HD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/paieterno/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5216,13 +5214,13 @@ fonte: https://video09.logicahost.com.br/paieterno/paieterno/chunklist_w16102408
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQwNTg2Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67092
+qualidade: HD
 
 canal: PlayTV
 categoria: TV Aberta
 logo: https://i.imgur.com/Ikrj3lk.png
 
-fonte: curtitv://68255
-qualidade: SD
 fonte: http://45.162.64.114/PLAY_TV/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://isaocorp.cloudecast.com/playtv/index.m3u8
@@ -5231,25 +5229,25 @@ fonte: http://45.177.114.115/PLAY_TV/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzYwNzEyLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://68255
+qualidade: SD
 
 canal: Rede Brasil
 categoria: TV Aberta
 logo: https://i.imgur.com/TXJKwzZ.png
 
-fonte: curtitv://68256
-qualidade: HD
 fonte: https://redebrasil.nuvemplay.live/hls/stream.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMjEwODc3NS5tM3U4.m3u8
 qualidade: HD
 fonte: https://video09.logicahost.com.br/redebrasiloficial/redebrasiloficial/playlist.m3u8
+fonte: curtitv://68256
+qualidade: HD
 
 canal: Rede Gospel
 categoria: Variedades
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/rede-gospel-br.png
 
-fonte: curtitv://67011
-qualidade: HD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/redegospel/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5284,13 +5282,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9069.m3u8
 qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMjEzNDk4Mi5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://67011
+qualidade: HD
 
 canal: Trace Brazuca
 categoria: Variedades
 logo: https://mondrian.claro.com.br/channels/inverse/trace-brazuca.png
 
-fonte: curtitv://67400
-qualidade: FHD
 fonte: https://amg01131-tracetv-tracebrazuca-xiaomi-vvr19.amagi.tv/playlist/amg01131-tracetv-tracebrazuca-xiaomi/playlist.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy83MjM4Ni5tM3U4.m3u8
@@ -5325,13 +5323,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72389.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72386.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67400
+qualidade: FHD
 
 canal: TV Câmara
 categoria: TV Aberta
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/tv-camara-br.png
 
-fonte: curtitv://67583
-qualidade: FHD
 fonte: http://45.162.64.114/TV_CAMARA/index.m3u8
 qualidade: SD · 718x480
 fonte: https://stream3.camara.gov.br/tv1/manifest.m3u8
@@ -5342,13 +5340,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/69905.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDgwLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67583
+qualidade: FHD
 
 canal: TV Evangelizar
 categoria: Variedades
 logo: https://i.imgur.com/IrYR7Kp.png
 
-fonte: curtitv://67089
-qualidade: HD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tvevangelizar/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5362,6 +5360,8 @@ qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/69257.m3u8
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQwNTgyLm0zdTg.m3u8
+qualidade: HD
+fonte: curtitv://67089
 qualidade: HD
 
 canal: TV Justiça
@@ -5424,8 +5424,6 @@ canal: TV Senado
 categoria: TV Aberta
 logo: https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil/tv-senado-br.png
 
-fonte: curtitv://67581
-qualidade: FHD
 fonte: http://45.162.64.114/TV_SENADO/index.m3u8
 qualidade: SD · 718x480
 fonte: http://168.197.104.22/TV_SENADO/index.m3u8
@@ -5436,6 +5434,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/69027.m3u8
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDg0Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67581
+qualidade: FHD
 
 canal: RIT
 categoria: Variedades
@@ -5453,8 +5453,6 @@ canal: Discovery Home & Health
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoveryhh.png
 
-fonte: curtitv://66804
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoveryhh/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -5516,6 +5514,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/93902.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30149.m3u8
 qualidade: HD
+fonte: curtitv://66804
+qualidade: FHD
 
 canal: Canal Agro
 categoria: Variedades
@@ -5689,8 +5689,6 @@ canal: Canal do Boi
 categoria: Variedades
 logo: https://i.imgur.com/pVM5MhS.png
 
-fonte: curtitv://67443
-qualidade: FHD
 fonte: http://45.162.64.114/CANAL_DO_BOI/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://168.197.104.22/CANAL_DO_BOI/index.m3u8
@@ -5713,6 +5711,8 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71820.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDYzLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67443
+qualidade: FHD
 
 canal: Chef TV
 categoria: Variedades
@@ -5749,8 +5749,6 @@ canal: Futura
 categoria: TV Aberta
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Canal_Futura.png/960px-Canal_Futura.png
 
-fonte: curtitv://67436
-qualidade: FHD
 fonte: http://168.197.104.22/FUTURA/index.m3u8
 qualidade: HD · 1280x720
 fonte: http://170.83.49.66:8083/FUTURAHD/index.m3u8
@@ -5779,6 +5777,8 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71962.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDY5Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67436
+qualidade: FHD
 
 canal: KpopTV Play
 categoria: Variedades
@@ -5849,17 +5849,15 @@ canal: Pluto TV Anime
 categoria: Pluto TV
 logo: https://images.pluto.tv/channels/5f12136385bccc00070142ed/colorLogoPNG_1785430875394.png
 
-fonte: curtitv://67393
-qualidade: SD
 fonte: https://jmp2.uk/plu-5f12136385bccc00070142ed.m3u8
 qualidade: SD · 1216x684
+fonte: curtitv://67393
+qualidade: SD
 
 canal: Rede TV!
 categoria: TV Aberta
 logo: https://i.imgur.com/ZJgD38F.png
 
-fonte: curtitv://67433
-qualidade: FHD
 fonte: http://45.162.64.114/REDE_TV/index.m3u8
 qualidade: HD · 1280x720
 fonte: https://tv01.zas.media:1936/redetvparana/redetvparana/playlist.m3u8
@@ -5874,6 +5872,8 @@ fonte: https://tv01.zas.media:1936/redetvparana/redetvparana/chunklist_w10746345
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDczLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67433
+qualidade: FHD
 
 canal: Runtime
 categoria: Filmes e Séries
@@ -5893,8 +5893,6 @@ canal: Travel Box Brazil
 categoria: Variedades
 logo: https://i.imgur.com/3tBJERH.png
 
-fonte: curtitv://67081
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy83MjM5MC5tM3U4.m3u8
 qualidade: FHD
 fonte: http://168.197.104.22/TRAVEL_BOX_BRASIL/index.m3u8
@@ -5923,13 +5921,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72393.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72393.m3u8
 qualidade: SD · 852x480
+fonte: curtitv://67081
+qualidade: FHD
 
 canal: AEROPORTO AREA RESTRITA
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://66738
-qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/150488.m3u8
 qualidade: HD · 1280x720
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/150489.m3u8
@@ -5946,6 +5944,8 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/150489.m3u8
 qualidade: HD · 1280x720
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/150490.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://66738
+qualidade: FHD
 
 canal: FILHINHO DA MAMAE
 categoria: 24 Horas
@@ -6024,8 +6024,6 @@ canal: Combate
 categoria: Esportes
 logo: https://img.faz-o-eli.online/combate.png
 
-fonte: curtitv://66789
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/combate/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6091,6 +6089,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NTE2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66789
+qualidade: FHD
 
 canal: DAZN (Jogo 1)
 categoria: Esportes
@@ -6114,27 +6114,27 @@ canal: Disney+ 01
 categoria: Esportes
 logo: http://www.fontedecanais.me/logos/canais/disneyplus.png
 
-fonte: curtitv://67250
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169096.m3u8
 qualidade: HD
+fonte: curtitv://67250
+qualidade: SD
 
 canal: Disney+ 02
 categoria: Esportes
 logo: http://www.fontedecanais.me/logos/canais/disneyplus.png
 
-fonte: curtitv://67251
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus02/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169098.m3u8
 qualidade: HD
+fonte: curtitv://67251
+qualidade: SD
 
 canal: NBA 01
 categoria: Esportes
@@ -6147,10 +6147,10 @@ canal: N Sports (Jogo 1)
 categoria: Esportes
 logo: https://img.faz-o-eli.online/nsports.png
 
-fonte: curtitv://67599
-qualidade: HD
 fonte: http://64.31.23.207:80/59471019/60849037/3460254.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67599
+qualidade: HD
 
 canal: Paramount+ (Jogo 1)
 categoria: Esportes
@@ -6225,32 +6225,30 @@ canal: UFC Fight Pass 01
 categoria: Esportes
 logo: https://img.faz-o-eli.online/ufcfightpass.png
 
-fonte: curtitv://67415
-qualidade: SD
 fonte: http://64.31.23.207:80/59471019/60849037/297545.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/297548.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2403505.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67415
+qualidade: SD
 
 canal: UFC Fight Pass 03
 categoria: Esportes
 logo: http://logos.imperioapps.top/UFC_FIGHT_PASS.png
 
-fonte: curtitv://67415
-qualidade: SD
 fonte: http://64.31.23.207:80/59471019/60849037/297547.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/297550.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67415
+qualidade: SD
 
 canal: Canal Brasil
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/canalbrasil.png
 
-fonte: curtitv://67125
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzAyLm0zdTg.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/103518.m3u8
@@ -6281,6 +6279,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MzA0Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67125
+qualidade: FHD
 
 canal: Cine SKY 01
 categoria: Filmes e Séries
@@ -6314,8 +6314,6 @@ canal: Lifetime
 categoria: Filmes e Séries
 logo: http://www.fontedecanais.me/logos/canais/lifetime.png
 
-fonte: curtitv://66963
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTE0Lm0zdTg.m3u8
 qualidade: FHD
 fonte: http://64.31.23.207:80/59471019/60849037/518571.m3u8
@@ -6356,6 +6354,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTE2Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66963
+qualidade: FHD
 
 canal: MAX 01
 categoria: Filmes e Séries
@@ -6440,8 +6440,6 @@ canal: Gloob
 categoria: Infantil
 logo: https://img.faz-o-eli.online/gloob.png
 
-fonte: curtitv://66911
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/gloob/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6488,13 +6486,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDE3Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66911
+qualidade: FHD
 
 canal: Gloobinho
 categoria: Infantil
 logo: https://logos.imperioapps.top/GLOBINHO.png
 
-fonte: curtitv://67130
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/gloobinho/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6537,13 +6535,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1NDIxLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67130
+qualidade: FHD
 
 canal: TV Rá Tim Bum
 categoria: Infantil
 logo: https://logos.imperioapps.top/TV_RA_TIM_BUM.png
 
-fonte: curtitv://67095
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/tvratimbum/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6580,68 +6578,68 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72412.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzQ0OTgyLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67095
+qualidade: FHD
 
 canal: Band Campinas
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67483
-qualidade: FHD
 fonte: http://64.31.23.207:80/59471019/60849037/324352.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/324353.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/20522.m3u8
 qualidade: HD
+fonte: curtitv://67483
+qualidade: FHD
 
 canal: Band Curitiba
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324354.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/324355.m3u8
 qualidade: SD · 854x480
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band MG
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324359.m3u8
 qualidade: FHD · 1920x1080
 fonte: http://64.31.23.207:80/59471019/60849037/324361.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band Pará
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324362.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band Recife TV Tribuna
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324364.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/324365.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band RJ
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/band.png
 
-fonte: curtitv://67379
-qualidade: FHD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9a952a862b6307d6080014f48e43034f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -6652,26 +6650,28 @@ fonte: http://64.31.23.207:80/59471019/60849037/324366.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/20524.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67379
+qualidade: FHD
 
 canal: Band RN
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324367.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMTgwNTM5NC5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Band Sergipe
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/band.png
 
-fonte: curtitv://67287
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324370.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67287
+qualidade: 4K
 
 canal: Rede Família
 categoria: TV Aberta
@@ -6684,8 +6684,6 @@ canal: SBT Alterosa
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324287.m3u8
 qualidade: HD · 1280x720
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/72621.m3u8
@@ -6696,84 +6694,84 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72621.m3u8
 qualidade: HD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/218366.m3u8
 qualidade: FHD
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT BA
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324288.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://cdn.live.br1.jmvstream.com/w/LVW-9359/LVW9359_XSyReL0QVf/playlist.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT GO
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324291.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT Londrina
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324312.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT Maringá
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324311.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT MG
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324296.m3u8
 qualidade: HD · 1280x720
 fonte: http://64.31.23.207:80/59471019/60849037/324310.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT PI
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67288
-qualidade: 4K
 fonte: http://64.31.23.207:80/59471019/60849037/324309.m3u8
 qualidade: FHD · 1920x1080
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/131432.m3u8
 qualidade: HD
+fonte: curtitv://67288
+qualidade: 4K
 
 canal: SBT PR
 categoria: TV Aberta
 logo: http://www.fontedecanais.me/logos/canais/sbt.png
 
-fonte: curtitv://67341
-qualidade: HD
 fonte: http://64.31.23.207:80/59471019/60849037/324301.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/88432.m3u8
+qualidade: HD
+fonte: curtitv://67341
 qualidade: HD
 
 canal: SBT RJ
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/sbt.png
 
-fonte: curtitv://67323
-qualidade: SD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sbtrj/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6810,17 +6808,19 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/35844.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/108682.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67323
+qualidade: SD
 
 canal: TVE Bahia
 categoria: TV Aberta
 logo: http://i.imgur.com/IWGyp65.jpeg
 
-fonte: curtitv://68248
-qualidade: FHD
 fonte: http://streaming.procergs.com.br:1935/tve/stve/playlist.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMTQ0NjcyMS5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://68248
+qualidade: FHD
 
 canal: Tv Goiania
 categoria: TV Aberta
@@ -6833,8 +6833,6 @@ canal: BIS
 categoria: Variedades
 logo: http://www.fontedecanais.me/logos/canais/bis.png
 
-fonte: curtitv://67403
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDkwLm0zdTg.m3u8
 qualidade: FHD
 fonte: http://64.31.23.207:80/59471019/60849037/518551.m3u8
@@ -6875,13 +6873,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDkyLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67403
+qualidade: FHD
 
 canal: Food Network
 categoria: Variedades
 logo: https://img.faz-o-eli.online/foodnetwork.png
 
-fonte: curtitv://67507
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/foodnetwork/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -6941,13 +6939,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTA4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67507
+qualidade: FHD
 
 canal: Modo Viagem
 categoria: Variedades
 logo: http://www.fontedecanais.me/logos/canais/modoviagem.png
 
-fonte: curtitv://67384
-qualidade: FHD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTE4Lm0zdTg.m3u8
 qualidade: FHD
 fonte: http://64.31.23.207:80/59471019/60849037/518575.m3u8
@@ -6982,6 +6980,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MTIwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://67384
+qualidade: FHD
 
 canal: Joias Sobre Rodas 24H
 categoria: 24 Horas
@@ -6994,8 +6994,6 @@ canal: 24H Chaves
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://68032
-qualidade: SD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/137139.m3u8
 qualidade: SD · 640x480
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_chaves/24h_chaves.m3u8
@@ -7034,13 +7032,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169218.m3u8
 qualidade: SD · 640x480
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169219.m3u8
 qualidade: SD · 640x480
+fonte: curtitv://68032
+qualidade: SD
 
 canal: 24H Dragon Ball Z
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://67951
-qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/52e5b4e936ba314127ebe4742e6ae12f/24h_dragonball.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/dragon-ball-z
@@ -7057,26 +7055,26 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_dragonball/24h_dr
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169226.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67951
+qualidade: SD
 
 canal: 24H Naruto Clássico
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://67739
-qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/6737cee56410ce8152726dcedc419bc1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_naruto/24h_naruto.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67739
+qualidade: SD
 
 canal: 24H Os Simpsons
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://67815
-qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/2efddc40d3e9b9d781d88441ec82e8ce/24h_simpsons.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/os-simpsons
@@ -7221,13 +7219,13 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/135570.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169244.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67815
+qualidade: SD
 
 canal: 24H Pica Pau
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://67706
-qualidade: SD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/136821.m3u8
 qualidade: SD · 640x480
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_picapau/24h_picapau.m3u8
@@ -7240,13 +7238,13 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/136821.m3u8
 qualidade: SD · 640x480
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/136821.m3u8
 qualidade: SD · 640x480
+fonte: curtitv://67706
+qualidade: SD
 
 canal: 24H Todo Mundo Odeia o Cris
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://68184
-qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/02bde299980d2c1a30e472930d0a76d8/24h_odeiachris.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/todo-mundo-odeia-o-cris
@@ -7279,13 +7277,13 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/135472.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1169249.m3u8
 qualidade: SD · 624x352
+fonte: curtitv://68184
+qualidade: SD
 
 canal: 24H Friends
 categoria: 24 Horas
 logo: https://img.faz-o-eli.online/24h.png
 
-fonte: curtitv://68103
-qualidade: SD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/138814.m3u8
 qualidade: HD · 1280x720
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/24h_friends/24h_friends.m3u8
@@ -7332,13 +7330,13 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/138822.m3u8
 qualidade: HD · 1280x720
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/138823.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68103
+qualidade: SD
 
 canal: Discovery World
 categoria: Documentários
 logo: https://img.faz-o-eli.online/discoveryworld.png
 
-fonte: curtitv://66823
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/discoveryworld/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7396,13 +7394,13 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDQwLm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66823
+qualidade: FHD
 
 canal: CazeTV 1
 categoria: Esportes
 logo: https://img.faz-o-eli.online/cazetv.png
 
-fonte: curtitv://67598
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/cazetv/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7419,6 +7417,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/245798.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/245797.m3u8
 qualidade: FHD
+fonte: curtitv://67598
+qualidade: SD
 
 canal: CazeTV 2
 categoria: Esportes
@@ -7584,8 +7584,6 @@ canal: SportyNet+ 1
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: curtitv://67372
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportynet1/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7594,26 +7592,26 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/184570.m3u8
 qualidade: HD · 1280x720
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU3Nzk5Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67372
+qualidade: SD
 
 canal: SportyNet+ 2
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: curtitv://67373
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportynet2/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU3ODAwLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67373
+qualidade: SD
 
 canal: SportyNet+ 3
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: curtitv://67374
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportynet3/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7622,39 +7620,39 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/184580.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU3ODAxLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67374
+qualidade: SD
 
 canal: Globo AM
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67010
-qualidade: HD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/a87ac78a6280a4dec96f655561273f3f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globoam/globoam.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67010
+qualidade: HD
 
 canal: Globo CE
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67223
-qualidade: FHD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/fa516b073a1bcfae3253db2eaa12163f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globoce/globoce.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67223
+qualidade: FHD
 
 canal: Globo ES
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67286
-qualidade: 4K
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globoes/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7665,52 +7663,52 @@ referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globoes/globoes.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67286
+qualidade: 4K
 
 canal: Globo GO
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67286
-qualidade: 4K
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/cce5fc6dc821be20de867a0bf1f560c1/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globogo/globogo.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67286
+qualidade: 4K
 
 canal: Globo PB
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67286
-qualidade: 4K
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/b35e5aee8d03610d0f00caf66074f52f/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globopb/globopb.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67286
+qualidade: 4K
 
 canal: Globo PE
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://66854
-qualidade: FHD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/5f69842c2471a8724578aae47d6d2939/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globope/globope.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://66854
+qualidade: FHD
 
 canal: Globo RJ
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globorj.png
 
-fonte: curtitv://67177
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globorj/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7748,13 +7746,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1168921.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72025.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67177
+qualidade: FHD
 
 canal: Globo RS
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67167
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globors/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7765,13 +7763,13 @@ referer: https://w7.embedtv.cc/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/globors/globors.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67167
+qualidade: FHD
 
 canal: Record GO
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/record.png
 
-fonte: curtitv://67319
-qualidade: FHD
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/recordgo/recordgo.m3u8
 qualidade: Qualidade não informada
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/57f5b712036ac6a920df45a3dbdfe552/error.txt
@@ -7788,13 +7786,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/106096.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/106097.m3u8
 qualidade: HD
+fonte: curtitv://67319
+qualidade: FHD
 
 canal: Record MG
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/record.png
 
-fonte: curtitv://67320
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recordmg/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7809,13 +7807,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9055.m3u8
 qualidade: HD · 1280x720
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9054.m3u8
 qualidade: HD
+fonte: curtitv://67320
+qualidade: FHD
 
 canal: Record RJ
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/record.png
 
-fonte: curtitv://67311
-qualidade: HD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recordrj/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -7832,13 +7830,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/71697.m3u8
 qualidade: FHD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9063.m3u8
 qualidade: HD
+fonte: curtitv://67311
+qualidade: HD
 
 canal: HGTV
 categoria: Variedades
 logo: https://img.faz-o-eli.online/hgtv.png
 
-fonte: curtitv://66953
-qualidade: FHD
 fonte: https://aws.s13-s1001604.lat/stream/83388f6af00a1e30e6a19d56af52fd76/hgtv.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/hgtv
@@ -7890,6 +7888,8 @@ fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlL
 qualidade: HD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzI1MDQ4Lm0zdTg.m3u8
 qualidade: SD
+fonte: curtitv://66953
+qualidade: FHD
 
 canal: MTV
 categoria: Variedades
@@ -7907,8 +7907,6 @@ canal: A Fazenda 18 1
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68333
-qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/820fef4ff510e9724f894c3b408b9a93/afazenda.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/a-fazenda-18
@@ -7925,13 +7923,13 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda/afazenda.m3u
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470061.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68333
+qualidade: SD
 
 canal: A Fazenda 18 2
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68334
-qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9b3b21cd30304fb4eb6681a4e3e330e9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7940,13 +7938,13 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda2/afazenda2.m
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470062.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68334
+qualidade: SD
 
 canal: A Fazenda 18 3
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68335
-qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/04e77d74c78b23da7fe308a71d681c8b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7955,13 +7953,13 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda3/afazenda3.m
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470063.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68335
+qualidade: SD
 
 canal: A Fazenda 18 4
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68336
-qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/eeb5bfb46a2b1533c44690b9c2fbc179/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7970,13 +7968,13 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda4/afazenda4.m
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470064.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68336
+qualidade: SD
 
 canal: A Fazenda 18 5
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68337
-qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/78dd163cdf878bfea79746c2dc580f68/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7985,6 +7983,8 @@ fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/afazenda5/afazenda5.m
 qualidade: Qualidade não informada
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/2470065.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://68337
+qualidade: SD
 
 canal: CazeTV 3
 categoria: Esportes
@@ -8001,8 +8001,6 @@ canal: Globo DF
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://67286
-qualidade: 4K
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globodf/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -8025,13 +8023,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/131164.m3u8
 qualidade: HD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/131116.m3u8
 qualidade: SD
+fonte: curtitv://67286
+qualidade: 4K
 
 canal: Globo MG
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globosp.png
 
-fonte: curtitv://66848
-qualidade: FHD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/globomg/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -8058,6 +8056,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1168939.m3u8
 qualidade: HD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1168940.m3u8
 qualidade: HD
+fonte: curtitv://66848
+qualidade: FHD
 
 canal: MAX 03
 categoria: Filmes e Séries
@@ -8089,8 +8089,6 @@ canal: SporTV 4
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportv4.png
 
-fonte: curtitv://67030
-qualidade: FHD
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/sportv4/sportv4.m3u8
 qualidade: Qualidade não informada
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL3BhbGRpLnBybzo4MC9saXZlL3RvbmluaG8wMi9DYjQ5ODAzNy8yNzYwODkubTN1OA.m3u8
@@ -8111,6 +8109,8 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/276093.m3u8
 qualidade: 4K
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/570369.m3u8
 qualidade: FHD
+fonte: curtitv://67030
+qualidade: FHD
 
 canal: Star Channel
 categoria: Filmes e Séries
@@ -8123,8 +8123,6 @@ canal: Curta
 categoria: Documentários
 logo: https://img.faz-o-eli.online/curta.png
 
-fonte: curtitv://66799
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/71855.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/71856.m3u8
@@ -8149,13 +8147,13 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/12948.m3u8
 qualidade: FHD · 1920x1080
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71855.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://66799
+qualidade: FHD
 
 canal: DOG TV
 categoria: Variedades
 logo: https://mondrian.claro.com.br/channels/inverse/dog-tv.png
 
-fonte: curtitv://67133
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/178517.m3u8
 qualidade: 4K
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/76922.m3u8
@@ -8176,13 +8174,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/104908.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/76922.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67133
+qualidade: FHD
 
 canal: Eurochannel
 categoria: Notícias
 logo: https://i.imgur.com/yXAtmI6.png
 
-fonte: curtitv://66827
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/104910.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/104913.m3u8
@@ -8203,13 +8201,13 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/104910.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvMTc1MjMyNy5tM3U4.m3u8
 qualidade: HD
+fonte: curtitv://66827
+qualidade: FHD
 
 canal: FashionTV
 categoria: Variedades
 logo: https://i.imgur.com/1jtRh4S.png
 
-fonte: curtitv://67495
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/103503.m3u8
 qualidade: 4K
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/71924.m3u8
@@ -8232,13 +8230,13 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/71924.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzYwNzA3Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67495
+qualidade: FHD
 
 canal: Film&Arts
 categoria: Filmes e Séries
 logo: https://img.faz-o-eli.online/filmarts.png
 
-fonte: curtitv://67499
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/104914.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/104920.m3u8
@@ -8263,6 +8261,8 @@ fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/104914.m3u8
 qualidade: FHD · 1920x1080
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzYwNzA4Lm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67499
+qualidade: FHD
 
 canal: Formula 1 TV
 categoria: PPV
@@ -8300,8 +8300,6 @@ canal: Markket
 categoria: Variedades
 logo: https://mondrian.claro.com.br/channels/inverse/markket.png
 
-fonte: curtitv://67518
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/164026.m3u8
 qualidade: 4K
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/164030.m3u8
@@ -8324,13 +8322,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/164027.m3u8
 qualidade: FHD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/164030.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67518
+qualidade: FHD
 
 canal: NBA League Pass 1
 categoria: Esportes
 logo: https://i.imgur.com/ynW8fZF.png
 
-fonte: curtitv://67420
-qualidade: HD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/140516.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/140517.m3u8
@@ -8345,6 +8343,8 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/140518.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/140516.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67420
+qualidade: HD
 
 canal: NBA League Pass 2
 categoria: Esportes
@@ -8384,8 +8384,6 @@ canal: SportyNet 4
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: curtitv://67375
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/184584.m3u8
 qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/184585.m3u8
@@ -8400,13 +8398,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/184586.m3u8
 qualidade: SD
 fonte: https://frostview.squareweb.app/relay/m/aHR0cDovL2Fic29sdXRvLnRvcC9saXZlLzIzMzczMTkyOS80MTAzMTQ1ODcvNzU3ODAyLm0zdTg.m3u8
 qualidade: HD
+fonte: curtitv://67375
+qualidade: SD
 
 canal: SportyNet
 categoria: Esportes
 logo: https://img.faz-o-eli.online/sportynet.png
 
-fonte: curtitv://67375
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/sportynet/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
@@ -8418,6 +8416,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/1165167.m3u8
 qualidade: HD · 1280x720
 fonte: https://fallback1.nexustvplay.bbroot.com/nxs/stream/sportynetplus3/sportynetplus3.m3u8
 qualidade: Qualidade não informada
+fonte: curtitv://67375
+qualidade: SD
 
 canal: Paramount + 4
 categoria: Variedades
@@ -8459,8 +8459,6 @@ canal: Prime Box Brazil
 categoria: Variedades
 logo: https://img.faz-o-eli.online/primeboxbrazil.png
 
-fonte: curtitv://67519
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/103476.m3u8
 qualidade: 4K
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/72267.m3u8
@@ -8479,6 +8477,8 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/72270.m3u8
 qualidade: SD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/72269.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://67519
+qualidade: FHD
 
 canal: Sabor & Arte
 categoria: Variedades
@@ -8509,8 +8509,6 @@ canal: UFC Fight Pass
 categoria: PPV
 logo: https://img.faz-o-eli.online/ufcfightpass.png
 
-fonte: curtitv://67415
-qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/08a88b58b4cce722ea16074fd446a37c/ufcfightpass.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/ufc-fight-pass
@@ -8533,13 +8531,13 @@ fonte: http://vivlar.me:80/live/497238/KK8Kdy/184047.m3u8
 qualidade: HD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/184048.m3u8
 qualidade: SD
+fonte: curtitv://67415
+qualidade: SD
 
 canal: Zoomoo
 categoria: Infantil
 logo: https://img.faz-o-eli.online/zoomoo.png
 
-fonte: curtitv://67117
-qualidade: FHD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/178533.m3u8
 qualidade: 4K
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/104934.m3u8
@@ -8564,6 +8562,8 @@ fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/9230.m3u8
 qualidade: HD
 fonte: http://332nr7hbfu.xyz:80/live/999913/S3CvUB/104934.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://67117
+qualidade: FHD
 
 canal: 101 Dalmatas
 categoria: 24 Horas
@@ -8748,19 +8748,17 @@ canal: Escolinha do Professor Raimundo
 categoria: 24 Horas
 logo: http://24horas.cc:80/images/151df67d8d15f1c0c39c7779f27935b6.jpg
 
-fonte: curtitv://66827
-qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/137611.m3u8
 qualidade: SD · 594x456
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/137611.m3u8
 qualidade: SD · 594x456
+fonte: curtitv://66827
+qualidade: FHD
 
 canal: Eu a Patroa e as Criancas
 categoria: 24 Horas
 logo: http://24horas.cc:80/images/f8d46ebce886f39998603845cd3fc331.jpg
 
-fonte: curtitv://66827
-qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/138020.m3u8
 qualidade: HD · 1280x720
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/138021.m3u8
@@ -8781,6 +8779,8 @@ fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/138023.m3u8
 qualidade: HD · 1280x720
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/138024.m3u8
 qualidade: HD · 1280x720
+fonte: curtitv://66827
+qualidade: FHD
 
 canal: Game Shakers
 categoria: 24 Horas
@@ -9107,67 +9107,67 @@ canal: A Fazenda Cam 1
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68333
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397317.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397317.m3u8
 qualidade: FHD
+fonte: curtitv://68333
+qualidade: SD
 
 canal: A Fazenda Cam 2
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68334
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397320.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397320.m3u8
 qualidade: FHD
+fonte: curtitv://68334
+qualidade: SD
 
 canal: A Fazenda Cam 3
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68335
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397321.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397321.m3u8
 qualidade: FHD
+fonte: curtitv://68335
+qualidade: SD
 
 canal: A Fazenda Cam 4
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68336
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397322.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397322.m3u8
 qualidade: FHD
+fonte: curtitv://68336
+qualidade: SD
 
 canal: A Fazenda Cam 5
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68337
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397323.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397323.m3u8
 qualidade: FHD
+fonte: curtitv://68337
+qualidade: SD
 
 canal: A Fazenda Cam 6
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
-fonte: curtitv://68338
-qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397324.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397324.m3u8
 qualidade: FHD
+fonte: curtitv://68338
+qualidade: SD
 
 canal: MAX 07
 categoria: Filmes e Séries
@@ -9187,10 +9187,10 @@ canal: PREMIERE 8 MOSAICO
 categoria: Esportes
 logo: http://1.bp.blogspot.com/-9NsHz_itoFc/Xk70dxuLv7I/AAAAAAAACGQ/wCExIoJZ8xgbleziCR-Guhr-AkuLgFhVQCLcBGAsYHQ/s1600/premiere_2.png
 
-fonte: curtitv://68303
-qualidade: SD
 fonte: http://corruptx.org:80/live/hfp5ejnrey/zq0u3kzads/30063.m3u8
 qualidade: FHD
+fonte: curtitv://68303
+qualidade: SD
 
 canal: JOGOS DE HOJE
 categoria: Esportes
@@ -9365,12 +9365,12 @@ canal: Viva
 categoria: Variedades
 logo: https://img.faz-o-eli.online/viva.png
 
-fonte: curtitv://67108
-qualidade: FHD
 fonte: https://aws.s13-s1001604.lat/stream/5c26746b95e7ead7d92ec9b47d7f940f/viva.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/viva
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67108
+qualidade: FHD
 
 canal: Comedy Central
 categoria: Variedades
@@ -9385,10 +9385,10 @@ canal: Globo Bahia
 categoria: TV Aberta
 logo: https://img.faz-o-eli.online/globo.png
 
-fonte: curtitv://68310
-qualidade: HD
 fonte: http://hls1.sua.tv/live/globotvbahiafhdbr2/s.m3u8
 qualidade: FHD · 1920x1080
+fonte: curtitv://68310
+qualidade: HD
 
 canal: Runtime Ação
 categoria: Filmes e Séries
@@ -9487,45 +9487,45 @@ canal: Apple TV 01
 categoria: Esportes
 logo: https://1.embedcanaisdetv.com/images/appletv1.png
 
-fonte: curtitv://67589
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/appletv01/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67589
+qualidade: SD
 
 canal: Apple TV 02
 categoria: Esportes
 logo: https://1.embedcanaisdetv.com/images/appletv1.png
 
-fonte: curtitv://67590
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/appletv02/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67590
+qualidade: SD
 
 canal: Apple TV 03
 categoria: Esportes
 logo: https://vipcanais.net/images/appletv1.png
 
-fonte: curtitv://67591
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/appletv03/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67591
+qualidade: SD
 
 canal: Apple TV 04
 categoria: Esportes
 logo: https://vipcanais.net/images/appletv1.png
 
-fonte: curtitv://67592
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/appletv04/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67592
+qualidade: SD
 
 canal: Apple TV 05
 categoria: Esportes
@@ -9576,12 +9576,12 @@ canal: Disney+ 07
 categoria: Esportes
 logo: https://vipcanais.net/images/disneyplus.png
 
-fonte: curtitv://67597
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus07/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67597
+qualidade: SD
 
 canal: Disney+ 08
 categoria: Esportes
@@ -9605,34 +9605,34 @@ canal: Disney+ 03
 categoria: Esportes
 logo: https://1.embedcanaisdetv.com/images/disneyplus.png
 
-fonte: curtitv://67252
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus03/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67252
+qualidade: SD
 
 canal: Disney+ 05
 categoria: Esportes
 logo: https://1.embedcanaisdetv.com/images/disneyplus.png
 
-fonte: curtitv://67254
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus05/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67254
+qualidade: SD
 
 canal: Disney+ 06
 categoria: Esportes
 logo: https://1.embedcanaisdetv.com/images/disneyplus.png
 
-fonte: curtitv://67255
-qualidade: SD
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/disneyplus06/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67255
+qualidade: SD
 
 canal: MAX 04
 categoria: Esportes
@@ -9692,349 +9692,403 @@ canal: AMC Séries
 categoria: Filmes e Séries
 logo: https://vipcanais.net/images/amcseries.png
 
-fonte: curtitv://66742
-qualidade: FHD
 fonte: https://d2-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/amcseries/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://66742
+qualidade: FHD
 
 canal: Record DF
 categoria: TV Aberta
 logo: https://1.embedcanaisdetv.com/images/record.png
 
-fonte: curtitv://67289
-qualidade: 4K
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recorddf/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67289
+qualidade: 4K
 
 canal: Record ES
 categoria: TV Aberta
 logo: https://1.embedcanaisdetv.com/images/record.png
 
-fonte: curtitv://67289
-qualidade: 4K
 fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13embed.xyz/recordes/index.m3u8
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+fonte: curtitv://67289
+qualidade: 4K
+
 canal: NFL Network
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=67412
 
 fonte: curtitv://67412
 qualidade: FHD
+
 canal: NFL Now
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=67413
 
 fonte: curtitv://67413
 qualidade: FHD
+
 canal: Kings League Brasil 01
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68281
 
 fonte: curtitv://68281
 qualidade: SD
+
 canal: Kings League Brasil 02
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68282
 
 fonte: curtitv://68282
 qualidade: SD
+
 canal: Kings League Brasil 03
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68283
 
 fonte: curtitv://68283
 qualidade: SD
+
 canal: Flograppling BJJ 01
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68304
 
 fonte: curtitv://68304
 qualidade: SD
+
 canal: Flograppling BJJ 02
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68305
 
 fonte: curtitv://68305
 qualidade: SD
+
 canal: Flograppling BJJ 03
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68306
 
 fonte: curtitv://68306
 qualidade: SD
+
 canal: Desimpedidos TV 01
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68308
 
 fonte: curtitv://68308
 qualidade: SD
+
 canal: Desimpedidos TV 02
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68307
 
 fonte: curtitv://68307
 qualidade: SD
+
 canal: Netflix Eventos 01
 categoria: PPV
 logo: https://curtitvonline.com.br/channel_logo.php?id=68285
 
 fonte: curtitv://68285
 qualidade: FHD
+
 canal: Netflix Eventos 02
 categoria: PPV
 logo: https://curtitvonline.com.br/channel_logo.php?id=68297
 
 fonte: curtitv://68297
 qualidade: FHD
+
 canal: Netflix Eventos 03
 categoria: PPV
 logo: https://curtitvonline.com.br/channel_logo.php?id=68298
 
 fonte: curtitv://68298
 qualidade: FHD
+
 canal: Flamengo TV
 categoria: Esportes
 logo: https://curtitvonline.com.br/channel_logo.php?id=68328
 
 fonte: curtitv://68328
 qualidade: SD
+
 canal: SBT+ Novelas
 categoria: TV Aberta
 logo: https://curtitvonline.com.br/channel_logo.php?id=67585
 
 fonte: curtitv://67585
 qualidade: SD
+
 canal: SBT+ Silvio Santos
 categoria: TV Aberta
 logo: https://curtitvonline.com.br/channel_logo.php?id=67586
 
 fonte: curtitv://67586
 qualidade: SD
+
 canal: SBT+ Tvzyn
 categoria: TV Aberta
 logo: https://curtitvonline.com.br/channel_logo.php?id=67587
 
 fonte: curtitv://67587
 qualidade: SD
+
 canal: 4 Amigos 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=67554
 
 fonte: curtitv://67554
 qualidade: FHD
+
 canal: Pânico na Band 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=67553
 
 fonte: curtitv://67553
 qualidade: FHD
+
 canal: The Noite 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=67552
 
 fonte: curtitv://67552
 qualidade: FHD
+
 canal: A Praça é Nossa 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=67549
 
 fonte: curtitv://67549
 qualidade: FHD
+
 canal: Silvio Santos 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=67548
 
 fonte: curtitv://67548
 qualidade: FHD
+
 canal: Marvel WandaVision 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68213
 
 fonte: curtitv://68213
 qualidade: FHD
+
 canal: Marvel Trilogia Homem-Aranha 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68212
 
 fonte: curtitv://68212
 qualidade: FHD
+
 canal: Marvel Thor 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68211
 
 fonte: curtitv://68211
 qualidade: FHD
+
 canal: Marvel Homem de Ferro 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68198
 
 fonte: curtitv://68198
 qualidade: FHD
+
 canal: Marvel Capitão América 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68194
 
 fonte: curtitv://68194
 qualidade: FHD
+
 canal: Marvel Demolidor 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68195
 
 fonte: curtitv://68195
 qualidade: FHD
+
 canal: Marvel Quarteto Fantástico 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68209
 
 fonte: curtitv://68209
 qualidade: FHD
+
 canal: Marvel Filmes 1 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68196
 
 fonte: curtitv://68196
 qualidade: FHD
+
 canal: Marvel Filmes 2 24h
 categoria: 24 Horas
 logo: https://curtitvonline.com.br/channel_logo.php?id=68197
 
 fonte: curtitv://68197
 qualidade: FHD
+
 canal: Globo 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/globo.png
 
 fonte: curtitv://67286
 qualidade: 4K
+
 canal: Band 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/band.png
 
 fonte: curtitv://67287
 qualidade: 4K
+
 canal: SBT 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/sbt.png
 
 fonte: curtitv://67288
 qualidade: 4K
+
 canal: Record 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/record.png
 
 fonte: curtitv://67289
 qualidade: 4K
+
 canal: RedeTV! 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/redetv.png
 
 fonte: curtitv://67290
 qualidade: 4K
+
 canal: SporTV 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/sportv.png
 
 fonte: curtitv://67293
 qualidade: 4K
+
 canal: Premiere Clubes 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/premiere.png
 
 fonte: curtitv://67294
 qualidade: 4K
+
 canal: ESPN 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/espn.png
 
 fonte: curtitv://68279
 qualidade: 4K
+
 canal: ESPN 4 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/espn4.png
 
 fonte: curtitv://68280
 qualidade: 4K
+
 canal: Combate 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/combate.png
 
 fonte: curtitv://67305
 qualidade: 4K
+
 canal: HBO 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/hbo.png
 
 fonte: curtitv://67295
 qualidade: 4K
+
 canal: HBO Xtreme 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/hboxtreme.png
 
 fonte: curtitv://67296
 qualidade: 4K
+
 canal: Telecine Premium 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/telecinepremium.png
 
 fonte: curtitv://67299
 qualidade: 4K
+
 canal: Telecine Pipoca 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/telecinepipoca.png
 
 fonte: curtitv://67298
 qualidade: 4K
+
 canal: Megapix 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/megapix.png
 
 fonte: curtitv://67297
 qualidade: 4K
+
 canal: Space 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/space.png
 
 fonte: curtitv://67292
 qualidade: 4K
+
 canal: TNT 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/tnt.png
 
 fonte: curtitv://67300
 qualidade: 4K
+
 canal: TNT Series 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/tntseries.png
 
 fonte: curtitv://67301
 qualidade: 4K
+
 canal: Multishow 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/multishow.png
 
 fonte: curtitv://67291
 qualidade: 4K
+
 canal: Discovery Channel 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/discoverychannel.png
 
 fonte: curtitv://67303
 qualidade: 4K
+
 canal: Animal Planet 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/animalplanet.png
 
 fonte: curtitv://67302
 qualidade: 4K
+
 canal: Cartoon Network 4K
 categoria: Canais 4K UHD
 logo: https://1.embedcanaisdetv.com/images/cartoonnetwork.png
 
 fonte: curtitv://67304
 qualidade: 4K
+
