@@ -7907,6 +7907,8 @@ canal: A Fazenda 18 1
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68333
+qualidade: SD
 fonte: https://aws.s13-s1001604.lat/stream/820fef4ff510e9724f894c3b408b9a93/afazenda.m3u8
 qualidade: HD · 1280x720
 referer: https://meufut.top/a-fazenda-18
@@ -7928,6 +7930,8 @@ canal: A Fazenda 18 2
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68334
+qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/9b3b21cd30304fb4eb6681a4e3e330e9/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7941,6 +7945,8 @@ canal: A Fazenda 18 3
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68335
+qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/04e77d74c78b23da7fe308a71d681c8b/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7954,6 +7960,8 @@ canal: A Fazenda 18 4
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68336
+qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/eeb5bfb46a2b1533c44690b9c2fbc179/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -7967,6 +7975,8 @@ canal: A Fazenda 18 5
 categoria: PPV
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68337
+qualidade: SD
 fonte: https://8f246fdcdd11e03e7750ed4f8e050161.s25-cloudfront-net.lat/stream/78dd163cdf878bfea79746c2dc580f68/error.txt
 qualidade: Qualidade não informada
 referer: https://w7.embedtv.cc/
@@ -9097,6 +9107,8 @@ canal: A Fazenda Cam 1
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68333
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397317.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397317.m3u8
@@ -9106,6 +9118,8 @@ canal: A Fazenda Cam 2
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68334
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397320.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397320.m3u8
@@ -9115,6 +9129,8 @@ canal: A Fazenda Cam 3
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68335
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397321.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397321.m3u8
@@ -9124,6 +9140,8 @@ canal: A Fazenda Cam 4
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68336
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397322.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397322.m3u8
@@ -9133,6 +9151,8 @@ canal: A Fazenda Cam 5
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68337
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397323.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397323.m3u8
@@ -9142,6 +9162,8 @@ canal: A Fazenda Cam 6
 categoria: Variedades
 logo: https://img.faz-o-eli.online/afazenda2.png
 
+fonte: curtitv://68338
+qualidade: SD
 fonte: http://vaiagora.vip:80/live/5q8VUj/5BeUd8/397324.m3u8
 qualidade: FHD
 fonte: http://vivlar.me:80/live/497238/KK8Kdy/397324.m3u8
@@ -9698,3 +9720,321 @@ fonte: https://d1-ywppjexvlyulasvmgzjdftfjikth2210oq80soveui6lkbi2iza2zf.cdn13em
 qualidade: FHD
 referer: https://embedcanaisdetv.xyz/
 agente: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+canal: NFL Network
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=67412
+
+fonte: curtitv://67412
+qualidade: FHD
+canal: NFL Now
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=67413
+
+fonte: curtitv://67413
+qualidade: FHD
+canal: Kings League Brasil 01
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68281
+
+fonte: curtitv://68281
+qualidade: SD
+canal: Kings League Brasil 02
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68282
+
+fonte: curtitv://68282
+qualidade: SD
+canal: Kings League Brasil 03
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68283
+
+fonte: curtitv://68283
+qualidade: SD
+canal: Flograppling BJJ 01
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68304
+
+fonte: curtitv://68304
+qualidade: SD
+canal: Flograppling BJJ 02
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68305
+
+fonte: curtitv://68305
+qualidade: SD
+canal: Flograppling BJJ 03
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68306
+
+fonte: curtitv://68306
+qualidade: SD
+canal: Desimpedidos TV 01
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68308
+
+fonte: curtitv://68308
+qualidade: SD
+canal: Desimpedidos TV 02
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68307
+
+fonte: curtitv://68307
+qualidade: SD
+canal: Netflix Eventos 01
+categoria: PPV
+logo: https://curtitvonline.com.br/channel_logo.php?id=68285
+
+fonte: curtitv://68285
+qualidade: FHD
+canal: Netflix Eventos 02
+categoria: PPV
+logo: https://curtitvonline.com.br/channel_logo.php?id=68297
+
+fonte: curtitv://68297
+qualidade: FHD
+canal: Netflix Eventos 03
+categoria: PPV
+logo: https://curtitvonline.com.br/channel_logo.php?id=68298
+
+fonte: curtitv://68298
+qualidade: FHD
+canal: Flamengo TV
+categoria: Esportes
+logo: https://curtitvonline.com.br/channel_logo.php?id=68328
+
+fonte: curtitv://68328
+qualidade: SD
+canal: SBT+ Novelas
+categoria: TV Aberta
+logo: https://curtitvonline.com.br/channel_logo.php?id=67585
+
+fonte: curtitv://67585
+qualidade: SD
+canal: SBT+ Silvio Santos
+categoria: TV Aberta
+logo: https://curtitvonline.com.br/channel_logo.php?id=67586
+
+fonte: curtitv://67586
+qualidade: SD
+canal: SBT+ Tvzyn
+categoria: TV Aberta
+logo: https://curtitvonline.com.br/channel_logo.php?id=67587
+
+fonte: curtitv://67587
+qualidade: SD
+canal: 4 Amigos 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=67554
+
+fonte: curtitv://67554
+qualidade: FHD
+canal: Pânico na Band 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=67553
+
+fonte: curtitv://67553
+qualidade: FHD
+canal: The Noite 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=67552
+
+fonte: curtitv://67552
+qualidade: FHD
+canal: A Praça é Nossa 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=67549
+
+fonte: curtitv://67549
+qualidade: FHD
+canal: Silvio Santos 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=67548
+
+fonte: curtitv://67548
+qualidade: FHD
+canal: Marvel WandaVision 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68213
+
+fonte: curtitv://68213
+qualidade: FHD
+canal: Marvel Trilogia Homem-Aranha 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68212
+
+fonte: curtitv://68212
+qualidade: FHD
+canal: Marvel Thor 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68211
+
+fonte: curtitv://68211
+qualidade: FHD
+canal: Marvel Homem de Ferro 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68198
+
+fonte: curtitv://68198
+qualidade: FHD
+canal: Marvel Capitão América 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68194
+
+fonte: curtitv://68194
+qualidade: FHD
+canal: Marvel Demolidor 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68195
+
+fonte: curtitv://68195
+qualidade: FHD
+canal: Marvel Quarteto Fantástico 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68209
+
+fonte: curtitv://68209
+qualidade: FHD
+canal: Marvel Filmes 1 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68196
+
+fonte: curtitv://68196
+qualidade: FHD
+canal: Marvel Filmes 2 24h
+categoria: 24 Horas
+logo: https://curtitvonline.com.br/channel_logo.php?id=68197
+
+fonte: curtitv://68197
+qualidade: FHD
+canal: Globo 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/globo.png
+
+fonte: curtitv://67286
+qualidade: 4K
+canal: Band 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/band.png
+
+fonte: curtitv://67287
+qualidade: 4K
+canal: SBT 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/sbt.png
+
+fonte: curtitv://67288
+qualidade: 4K
+canal: Record 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/record.png
+
+fonte: curtitv://67289
+qualidade: 4K
+canal: RedeTV! 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/redetv.png
+
+fonte: curtitv://67290
+qualidade: 4K
+canal: SporTV 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/sportv.png
+
+fonte: curtitv://67293
+qualidade: 4K
+canal: Premiere Clubes 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/premiere.png
+
+fonte: curtitv://67294
+qualidade: 4K
+canal: ESPN 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/espn.png
+
+fonte: curtitv://68279
+qualidade: 4K
+canal: ESPN 4 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/espn4.png
+
+fonte: curtitv://68280
+qualidade: 4K
+canal: Combate 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/combate.png
+
+fonte: curtitv://67305
+qualidade: 4K
+canal: HBO 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/hbo.png
+
+fonte: curtitv://67295
+qualidade: 4K
+canal: HBO Xtreme 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/hboxtreme.png
+
+fonte: curtitv://67296
+qualidade: 4K
+canal: Telecine Premium 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/telecinepremium.png
+
+fonte: curtitv://67299
+qualidade: 4K
+canal: Telecine Pipoca 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/telecinepipoca.png
+
+fonte: curtitv://67298
+qualidade: 4K
+canal: Megapix 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/megapix.png
+
+fonte: curtitv://67297
+qualidade: 4K
+canal: Space 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/space.png
+
+fonte: curtitv://67292
+qualidade: 4K
+canal: TNT 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/tnt.png
+
+fonte: curtitv://67300
+qualidade: 4K
+canal: TNT Series 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/tntseries.png
+
+fonte: curtitv://67301
+qualidade: 4K
+canal: Multishow 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/multishow.png
+
+fonte: curtitv://67291
+qualidade: 4K
+canal: Discovery Channel 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/discoverychannel.png
+
+fonte: curtitv://67303
+qualidade: 4K
+canal: Animal Planet 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/animalplanet.png
+
+fonte: curtitv://67302
+qualidade: 4K
+canal: Cartoon Network 4K
+categoria: Canais 4K UHD
+logo: https://1.embedcanaisdetv.com/images/cartoonnetwork.png
+
+fonte: curtitv://67304
+qualidade: 4K
