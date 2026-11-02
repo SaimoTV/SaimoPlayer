@@ -13,6 +13,10 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+for d in "$HOME"/.nvm/versions/node/v18*/bin /usr/local/bin /opt/homebrew/bin "$HOME"/.nvm/versions/node/v20*/bin "$HOME"/.nvm/versions/node/v22*/bin "$HOME"/.nvm/versions/node/v24*/bin; do
+  [ -d "$d" ] && export PATH="$d:$PATH"
+done
+
 PLIST="Info.plist"
 GRADLE="../SaimoTV-Android/app/build.gradle.kts"
 JAVA17="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
