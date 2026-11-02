@@ -260,8 +260,8 @@ régua: o celular toca o som sem o acerto fino.
 
 ### Listas: dois endereços, sem lista no código
 
-O app do Mac não carrega lista nenhuma no código nem no binário (não existe mais
-`Channels.swift`); só dois endereços-base, constantes em `Enderecos.swift`, já ativos
+O app do Mac não carrega lista nenhuma no código nem no binário (`Channels.swift`
+só define os tipos); só dois endereços-base, constantes em `Enderecos.swift`, já ativos
 de fábrica: `https://canais-saimo.pages.dev/` e `https://filmes-saimo.pages.dev/`.
 Ninguém precisa digitar nada. Em Ajustes > Listas dá para trocar cada um, deixar em
 branco para desligar aquela lista (guardado como valor vazio explícito: estado vazio,

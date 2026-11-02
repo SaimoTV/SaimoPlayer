@@ -15,3 +15,11 @@ arquivos-gerados/
 
 # Cache local do wrangler
 .wrangler/
+
+# Listas nunca vão para o Git: canais e filmes vêm só dos links das configs.
+catalogo.txt
+canais.txt
+restritos.txt
+radios.txt
+*.m3u
+*.m3u8
