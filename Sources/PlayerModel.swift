@@ -253,16 +253,18 @@ final class PlayerModel: NSObject, ObservableObject {
 
     /// Pergunta ao `/api/stream` (com `json=1`) o destino e abre por ele. Destino
     /// http volta embrulhado no proxy do site, que a Cloudflare tem barrado: o app
-    /// abre http direto, então desembrulha.
-    static func resolverDinamica(_ url: URL) async -> URL {
+    /// abre http direto, então desembrulha. `nil` quando o servidor afirma (404)
+    /// que não há vídeo em provedor nenhum.
+    static func resolverDinamica(_ url: URL) async -> URL? {
         guard var partes = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
         partes.queryItems = (partes.queryItems ?? []).filter { $0.name != "json" } + [URLQueryItem(name: "json", value: "1")]
         guard let pedidoURL = partes.url else { return url }
         var pedido = URLRequest(url: pedidoURL)
         pedido.timeoutInterval = 20
         pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
-        guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
-              (resposta as? HTTPURLResponse)?.statusCode == 200,
+        guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido) else { return url }
+        if (resposta as? HTTPURLResponse)?.statusCode == 404 { return nil }
+        guard (resposta as? HTTPURLResponse)?.statusCode == 200,
               let json = try? JSONSerialization.jsonObject(with: dados) as? [String: Any],
               let texto = json["url"] as? String, let destino = URL(string: texto) else { return url }
         if destino.path == "/api/proxy",
@@ -279,6 +281,17 @@ final class PlayerModel: NSObject, ObservableObject {
             let destino = await PlayerModel.resolverDinamica(link)
             // Outra fonte ou outro título começou enquanto a resposta vinha.
             guard let self, self.playingFile == link else { return }
+            guard let destino else {
+                // Sem vídeo em lugar nenhum: tenta a fonte seguinte ou avisa.
+                if self.fileSources.count > 1, self.sourcesTried + 1 < self.fileSources.count {
+                    self.sourcesTried += 1
+                    self.escolherFonteDoArquivo((self.fileSourceIndex + 1) % self.fileSources.count)
+                } else {
+                    self.status = "Este título ainda não está disponível em nenhuma fonte. Tente de novo mais tarde."
+                    Log.shared.write("\(self.playingFileName): sem vídeo em nenhuma fonte")
+                }
+                return
+            }
             guard destino != link else {
                 self.scheduleReconnect(reason: "sem destino para o link do catálogo")
                 return
