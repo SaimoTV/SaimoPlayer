@@ -247,6 +247,55 @@ final class PlayerModel: NSObject, ObservableObject {
     /// playlists desde o primeiro pedido. Servi-lo direto faz o AVFoundation
     /// acreditar que é texto; mandá-lo ao proxy de MP4 também não reescreveria
     /// variantes, áudios, legendas e segmentos relativos.
+    /// `/api/stream` só escolhe o destino quando chamado e pode cair em HLS servido
+    /// como `.txt`/`text/html`, que o AVFoundation recusa direto.
+    static func ehEnderecoDinamico(_ url: URL) -> Bool { url.path == "/api/stream" }
+
+    /// Pergunta ao `/api/stream` (com `json=1`) o destino e abre por ele. Destino
+    /// http volta embrulhado no proxy do site, que a Cloudflare tem barrado: o app
+    /// abre http direto, então desembrulha.
+    static func resolverDinamica(_ url: URL) async -> URL {
+        guard var partes = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url }
+        partes.queryItems = (partes.queryItems ?? []).filter { $0.name != "json" } + [URLQueryItem(name: "json", value: "1")]
+        guard let pedidoURL = partes.url else { return url }
+        var pedido = URLRequest(url: pedidoURL)
+        pedido.timeoutInterval = 20
+        pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
+              (resposta as? HTTPURLResponse)?.statusCode == 200,
+              let json = try? JSONSerialization.jsonObject(with: dados) as? [String: Any],
+              let texto = json["url"] as? String, let destino = URL(string: texto) else { return url }
+        if destino.path == "/api/proxy",
+           let dentro = URLComponents(url: destino, resolvingAgainstBaseURL: false)?
+               .queryItems?.first(where: { $0.name == "url" })?.value,
+           dentro.hasPrefix("http"), let direto = URL(string: dentro) {
+            return direto
+        }
+        return destino
+    }
+
+    private func resolverEAbrir(_ link: URL) {
+        Task { @MainActor [weak self] in
+            let destino = await PlayerModel.resolverDinamica(link)
+            // Outra fonte ou outro título começou enquanto a resposta vinha.
+            guard let self, self.playingFile == link else { return }
+            guard destino != link else {
+                self.scheduleReconnect(reason: "sem destino para o link do catálogo")
+                return
+            }
+            if self.fileSources.indices.contains(self.fileSourceIndex),
+               self.fileSources[self.fileSourceIndex] == link {
+                self.fileSources[self.fileSourceIndex] = destino
+            }
+            Log.shared.write("\(self.playingFileName): link do catálogo resolvido")
+            let preparada = self.fonteDeArquivo(destino)
+            self.fonteViaProxy = preparada.peloProxy
+            self.playingFile = preparada.url
+            self.generatedLink = preparada.url
+            self.load(preparada.url, channel: nil)
+        }
+    }
+
     private func fonteDeArquivo(_ origem: URL) -> (url: URL, peloProxy: Bool) {
         guard origem.pathExtension.lowercased() == "txt" else { return (origem, false) }
         let canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
@@ -644,6 +693,10 @@ final class PlayerModel: NSObject, ObservableObject {
     }
 
     private func load(_ link: URL, channel: Channel?) {
+        if channel == nil, PlayerModel.ehEnderecoDinamico(link) {
+            resolverEAbrir(link)
+            return
+        }
         tearDownItemObservers()
 
         var headers: [String: String] = [
