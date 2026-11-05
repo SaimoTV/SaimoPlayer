@@ -132,6 +132,8 @@ final class Upstream: @unchecked Sendable {
             if let r = res.referer { ref = r }
         } else if url.host?.contains("tiktokcdn") == true {
             ref = "https://dadinhodetapioca.fun/"
+        } else if (url.host?.contains("embedtvproxy.workers.dev") == true || url.host?.contains("cloudfront-net.lat") == true) && ref == nil {
+            ref = "https://nexustvplay.bbroot.com/"
         }
         do {
             return try fetchViaURLSession(url, method: method, referer: ref, agente: agente)
