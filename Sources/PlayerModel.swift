@@ -39,6 +39,10 @@ final class PlayerModel: NSObject, ObservableObject {
     // Playback
     @Published private(set) var isPlaying = false
     @Published var status: String = "parado"
+    /// Mensagem na tela quando o título ou o canal desistiu de abrir. Antes só
+    /// o `status` mudava, e ele não aparece em lugar nenhum: o vídeo ficava
+    /// preto sem a pessoa saber o que aconteceu.
+    @Published var aviso: String?
     @Published var generatedLink: URL?
     @Published var volume: Double = 1.0 { didSet { applyVolume() } }
     @Published var isMuted: Bool = Preferencias.isMuted {
@@ -416,6 +420,7 @@ final class PlayerModel: NSObject, ObservableObject {
                     self.escolherFonteDoArquivo((self.fileSourceIndex + 1) % self.fileSources.count)
                 } else {
                     self.status = "Este título ainda não está disponível em nenhuma fonte. Tente de novo mais tarde."
+                    self.aviso = self.status
                     Log.shared.write("\(self.playingFileName): sem vídeo em nenhuma fonte")
                 }
                 return
@@ -834,6 +839,7 @@ final class PlayerModel: NSObject, ObservableObject {
     }
 
     private func load(_ link: URL, channel: Channel?) {
+        aviso = nil
         if channel == nil, PlayerModel.ehEnderecoDinamico(link) {
             resolverEAbrir(link)
             return
@@ -1188,6 +1194,9 @@ final class PlayerModel: NSObject, ObservableObject {
             reconnectAttempt += 1
             guard reconnectAttempt <= 4 else {
                 status = "falhou: \(reason)"
+                aviso = playedSinceOpen
+                    ? "A conexão com este título caiu e não voltou. Tente de novo ou escolha outra fonte."
+                    : "Não foi possível abrir este título em nenhuma fonte agora. Tente outra fonte ou volte mais tarde."
                 return
             }
             let retomar = position
@@ -1227,6 +1236,7 @@ final class PlayerModel: NSObject, ObservableObject {
         reconnectAttempt += 1
         guard reconnectAttempt <= 8 else {
             status = "falhou: \(reason)"
+            aviso = "Este canal não abriu em nenhuma fonte agora. Tente outro canal ou volte daqui a pouco."
             Log.shared.write("desisti após 8 tentativas")
             return
         }

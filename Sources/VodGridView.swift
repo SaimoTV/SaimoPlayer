@@ -147,6 +147,8 @@ struct VodGridView: View {
                 TelaBusca(model: model, acoes: acoes)
             case .ajustes:
                 TelaAjustes(model: model)
+            case .apoie:
+                TelaApoie()
             case .favoritos, .extras, nil:
                 telaDaGrade
             }

@@ -13,7 +13,7 @@ enum VodSecao: String, Identifiable, CaseIterable {
     /// As telas da barra do topo que não são uma parte do acervo, mas moram
     /// no mesmo lugar dele: com uma delas aberta o ao vivo para, como em
     /// qualquer outra seção.
-    case ondemand, radios, buscar, ajustes
+    case ondemand, radios, buscar, ajustes, apoie
     var id: String { rawValue }
     var titulo: String {
         switch self {
@@ -22,6 +22,7 @@ enum VodSecao: String, Identifiable, CaseIterable {
         case .radios: return "Rádios"
         case .buscar: return "Buscar"
         case .ajustes: return "Ajustes"
+        case .apoie: return "Apoie"
         case .filmes: return "Filmes"
         case .series: return "Séries"
         case .animes: return "Animes"
@@ -45,11 +46,12 @@ enum VodSecao: String, Identifiable, CaseIterable {
         case .radios: return "radio"
         case .buscar: return "magnifyingglass"
         case .ajustes: return "gearshape"
+        case .apoie: return "heart.fill"
         }
     }
     /// Extras são filmes noutro arquivo do catálogo, não outra natureza.
     var pedeFilmes: Bool {
-        ![.series, .animes, .doramas, .inicio, .eventos, .ondemand, .radios, .buscar, .ajustes].contains(self)
+        ![.series, .animes, .doramas, .inicio, .eventos, .ondemand, .radios, .buscar, .ajustes, .apoie].contains(self)
     }
     /// As quatro categorias do On Demand: cada uma tem a página dela, em
     /// fileiras, e o acervo inteiro de A a Z por trás.

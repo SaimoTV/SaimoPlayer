@@ -367,6 +367,7 @@ final class SaimoConnect: ObservableObject {
     private func telaDaSecao(_ secao: VodSecao?) -> String {
         switch secao {
         case .ajustes: return "settings"
+        case .apoie: return "apoie"
         case .buscar: return "search"
         case .radios: return "radio"
         case nil: return "live"

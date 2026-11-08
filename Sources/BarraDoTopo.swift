@@ -3,7 +3,7 @@ import AppKit
 
 /// As abas da barra do topo, na ordem da TV Box.
 enum Aba: String, CaseIterable, Identifiable {
-    case buscar, inicio, aoVivo, eventos, onDemand, favoritos, radios, extras, ajustes
+    case buscar, inicio, aoVivo, eventos, onDemand, favoritos, radios, extras, apoie, ajustes
 
     var id: String { rawValue }
 
@@ -17,6 +17,7 @@ enum Aba: String, CaseIterable, Identifiable {
         case .favoritos: return "Favoritos"
         case .radios: return "Rádios"
         case .extras: return "Extras"
+        case .apoie: return "Apoie"
         case .ajustes: return "Ajustes"
         }
     }
@@ -31,6 +32,7 @@ enum Aba: String, CaseIterable, Identifiable {
         case .favoritos: return "star.fill"
         case .radios: return "radio.fill"
         case .extras: return "plus.rectangle.on.rectangle"
+        case .apoie: return "heart.fill"
         case .ajustes: return "gearshape.fill"
         }
     }
@@ -51,6 +53,7 @@ enum Aba: String, CaseIterable, Identifiable {
         case .extras: return .extras
         case .buscar: return .buscar
         case .ajustes: return .ajustes
+        case .apoie: return .apoie
         }
     }
 
@@ -78,6 +81,7 @@ enum Aba: String, CaseIterable, Identifiable {
         case .extras: estado.secao = .extras
         case .buscar: estado.secao = .buscar
         case .ajustes: estado.secao = .ajustes
+        case .apoie: estado.secao = .apoie
         }
     }
 }
@@ -200,6 +204,11 @@ struct BarraDoTopo: View {
                 if escolhida {
                     Capsule().fill(Color.white)
                         .matchedGeometryEffect(id: "aba", in: espaco)
+                } else if aba == .apoie {
+                    // Apoie fica sempre em destaque, chamando atenção na barra.
+                    Capsule().fill(LinearGradient(colors: [Color(red: 0.06, green: 0.66, blue: 0.60),
+                                                           Color(red: 0.15, green: 0.39, blue: 0.92)],
+                                                  startPoint: .leading, endPoint: .trailing))
                 }
             }
             .contentShape(Capsule())

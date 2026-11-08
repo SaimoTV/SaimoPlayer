@@ -173,6 +173,10 @@ struct ContentView: View {
 
             LegendaNaTela(model: model, acimaDosControles: controlsVisible)
 
+            if let aviso = model.aviso {
+                AvisoNaTela(texto: aviso) { model.aviso = nil }
+            }
+
             if model.showStats {
                 statsOverlay
                     .opacity(controlsVisible ? 1 : 0)
@@ -833,6 +837,29 @@ private func rotuloDoAtraso(_ segundos: Double) -> String {
 
 /// A legenda do OpenSubtitles, desenhada por cima do vídeo. O texto é escolhido
 /// pelo relógio do player, cinco vezes por segundo, sem publicar nada.
+/// Por que o vídeo não abriu, no meio da tela, até a pessoa fechar ou trocar.
+private struct AvisoNaTela: View {
+    let texto: String
+    let fechar: () -> Void
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 30))
+                .foregroundStyle(.yellow)
+            Text(texto)
+                .font(.system(size: 16, weight: .medium))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
+                .frame(maxWidth: 420)
+            Button("Fechar", action: fechar)
+                .keyboardShortcut(.cancelAction)
+        }
+        .padding(24)
+        .background(.black.opacity(0.78), in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
 private struct LegendaNaTela: View {
     @ObservedObject var model: PlayerModel
     let acimaDosControles: Bool
