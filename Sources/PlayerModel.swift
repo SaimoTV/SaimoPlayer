@@ -171,6 +171,14 @@ final class PlayerModel: NSObject, ObservableObject {
     /// disco a cada quadro.
     private func guardarProgresso(forcado: Bool = false) {
         guard playingFile != nil, !chaveArquivo.isEmpty, duration > 0 else { return }
+        // Só o item deste arquivo, já tocando. Era aqui o "pula para o final":
+        // ao abrir outro episódio, o tique lia a posição do episódio anterior
+        // (ainda no player enquanto o novo carregava) e gravava na chave nova.
+        guard playedSinceOpen, let item = itemDoArquivo, item === player.currentItem else { return }
+        if let r = retomandoAte {
+            if abs(position - r.alvo) > 15, Date().timeIntervalSince(r.desde) < 10 { return }
+            retomandoAte = nil
+        }
         guard forcado || abs(position - ultimoGuardado) >= 5 else { return }
         ultimoGuardado = position
         Progresso.salvar(chaveArquivo, posicao: position, duracao: duration)
@@ -235,6 +243,17 @@ final class PlayerModel: NSObject, ObservableObject {
     private var playedSinceOpen = false
     private var ultimoPulo = Date.distantPast
     private var retomou = false
+    /// Onde o arquivo aberto deve começar, decidido na hora de abrir (ponto
+    /// guardado, pedido do celular ou o ponto da troca de fonte). Só é usado
+    /// quando o item novo fica pronto.
+    private var retomarEm: Double?
+    /// O item que pertence ao arquivo no ar. Até ele tocar, o player ainda pode
+    /// estar com o item anterior, e a posição dele não pode ser guardada na
+    /// chave do arquivo novo.
+    private weak var itemDoArquivo: AVPlayerItem?
+    /// Enquanto a retomada não chega ao ponto, a posição lida é a do começo:
+    /// guardá-la apagaria o ponto que se está retomando.
+    private var retomandoAte: (alvo: Double, desde: Date)?
     private var sourcesTried = 0
     /// Fontes do arquivo no ar, em ordem. O mesmo filme vem das duas listas.
     private var fileSources: [URL] = []
@@ -739,6 +758,10 @@ final class PlayerModel: NSObject, ObservableObject {
         }
         chaveArquivo = chave
         ultimoGuardado = -100
+        retomarEm = inicioPedido ?? (chave.isEmpty ? nil : Progresso.posicao(chave))
+        inicioPedido = nil
+        retomandoAte = nil
+        soltarItemAnterior()
         fileSources = urls
         fileSourceIndex = indice
         fileSourceLabels = rotulos
@@ -812,12 +835,16 @@ final class PlayerModel: NSObject, ObservableObject {
         sourceHost = proxima.host ?? ""
         playingFileDetail = detalheAtualDoArquivo()
         playedSinceOpen = false
-        retomou = true
+        // O ponto vale para o item novo, quando ele ficar pronto: buscar já
+        // agora caía no item anterior (ou em nenhum, com o link ainda resolvendo).
+        retomou = false
+        retomarEm = retomar > 5 ? retomar : nil
+        retomandoAte = nil
+        soltarItemAnterior()
         reconnectAttempt = 0
         status = "carregando…"
         Log.shared.write("\(playingFileName): fonte \(fileSourceIndex + 1) de \(fileSources.count)")
         load(preparada.url, channel: nil)
-        if retomar > 5 { seekQuandoPuder(retomar) }
     }
 
     /// Troca a fonte do arquivo no ar pela seguinte (ou anterior), do mesmo
@@ -908,6 +935,7 @@ final class PlayerModel: NSObject, ObservableObject {
             })
 
         ultimoRelogio = -1
+        itemDoArquivo = channel == nil ? item : nil
         player.replaceCurrentItem(with: item)
         player.rate = rate
         isPlaying = true
@@ -939,11 +967,14 @@ final class PlayerModel: NSObject, ObservableObject {
             }
             // Volta ao ponto em que parou, uma vez só por abertura. O ponto
             // pedido pelo celular (Saimo Connect) vale mais que o guardado.
-            if playingFile != nil, !retomou, !chaveArquivo.isEmpty || inicioPedido != nil {
+            if playingFile != nil, !retomou {
                 retomou = true
-                let ponto = inicioPedido ?? Progresso.posicao(chaveArquivo)
-                inicioPedido = nil
-                if ponto > 0 { seekQuandoPuder(ponto) }
+                let ponto = retomarEm ?? 0
+                retomarEm = nil
+                if ponto > 0 {
+                    retomandoAte = (ponto, Date())
+                    seekQuandoPuder(ponto)
+                }
             }
             Log.shared.write("pronto — reproduzindo")
         case .failed:
@@ -1093,6 +1124,17 @@ final class PlayerModel: NSObject, ObservableObject {
             qualidade: altura > 0 ? "\(altura)p" : nil)
     }
 
+    /// Tira o item anterior do player ao abrir outro arquivo ou fonte: até o
+    /// novo carregar, nada do anterior deve tocar, nem ter a posição gravada.
+    private func soltarItemAnterior() {
+        tearDownItemObservers()
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+        itemDoArquivo = nil
+        duration = 0
+        position = 0
+    }
+
     func stop() {
         Telemetria.shared.parou()
         player.pause()
@@ -1205,7 +1247,11 @@ final class PlayerModel: NSObject, ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
                 guard let self, self.playingFile == arquivo else { return }
                 self.load(arquivo, channel: nil)
-                if retomar > 5 { self.seek(to: retomar) }
+                if retomar > 5 {
+                    // Até voltar ao ponto, o tique leria o começo e apagaria o progresso.
+                    self.retomandoAte = (retomar, Date())
+                    self.seek(to: retomar)
+                }
             }
             return
         }
@@ -1260,6 +1306,13 @@ final class PlayerModel: NSObject, ObservableObject {
             // depende dela: sem preenchê-la aqui, a retomada seria descartada
             // por "duração zero" justamente na abertura.
             duration = total
+            // Ponto nos créditos (ou além do fim, gravado por outro arquivo):
+            // retomar ali é abrir no final. Começa do início.
+            guard segundos < total - 120, segundos < total * 0.95 else {
+                Log.shared.write("\(playingFileName): ponto \(Int(segundos)) s perto do fim de \(Int(total)) s — começando do início")
+                retomandoAte = nil
+                return
+            }
             seek(to: segundos)
             return
         }

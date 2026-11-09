@@ -652,6 +652,17 @@ private struct QualityBadge: View {
 /// jumping back over the bit they missed.
 private struct ScrubBar: View {
     @ObservedObject var model: PlayerModel
+    @ObservedObject private var previa = PrevisaoDeQuadro.shared
+    /// Onde o mouse está sobre a barra, de 0 a 1 (nil fora dela).
+    @State private var sobre: Double?
+    @State private var largura: CGFloat = 1
+
+    /// O instante da prévia: o do mouse, ou o ponto arrastado.
+    private var instantePrevia: Double? {
+        if model.scrubbing { return model.position }
+        guard let f = sobre, model.duration > 0 else { return nil }
+        return f * model.duration
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -666,11 +677,55 @@ private struct ScrubBar: View {
                 .frame(maxWidth: .infinity)
                 .controlSize(.small)
                 .tint(Tema.acento)
+                .background(GeometryReader { g in
+                    Color.clear.onAppear { largura = g.size.width }
+                        .onChange(of: g.size.width) { _, w in largura = w }
+                })
+                .onContinuousHover { fase in
+                    switch fase {
+                    case .active(let ponto): sobre = min(max(Double(ponto.x / max(largura, 1)), 0), 1)
+                    case .ended: sobre = nil; previa.cancelar()
+                    }
+                }
+                .onChange(of: instantePrevia) { _, t in
+                    if let t { previa.pedir(t, em: model.playingFile) }
+                }
+                .overlay(alignment: .bottomLeading) {
+                    if let t = instantePrevia, model.duration > 0 {
+                        quadro(t)
+                            .offset(x: min(max(CGFloat(t / model.duration) * largura - 80, 0), max(largura - 160, 0)),
+                                    y: -24)
+                            .allowsHitTesting(false)
+                    }
+                }
             Text(relogio(model.duration))
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.5))
         }
-        .help("Arraste para avançar ou voltar")
+    }
+
+    /// A prévia sobre a barra: o quadro (quando já chegou) e o instante.
+    private func quadro(_ t: Double) -> some View {
+        VStack(spacing: 4) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6).fill(Color.black.opacity(0.85))
+                if let imagem = previa.imagem, abs(previa.instante - t) < 30 {
+                    Image(nsImage: imagem).resizable().aspectRatio(contentMode: .fill)
+                } else {
+                    ProgressView().controlSize(.small)
+                }
+            }
+            .frame(width: 160, height: 90)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(.white.opacity(0.8), lineWidth: 1.5))
+            Text(relogio(t))
+                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(.black.opacity(0.7), in: Capsule())
+        }
+        .fixedSize()
+        .alignmentGuide(.bottom) { d in d[.bottom] }
     }
 
     private func relogio(_ segundos: Double) -> String {
