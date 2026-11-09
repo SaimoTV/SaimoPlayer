@@ -406,15 +406,19 @@ struct VodGridView: View {
                         .fixedSize()
                         .botaoDeVidro()
                     }
+                    if InfoDosTitulos.prontos {
+                        menuDeAno
+                        menuDeIdade
+                        menuDeNota
+                    }
                     Menu {
-                        Button { estado.novosPrimeiro = false } label: {
-                            Text(estado.novosPrimeiro ? "    De A a Z" : "✓  De A a Z")
-                        }
-                        Button { estado.novosPrimeiro = true } label: {
-                            Text(estado.novosPrimeiro ? "✓  Mais novos primeiro" : "    Mais novos primeiro")
+                        ForEach(VodEstado.OrdemGrade.allCases.filter { InfoDosTitulos.prontos || $0 == .az || $0 == .novos }, id: \.self) { o in
+                            Button { estado.ordem = o } label: {
+                                Text(estado.ordem == o ? "✓  \(o.titulo)" : "    \(o.titulo)")
+                            }
                         }
                     } label: {
-                        Label(estado.novosPrimeiro ? "Mais novos" : "A a Z", systemImage: "arrow.up.arrow.down")
+                        Label(estado.ordem.titulo, systemImage: "arrow.up.arrow.down")
                     }
                     .menuIndicator(.hidden)
                     .fixedSize()
@@ -435,21 +439,96 @@ struct VodGridView: View {
         }
     }
 
-    /// A lista já sem o que o gênero escolhido deixa de fora, filtrada pela
-    /// busca e na ordem escolhida.
+    /// A lista já sem o que o gênero e os filtros deixam de fora, filtrada
+    /// pela busca e na ordem escolhida.
     private func filtrados(_ todos: [Cartao]) -> [Cartao] {
         var itens = porGenero(todos)
         if !estado.busca.isEmpty {
             itens = itens.filter { $0.nomeCompleto.localizedCaseInsensitiveContains(estado.busca) }
         }
-        if estado.novosPrimeiro {
-            itens = itens.enumerated().sorted { a, b in
-                let x = CartoesDoAcervo.ano(a.element.titulo, a.element.ano)
-                let y = CartoesDoAcervo.ano(b.element.titulo, b.element.ano)
+        let anoDe: (Cartao) -> Int = { c in
+            InfoDosTitulos.de(c.titulo, serie: c.serie).map(\.ano).flatMap { $0 > 0 ? $0 : nil }
+                ?? CartoesDoAcervo.ano(c.titulo, c.ano)
+        }
+        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 {
+            itens = itens.filter { c in
+                let d = InfoDosTitulos.de(c.titulo, serie: c.serie)
+                if let faixa = estado.anos, !faixa.contains(anoDe(c)) { return false }
+                if let max = estado.idadeMax, !(d.map { (0...max).contains($0.idade) } ?? false) { return false }
+                if estado.notaMin > 0, (d?.nota ?? 0) < Double(estado.notaMin) { return false }
+                return true
+            }
+        }
+        // Filtrando ou ordenando, o mesmo filme em duas pastas ("Jack" e
+        // "Jack (1993)") aparece uma vez só.
+        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 || estado.ordem != .az {
+            var vistos = Set<String>()
+            itens = itens.filter { c in
+                let base = c.titulo.replacingOccurrences(of: #"\s*\(\d{4}\)\s*$"#, with: "", options: .regularExpression)
+                    .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+                    .components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }.joined(separator: " ")
+                return vistos.insert("\(c.serie)|\(base)|\(anoDe(c))").inserted
+            }
+        }
+        func ordenar(_ chave: (Cartao) -> Double) -> [Cartao] {
+            itens.enumerated().sorted { a, b in
+                let x = chave(a.element), y = chave(b.element)
                 return x != y ? x > y : a.offset < b.offset
             }.map(\.element)
         }
+        switch estado.ordem {
+        case .az: break
+        case .novos: itens = ordenar { Double(anoDe($0)) }
+        case .populares: itens = ordenar { Double(InfoDosTitulos.de($0.titulo, serie: $0.serie)?.popularidade ?? 0) }
+        case .melhores: itens = ordenar { InfoDosTitulos.de($0.titulo, serie: $0.serie)?.nota ?? 0 }
+        }
         return itens
+    }
+
+    private func marcado(_ sim: Bool, _ texto: String) -> String { sim ? "✓  \(texto)" : "    \(texto)" }
+
+    private var menuDeAno: some View {
+        let atual = Calendar.current.component(.year, from: Date())
+        let decada = atual / 10 * 10
+        var faixas: [(String, ClosedRange<Int>)] = (0...2).map { ("\(atual - $0)", (atual - $0)...(atual - $0)) }
+        if atual - 3 >= decada { faixas.append(("\(decada)–\(atual - 3)", decada...(atual - 3))) }
+        for d in stride(from: decada - 10, through: 1990, by: -10) { faixas.append(("Anos \(d)", d...(d + 9))) }
+        faixas.append(("Antes de 1990", 1...1989))
+        return Menu {
+            Button { estado.anos = nil; estado.rotuloAnos = "" } label: { Text(marcado(estado.anos == nil, "Todos")) }
+            Divider()
+            ForEach(faixas, id: \.0) { rotulo, faixa in
+                Button { estado.anos = faixa; estado.rotuloAnos = rotulo } label: { Text(marcado(estado.anos == faixa, rotulo)) }
+            }
+        } label: {
+            Label(estado.anos == nil ? "Ano" : estado.rotuloAnos, systemImage: "calendar")
+        }
+        .menuIndicator(.hidden).fixedSize().botaoDeVidro()
+    }
+
+    private var menuDeIdade: some View {
+        Menu {
+            Button { estado.idadeMax = nil } label: { Text(marcado(estado.idadeMax == nil, "Todas")) }
+            Divider()
+            Button { estado.idadeMax = 0 } label: { Text(marcado(estado.idadeMax == 0, "Livre")) }
+            ForEach([10, 12, 14, 16], id: \.self) { i in
+                Button { estado.idadeMax = i } label: { Text(marcado(estado.idadeMax == i, "Até \(i) anos")) }
+            }
+        } label: {
+            Label(estado.idadeMax.map { $0 == 0 ? "Livre" : "Até \($0) anos" } ?? "Idade", systemImage: "person.2")
+        }
+        .menuIndicator(.hidden).fixedSize().botaoDeVidro()
+    }
+
+    private var menuDeNota: some View {
+        Menu {
+            ForEach([0, 6, 7, 8], id: \.self) { n in
+                Button { estado.notaMin = n } label: { Text(marcado(estado.notaMin == n, n == 0 ? "Qualquer" : "\(n) ou mais")) }
+            }
+        } label: {
+            Label(estado.notaMin == 0 ? "Nota" : "\(estado.notaMin)+", systemImage: "star")
+        }
+        .menuIndicator(.hidden).fixedSize().botaoDeVidro()
     }
 
     private func porGenero(_ itens: [Cartao]) -> [Cartao] {
@@ -712,6 +791,7 @@ struct VodGridView: View {
     private func abrir() async {
         guard let secao = estado.secao else { return }
         await Generos.carregar()
+        await InfoDosTitulos.carregar()
         if estado.gavetas.isEmpty { estado.gavetas = await Vod.indice() }
         estado.filmes = secao.pedeFilmes
         estado.reservado = secao == .extras
@@ -726,6 +806,7 @@ struct VodGridView: View {
                 nomesDoAcervo = Set(await Vod.todos().map(\.titulo))
             }
             await Generos.carregar()
+            await InfoDosTitulos.carregar()
             return
         }
         // Telas que cuidam do que mostram.

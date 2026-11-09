@@ -109,9 +109,14 @@ O app abre no Início (ou no último canal, se os Ajustes mandarem):
   programa no ar), Favoritos e os destaques. On Demand: cartões das quatro
   categorias com colagem de capas, Continue assistindo, destaques, filmes por
   gênero e o "de A a Z" de cada uma. Cada categoria tem Lançamentos, uma fileira
-  por gênero com "Ver todos" e "Todos de A a Z".
-- A grade de A a Z (e Favoritos) tem as letras numa coluna de vidro, gênero,
-  ordem (A a Z ou mais novos primeiro) e busca no alto.
+  por gênero com "Ver todos" e, logo depois da primeira fileira, "Filtrar e
+  explorar".
+- A grade de A a Z (e Favoritos) tem as letras numa coluna de vidro e, no alto,
+  busca e filtros como nos grandes serviços: gênero, ano (2026, 2025, década...),
+  classificação indicativa (Livre a 16 anos), nota mínima e ordem (A a Z, mais
+  novos, mais populares, mais bem avaliados). Ano, nota, idade e popularidade
+  vêm do `detalhes.txt` do catálogo (`InfoDosTitulos.swift`); filtrando, o mesmo
+  título em duas pastas aparece uma vez só.
 - Ao vivo é o vídeo com a lista de canais de vidro à esquerda (⇧⌘L ou o botão da
   barra de controles): número, logo, nome, programa e progresso, categorias em
   pílulas e busca; no canto, o cartão do programa no ar. Controles, barra do

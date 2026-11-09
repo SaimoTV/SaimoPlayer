@@ -101,8 +101,29 @@ final class VodEstado: ObservableObject {
     /// O gênero escolhido na grade, ou vazio para todos. Fica aqui fora para
     /// o "Ver mais" de uma fileira de gênero abrir a grade já filtrada.
     @Published var genero = ""
-    /// Ordem da grade: os mais novos primeiro (como na TV) ou de A a Z.
-    @Published var novosPrimeiro = false
+    /// Ordem da grade.
+    enum OrdemGrade: String, CaseIterable { case az, novos, populares, melhores
+        var titulo: String {
+            switch self {
+            case .az: return "De A a Z"
+            case .novos: return "Mais novos"
+            case .populares: return "Mais populares"
+            case .melhores: return "Mais bem avaliados"
+            }
+        }
+    }
+    @Published var ordem: OrdemGrade = .az
+    /// Os mais novos primeiro (como na TV): a coluna de letras só vale no A a Z.
+    var novosPrimeiro: Bool {
+        get { ordem != .az }
+        set { ordem = newValue ? .novos : .az }
+    }
+    /// Filtros do On Demand (ver InfoDosTitulos): anos, idade máxima e nota mínima.
+    @Published var anos: ClosedRange<Int>?
+    @Published var rotuloAnos = ""
+    @Published var idadeMax: Int?
+    @Published var notaMin = 0
+    var filtrando: Bool { !genero.isEmpty || anos != nil || idadeMax != nil || notaMin > 0 }
     /// Último título aberto: é para ele que a lista rola ao reabrir, senão a
     /// rolagem voltaria ao topo mesmo com a letra certa escolhida.
     @Published var ancora: String?

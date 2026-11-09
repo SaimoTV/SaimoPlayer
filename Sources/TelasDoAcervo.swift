@@ -254,6 +254,7 @@ struct TelaOnDemand: View {
         carregando = true
         prontas = []
         await Generos.carregar()
+        await InfoDosTitulos.carregar()
         acervo = await Vod.todos()
         if tipo == nil || tipo == .animes { colecoes["animes"] = await Vod.colecao("animes") }
         if tipo == nil || tipo == .doramas { colecoes["doramas"] = await Vod.colecao("doramas") }
@@ -299,6 +300,11 @@ struct TelaOnDemand: View {
             }
         }
         if let tipo {
+            // O acervo inteiro com filtros (gênero, ano, idade, nota) logo
+            // depois da primeira fileira, sem precisar rolar a página toda.
+            let explorarFila = Fila(titulo: "Filtrar e explorar", tipo: .secao,
+                                    cartoes: [explorar(tipo, titulo: "Todos, com filtros")])
+            out.insert(explorarFila, at: min(out.count, continuar == nil ? 1 : 2))
             let candidatos = self.candidatos(tipo)
             let lancamentos = candidatos.filter { $0.ano >= anoAtual - 1 }.sorted { $0.ano > $1.ano }.prefix(30)
             if lancamentos.count >= 4 {
@@ -310,7 +316,6 @@ struct TelaOnDemand: View {
                 guard doGenero.count >= 6 else { continue }
                 out.append(Fila(titulo: genero, cartoes: doGenero.map(\.cartao) + [verTodos(tipo, genero)]))
             }
-            out.append(Fila(titulo: "Explorar", tipo: .secao, cartoes: [explorar(tipo, titulo: "Todos de A a Z")]))
         } else {
             let filmes = candidatos(.filmes)
             for genero in Self.generosOnDemand where Generos.todos.contains(genero) {
