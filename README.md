@@ -237,6 +237,8 @@ grupo ou nome adulto ficam de fora (o parental não é tocado). O menu "Importar
 lista .m3u…" agora cria uma lista por aqui. Teste do leitor contra o gabarito:
 `./scripts/testar_minhas_listas.sh` (os .m3u de teste ficam fora do git).
 
+Sincronia pelo Saimo Connect (`{"t":"dados"}`, mesmo formato na TV Box, Mac, Windows e celular): ao conectar e a cada mudança vão onde parou em filmes e episódios, títulos favoritos, canais favoritos, os dois endereços das listas (vale o escolhido por último; quem nunca escolheu fica com o do outro aparelho) e as listas adicionadas por link (união; a que veio de arquivo fica só no aparelho). Código em `SincroniaConnect.swift`. **Minhas listas** (`MinhasListas.swift`, Ajustes > Minhas listas): listas .m3u por link, canais na seção "Minhas listas" do Ao vivo; os de adulto só com o restrito desbloqueado.
+
 Saimo Connect (`SaimoConnect.swift`, `ConnectHls.swift`, `Historico.swift`): o
 celular com o app Saimo acha e controla o Mac do mesmo jeito que a TV Box, pelo
 mesmo protocolo, na porta 8999. O Mac aparece na varredura da rede (`GET /info`)

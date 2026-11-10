@@ -86,6 +86,7 @@ enum Categoria: String, CaseIterable, Identifiable {
     case vinteQuatroHoras = "24 Horas"
     case variedades = "Variedades"
     case musicas = "Músicas"
+    case minhasListas = "Minhas listas"
     case adulto = "Adulto"
 
     var id: String { rawValue }

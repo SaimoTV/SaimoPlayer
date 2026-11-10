@@ -66,6 +66,7 @@ final class VodFavoritos: ObservableObject {
             itens.insert(item, at: 0)
         }
         gravar()
+        SaimoConnect.shared.avisarDados()
     }
 
     private func gravar() {

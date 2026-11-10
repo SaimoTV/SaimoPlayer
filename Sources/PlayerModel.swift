@@ -492,7 +492,7 @@ final class PlayerModel: NSObject, ObservableObject {
         Migracao.executarSeNecessario()
         super.init()
         restritos = RemoteCatalog.restritosEmCache()
-        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels())
+        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + doUsuario)
         favorites = Store.favorites()
         volume = Store.volume()
         for c in channels { ProxyServer.shared.register(c) }
@@ -534,7 +534,7 @@ final class PlayerModel: NSObject, ObservableObject {
     func refreshCatalog() {
         // Sem endereço dos canais não há pedido de rede nenhum.
         guard Enderecos.canaisAtivos else {
-            channels = Store.customChannels()
+            channels = doUsuario
             return
         }
         Task { @MainActor in
@@ -549,7 +549,7 @@ final class PlayerModel: NSObject, ObservableObject {
             // O que o painel desligou some aqui, antes de a lista chegar à
             // tela: canal sem nenhuma fonte não abriria mesmo.
             await FontesDesativadas.atualizar()
-            let updated = FontesDesativadas.peneirar(fresh + Store.customChannels() + extra)
+            let updated = FontesDesativadas.peneirar(fresh + doUsuario + extra)
             guard updated != channels else { return }
 
             channels = updated
@@ -571,7 +571,7 @@ final class PlayerModel: NSObject, ObservableObject {
     func recarregarListas() {
         restritos = RemoteCatalog.restritosEmCache()
         let extra = restrictedUnlocked ? restritos : []
-        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + Store.customChannels() + extra)
+        channels = FontesDesativadas.peneirar(RemoteCatalog.cached() + doUsuario + extra)
         for c in channels { ProxyServer.shared.register(c) }
         if selection == nil || !channels.contains(where: { $0.id == selection }) {
             let antes = selection
@@ -619,10 +619,17 @@ final class PlayerModel: NSObject, ObservableObject {
 
     func isFavorite(_ c: Channel) -> Bool { favorites.contains(c.source.absoluteString) }
 
+    /// Canais que o usuário trouxe: os adicionados à mão e os de Minhas listas
+    /// (os de adulto destas só com o restrito desbloqueado).
+    private var doUsuario: [Channel] {
+        Store.customChannels() + MinhasListas.shared.canais(desbloqueado: restrictedUnlocked)
+    }
+
     func toggleFavorite(_ c: Channel) {
         let key = c.source.absoluteString
         if favorites.contains(key) { favorites.remove(key) } else { favorites.insert(key) }
         Store.setFavorites(favorites)
+        SaimoConnect.shared.avisarDados()
     }
 
     func addChannels(_ new: [Channel], persist: Bool = true) {
@@ -2013,14 +2020,17 @@ final class PlayerModel: NSObject, ObservableObject {
     }
 
     private func setRestricted(_ unlocked: Bool) {
-        guard unlocked != restrictedUnlocked, !restritos.isEmpty else { return }
+        // Os de adulto de Minhas listas seguem a mesma trava do catálogo.
+        let meusAdultos = MinhasListas.shared.canais(desbloqueado: true)
+            .filter { $0.categoria == Categoria.adulto.rawValue }
+        guard unlocked != restrictedUnlocked, !restritos.isEmpty || !meusAdultos.isEmpty else { return }
         restrictedUnlocked = unlocked
         // Trancar com um desses no ar deixaria o nome à vista na tela; volta
         // para o primeiro canal comum antes de sumir com a lista.
-        let restrictedIDs = Set(restritos.map(\.id))
+        let restrictedIDs = Set((restritos + meusAdultos).map(\.id))
         let leaving = selection.map { restrictedIDs.contains($0) } ?? false
         let base = channels.filter { !restrictedIDs.contains($0.id) }
-        channels = base + (unlocked ? restritos : [])
+        channels = base + (unlocked ? restritos + meusAdultos : [])
         for c in channels { ProxyServer.shared.register(c) }
         if !unlocked, leaving { selection = channels.first?.id }
         objectWillChange.send()

@@ -230,6 +230,26 @@ final class SaimoConnect: ObservableObject {
         Log.shared.write("Saimo Connect: \(cliente.nome) conectado")
         atualizarConectados()
         avisarEstado(forcado: true)
+        // Progresso, favoritos e listas vão ao celular assim que ele entra.
+        enviar(SincroniaConnect.pacote(model), para: [cliente])
+    }
+
+    private var envioDeDados: DispatchWorkItem?
+    private var aplicandoDados = false
+
+    /// Algo da sincronia mudou aqui (progresso, favorito, listas): manda ao
+    /// celular conectado, juntando as mudanças de alguns segundos num envio só.
+    func avisarDados(atraso: TimeInterval = 1) {
+        guard !aplicandoDados, !servidor.autenticados().isEmpty else { return }
+        envioDeDados?.cancel()
+        let tarefa = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.enviar(SincroniaConnect.pacote(self.model), para: self.servidor.autenticados())
+            }
+        }
+        envioDeDados = tarefa
+        DispatchQueue.main.asyncAfter(deadline: .now() + atraso, execute: tarefa)
     }
 
     /// Um celular saiu (fechou o app, perdeu a rede, foi esquecido).
@@ -448,6 +468,11 @@ final class SaimoConnect: ObservableObject {
             if model.multiTela { model.ativarTela(inteiro(j["idx"]) == 1 ? .segunda : .principal) }
         case "sync", "getState":
             avisarEstado(forcado: true)
+        case "dados":
+            // O que veio do celular não volta para ele como se fosse mudança daqui.
+            aplicandoDados = true
+            SincroniaConnect.aplicar(j, model: model)
+            aplicandoDados = false
         case "tvAudio":
             somDaTv((j["src"] as? String) ?? "0")
         case "playVod", "playMedia":

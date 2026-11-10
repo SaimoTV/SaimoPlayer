@@ -43,6 +43,7 @@ enum Progresso {
         defaults.set(posicao, forKey: chaveBase + chave)
         defaults.set(duracao, forKey: chaveBase + chave + "|d")
         defaults.set(Date().timeIntervalSince1970, forKey: chaveBase + chave + "|t")
+        Task { @MainActor in SaimoConnect.shared.avisarDados(atraso: 15) }
         // Gravar em disco na hora: o app pode ser fechado à força, e o valor
         // que interessa é justamente o do instante em que isso acontecer.
         defaults.synchronize()

@@ -119,6 +119,7 @@ enum Preferencias {
 /// Os ajustes, em seções como na TV Box: reprodução, geral, canais e sistema.
 /// Cada linha diz o que faz e o valor de agora; clicar troca.
 struct TelaAjustes: View {
+    @ObservedObject private var minhas = MinhasListas.shared
     @ObservedObject var model: PlayerModel
     @ObservedObject private var epg = EPGService.shared
     @ObservedObject private var connect = SaimoConnect.shared
@@ -320,6 +321,21 @@ struct TelaAjustes: View {
                         .padding(.vertical, 10)
                     }
 
+                    secao("Minhas listas") {
+                        ForEach(minhas.listas) { lista in
+                            linha(lista.nome, "\(lista.total) canais · toque para remover", icone: "list.bullet") {
+                                minhas.confirmarRemocao(lista)
+                            }
+                        }
+                        linha("Adicionar lista por link",
+                              minhas.listas.isEmpty
+                              ? "Uma lista .m3u: os canais entram no Ao vivo. Também chegam do celular pelo Saimo Connect"
+                              : "Até \(MinhasListas.maximo) listas",
+                              icone: "plus.circle") {
+                            minhas.pedirNova()
+                        }
+                    }
+
                     secao("Canais") {
                         linha("Importar lista .m3u", "Junta os canais de um arquivo à lista", icone: "square.and.arrow.down") {
                             ChannelListActions.importList(into: model)
@@ -395,6 +411,10 @@ struct TelaAjustes: View {
 
         Enderecos.canais = canaisNorm
         Enderecos.filmes = filmesNorm
+        if mudou {
+            Enderecos.escolhidosEm = Date().timeIntervalSince1970 * 1000
+            connect.avisarDados()
+        }
         urlCanais = canaisNorm
         urlFilmes = filmesNorm
 

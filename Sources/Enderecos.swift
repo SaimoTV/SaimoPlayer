@@ -48,7 +48,15 @@ enum Enderecos {
     static func restaurarPadroes() {
         UserDefaults.standard.removeObject(forKey: chaveCanais)
         UserDefaults.standard.removeObject(forKey: chaveFilmes)
+        escolhidosEm = Date().timeIntervalSince1970 * 1000
         NotificationCenter.default.post(name: mudou, object: nil)
+    }
+
+    /// Quando os endereços foram escolhidos (ms; 0 = nunca). Na sincronia
+    /// pelo Saimo Connect vale o mais recente.
+    static var escolhidosEm: Double {
+        get { UserDefaults.standard.double(forKey: "linksEm") }
+        set { UserDefaults.standard.set(newValue, forKey: "linksEm") }
     }
 
     static func normalizar(_ url: String) -> String {
