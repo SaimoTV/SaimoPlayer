@@ -982,7 +982,9 @@ final class PlayerModel: NSObject, ObservableObject {
             sourcesTried = 0
             playedSinceOpen = true
             stalledSince = nil
-            if selectedChannel != nil && zeroDelay != "off" {
+            // Só ao vivo tem "ponta": num filme a seleção de canal continua
+            // preenchida, e pular para o vivo ali é cair no fim do arquivo.
+            if playingFile == nil, selectedChannel != nil && zeroDelay != "off" {
                 jumpToLive()
             }
             // Volta ao ponto em que parou, uma vez só por abertura. O ponto
@@ -1175,6 +1177,8 @@ final class PlayerModel: NSObject, ObservableObject {
     /// Jumps to the live edge of the sliding window.
     func jumpToLive() {
         if multiTela && segundaAtiva { segunda.irAoVivo(); return }
+        // Filme e episódio não têm ao vivo: a ponta deles é o fim do arquivo.
+        guard playingFile == nil else { return }
         guard let item = player.currentItem else { return }
         if zeroDelay == "equilibrado",
            let range = item.seekableTimeRanges.last?.timeRangeValue {
@@ -1439,7 +1443,7 @@ final class PlayerModel: NSObject, ObservableObject {
             let edge = CMTimeGetSeconds(CMTimeRangeGetEnd(seekable))
             stats.behindLive = max(0, edge - CMTimeGetSeconds(item.currentTime()))
         }
-        if selectedChannel != nil && isPlaying && player.timeControlStatus == .playing {
+        if playingFile == nil, selectedChannel != nil && isPlaying && player.timeControlStatus == .playing {
             aplicarLiveCatchUp(item)
         }
     }
@@ -1775,7 +1779,7 @@ final class PlayerModel: NSObject, ObservableObject {
 
     func aplicarZeroDelay() {
         Historico.shared.limpar()
-        guard let item = player.currentItem, selectedChannel != nil else { return }
+        guard playingFile == nil, let item = player.currentItem, selectedChannel != nil else { return }
         configurarLiveZeroDelay(item)
         if zeroDelay != "off" {
             jumpToLive()
