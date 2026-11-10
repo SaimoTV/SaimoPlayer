@@ -37,7 +37,7 @@ enum Pulos {
         /// O trecho pulável em que a posição está agora, se houver.
         func em(_ posicao: Double, duracao: Double) -> Trecho? {
             trechos.first {
-                $0.tipo != .creditos && posicao >= $0.inicio && posicao < ($0.fim ?? duracao) - 1
+                $0.tipo != .creditos && $0.fim != nil && posicao >= $0.inicio && posicao < (($0.fim ?? duracao) - 1)
             }
         }
     }
@@ -75,6 +75,10 @@ enum Pulos {
                 let fim = (item["end_ms"] as? NSNumber).map { $0.doubleValue / 1000 }
                 // Trecho de menos de três segundos é marcação errada.
                 if let fim, fim - inicio < 3 { continue }
+                // Trecho sem fim só é válido para créditos; abertura/recap/prévia sem fim é dado corrompido do TheIntroDB.
+                if tipo != .creditos && fim == nil { continue }
+                // Recapitulação só ocorre no início do episódio e dura no máximo 5 min.
+                if tipo == .recapitulacao, let fim, (inicio > 300 || fim - inicio > 300 || fim > 420) { continue }
                 saida.append(Trecho(tipo: tipo, inicio: inicio, fim: fim))
             }
         }
