@@ -471,10 +471,18 @@ struct VodGridView: View {
             }
         }
         func ordenar(_ chave: (Cartao) -> Double) -> [Cartao] {
-            itens.enumerated().sorted { a, b in
-                let x = chave(a.element), y = chave(b.element)
-                return x != y ? x > y : a.offset < b.offset
-            }.map(\.element)
+            // As chaves saem antes da ordenação: o Swift 6.3 recusa a função
+            // recebida dentro do fecho do `sorted`.
+            let copia = itens
+            var chaves: [Double] = []
+            for c in copia { chaves.append(chave(c)) }
+            let prontas = chaves
+            let ordem = copia.indices.sorted { a, b in
+                prontas[a] != prontas[b] ? prontas[a] > prontas[b] : a < b
+            }
+            var saida: [Cartao] = []
+            for i in ordem { saida.append(copia[i]) }
+            return saida
         }
         switch estado.ordem {
         case .az: break
