@@ -45,6 +45,18 @@ enum Enderecos {
         !filmes.isEmpty
     }
 
+    /// Grava, uma vez, o endereço de fábrica de quem nunca escolheu nenhum.
+    /// Sem isto o padrão só existia no código; guardado, o app continua com a
+    /// mesma lista mesmo quando o endereço de fábrica sair de uma versão futura.
+    /// Quem desligou uma lista (valor vazio guardado) continua desligado, e a
+    /// data da escolha (`escolhidosEm`) não muda: a sincronia com o celular
+    /// não vê isso como uma escolha nova.
+    static func guardarPadroesDeQuemNuncaEscolheu() {
+        let d = UserDefaults.standard
+        if d.object(forKey: chaveCanais) == nil { d.set(padraoCanais, forKey: chaveCanais) }
+        if d.object(forKey: chaveFilmes) == nil { d.set(padraoFilmes, forKey: chaveFilmes) }
+    }
+
     static func restaurarPadroes() {
         UserDefaults.standard.removeObject(forKey: chaveCanais)
         UserDefaults.standard.removeObject(forKey: chaveFilmes)

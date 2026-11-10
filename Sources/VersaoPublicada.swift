@@ -1,10 +1,15 @@
 import Foundation
 
-/// O anúncio da versão mais nova, lido de `versao.json` (ver `Enderecos.canais`).
+/// O anúncio da versão mais nova, lido de `versao.json`.
 ///
-/// Nada aqui sabe de dono ou repositório: o endereço do instalador vem no
-/// próprio JSON e só é aceito se tiver cara de download de release do GitHub.
+/// O endereço do instalador vem no próprio JSON e só é aceito se tiver cara
+/// de download de release do GitHub.
 struct VersaoPublicada: Equatable {
+    /// Onde o anúncio mora: o `versao.json` anexado à última release. Não
+    /// depende de nenhum endereço de lista (quem trocou ou apagou a lista
+    /// continua recebendo atualização).
+    static let anuncio = URL(string: "https://github.com/SaimoTV/saimo-downloads/releases/latest/download/versao.json")!
+
     let tag: String
     let numero: String
     let notas: String

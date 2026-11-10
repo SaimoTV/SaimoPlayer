@@ -61,7 +61,7 @@ quebrar quem já instalou.
 - `https://saimo-filmes.pages.dev/`: espelho da pasta `vod/` (índice, filmes,
   séries, destaques, fichas, gêneros, imdb).
 
-A atualização lê `versao.json` (`arquivos.mac.url`, `bytes`, `sha256`). O app só
+A atualização lê o `versao.json` anexado à última release (`VersaoPublicada.anuncio`, sem depender de endereço de lista; `arquivos.mac.url`, `bytes`, `sha256`). O app só
 aceita um instalador `https` em `github.com/<dono>/<repo>/releases/download/…`
 (redirecionando apenas para a CDN do GitHub) e recusa o arquivo se o SHA-256
 não bater. Se `versao.json` não puder ser lido, é como "sem atualização".
@@ -278,8 +278,10 @@ só define os tipos); só dois endereços-base, constantes em `Enderecos.swift`,
 de fábrica: `https://canais-saimo.pages.dev/` e `https://filmes-saimo.pages.dev/`.
 Ninguém precisa digitar nada. Em Ajustes > Listas dá para trocar cada um, deixar em
 branco para desligar aquela lista (guardado como valor vazio explícito: estado vazio,
-nenhum pedido de rede) ou usar "Restaurar padrão". Chave ausente no `UserDefaults`
-(`linkCanais`, `linkFilmes`) = padrão. Não há diálogo na primeira abertura.
+nenhum pedido de rede) ou usar "Restaurar padrão". Desde a 2.8.0, quem nunca escolheu
+um endereço o tem gravado no `UserDefaults` (`linkCanais`, `linkFilmes`) na abertura
+(`Enderecos.guardarPadroesDeQuemNuncaEscolheu`; não muda `linksEm`, a data da escolha
+usada na sincronia). Não há diálogo na primeira abertura. `scripts/testar_enderecos.sh`.
 
 - Canais: o app só concatena `catalogo.txt`, `canais.txt`, `restritos.txt`,
   `radios.txt` e `guia.txt` ao endereço. A seção de cada canal vem do campo

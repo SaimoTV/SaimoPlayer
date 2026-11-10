@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-/// Procura versão nova (`versao.json`, em `Enderecos.canais`) e pergunta se quer baixar.
+/// Procura versão nova (`versao.json`, em `VersaoPublicada.anuncio`) e pergunta se quer baixar.
 ///
 /// O app não vem da App Store nem é assinado por um desenvolvedor registrado,
 /// então não existe atualização automática de fábrica: sem isto, uma correção
@@ -193,8 +193,7 @@ final class Atualizacao: ObservableObject {
     /// Lê `versao.json`. Qualquer falha (rede, JSON, endereço fora da lista)
     /// vira "sem atualização": nunca trava nem derruba o app.
     private func buscar() async -> Versao? {
-        guard Enderecos.canaisAtivos, let url = URL(string: Enderecos.canais + "versao.json") else { return nil }
-        var pedido = URLRequest(url: url)
+        var pedido = URLRequest(url: VersaoPublicada.anuncio)
         pedido.timeoutInterval = 20
         pedido.cachePolicy = .reloadIgnoringLocalCacheData
         pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
