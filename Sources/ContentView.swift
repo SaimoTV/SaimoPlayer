@@ -177,6 +177,33 @@ struct ContentView: View {
                 AvisoNaTela(texto: aviso) { model.aviso = nil }
             }
 
+            // Filme ou episódio: voltar para a tela de onde ele foi aberto,
+            // parando o vídeo (o ponto onde parou fica guardado).
+            if model.playingFile != nil {
+                VStack {
+                    HStack {
+                        Button { model.sairDoArquivo() } label: {
+                            Label("Voltar", systemImage: "chevron.left")
+                                .font(.system(size: 14, weight: .semibold))
+                                .padding(.horizontal, 14).padding(.vertical, 8)
+                                .vidroPainel(raio: 18, tinta: .black)
+                                .environment(\.colorScheme, .dark)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.white)
+                        .help("Parar e voltar (⌘←)")
+                        .keyboardShortcut(.leftArrow, modifiers: .command)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .padding(.top, 76)
+                .padding(.leading, 22)
+                .opacity(controlsVisible ? 1 : 0)
+                .animation(.easeInOut(duration: 0.22), value: controlsVisible)
+                .allowsHitTesting(controlsVisible)
+            }
+
             if model.showStats {
                 statsOverlay
                     .opacity(controlsVisible ? 1 : 0)

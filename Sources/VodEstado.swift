@@ -79,6 +79,9 @@ final class VodEstado: ObservableObject {
             if secao == nil { PlayerModel.shared.retomarAoVivo() } else { PlayerModel.shared.suspenderAoVivo() }
         }
     }
+    /// De que tela o filme ou episódio no ar foi aberto: para onde o botão
+    /// Voltar do player leva.
+    var secaoDeOnde: VodSecao?
     @Published var letra = ""
     /// Acervo inteiro numa lista só, em vez de uma letra por vez.
     @Published var tudo = true

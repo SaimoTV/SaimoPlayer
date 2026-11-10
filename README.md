@@ -117,6 +117,12 @@ O app abre no Início (ou no último canal, se os Ajustes mandarem):
   novos, mais populares, mais bem avaliados). Ano, nota, idade e popularidade
   vêm do `detalhes.txt` do catálogo (`InfoDosTitulos.swift`); filtrando, o mesmo
   título em duas pastas aparece uma vez só.
+- No filme ou episódio, o botão **Voltar** (alto à esquerda, ou ⌘←) para o vídeo,
+  guarda onde parou e volta para a tela de onde ele foi aberto.
+- Fonte de filme/série em HEVC passa pelo remux do ffmpeg em modo de filme
+  (`Channel.sobDemanda`): todos os trechos ficam e a lista começa do 0. No modo
+  de canal ao vivo (janela de 8 trechos) o ffmpeg lia o arquivo inteiro em
+  segundos e só sobrava o fim — o filme abria no final e não voltava.
 - Ao vivo é o vídeo com a lista de canais de vidro à esquerda (⇧⌘L ou o botão da
   barra de controles): número, logo, nome, programa e progresso, categorias em
   pílulas e busca; no canto, o cartão do programa no ar. Controles, barra do

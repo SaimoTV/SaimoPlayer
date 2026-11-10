@@ -976,6 +976,8 @@ struct VodGridView: View {
                        detalhe: detalheDaFonte(detalheBase, escolhida),
                        detalheBase: detalheBase,
                        chave: chave)
+        // O botão Voltar do player traz de volta para cá.
+        estado.secaoDeOnde = estado.secao
         estado.secao = nil
     }
 

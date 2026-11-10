@@ -152,11 +152,11 @@ final class Remuxer: @unchecked Sendable {
         while Date() < deadline {
             if let text = try? String(contentsOf: master, encoding: .utf8),
                text.contains("#EXT-X-STREAM-INF") {
-                return rewrite(text, base: rewriteBase)
+                return rewrite(text, base: rewriteBase, doInicio: channel.sobDemanda)
             }
             if let text = try? String(contentsOf: index, encoding: .utf8),
                text.contains("#EXTINF") {
-                return rewrite(text, base: rewriteBase)
+                return rewrite(text, base: rewriteBase, doInicio: channel.sobDemanda)
             }
             if !session.process.isRunning { return nil }
             Thread.sleep(forTimeInterval: 0.25)
@@ -238,11 +238,19 @@ final class Remuxer: @unchecked Sendable {
         // ADTS only exists in MPEG-TS input; the filter errors out on fMP4/DASH.
         if !variant.isDASH { args += ["-bsf:a", "aac_adtstoasc"] }
 
+        args += ["-f", "hls", "-hls_time", "4"]
+        if channel.sobDemanda {
+            // Filme ou episódio: o ffmpeg lê o arquivo bem mais rápido que o
+            // tempo real. Na janela de canal ao vivo (8 trechos, apagando os
+            // antigos) só sobrava o fim do filme — ele abria no final e não
+            // voltava. Aqui todos os trechos ficam e a lista fecha no fim.
+            args += ["-hls_list_size", "0", "-hls_playlist_type", "event",
+                     "-hls_flags", "independent_segments"]
+        } else {
+            args += ["-hls_list_size", "8",
+                     "-hls_flags", "delete_segments+append_list+omit_endlist+independent_segments"]
+        }
         args += [
-            "-f", "hls",
-            "-hls_time", "4",
-            "-hls_list_size", "8",
-            "-hls_flags", "delete_segments+append_list+omit_endlist+independent_segments",
             "-hls_segment_type", "fmp4",
             "-hls_fmp4_init_filename", "init.mp4",
         ]
@@ -301,7 +309,9 @@ final class Remuxer: @unchecked Sendable {
         return session
     }
 
-    private func rewrite(_ playlist: String, base: String) -> String {
+    /// `doInicio`: lista de filme ainda sendo montada (EVENT) — sem o
+    /// EXT-X-START o AVPlayer começa pela ponta, como num canal ao vivo.
+    private func rewrite(_ playlist: String, base: String, doInicio: Bool = false) -> String {
         var out: [String] = []
         for raw in playlist.split(separator: "\n", omittingEmptySubsequences: false) {
             var line = String(raw)
@@ -321,6 +331,10 @@ final class Remuxer: @unchecked Sendable {
             } else {
                 out.append(base + trimmed)
             }
+        }
+        if doInicio, !out.contains(where: { $0.hasPrefix("#EXT-X-START") }),
+           let i = out.firstIndex(where: { $0.hasPrefix("#EXTM3U") }) {
+            out.insert("#EXT-X-START:TIME-OFFSET=0,PRECISE=YES", at: i + 1)
         }
         return out.joined(separator: "\n")
     }

@@ -30,6 +30,9 @@ struct Channel: Identifiable, Hashable {
     /// Seção declarada no catálogo publicado. Quando vem vazia, a seção sai do
     /// nome — ver `Categoria.de(_:)`.
     var categoria: String?
+    /// Filme ou episódio (e não canal ao vivo): o remux guarda o vídeo
+    /// inteiro em vez da janela dos últimos trechos.
+    var sobDemanda = false
 
     var primary: Variant { variants[0] }
     var source: URL { variants[0].url }

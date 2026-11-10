@@ -463,8 +463,9 @@ final class PlayerModel: NSObject, ObservableObject {
 
     private func fonteDeArquivo(_ origem: URL) -> (url: URL, peloProxy: Bool) {
         guard origem.pathExtension.lowercased() == "txt" else { return (origem, false) }
-        let canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
+        var canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
                             source: origem)
+        canal.sobDemanda = true
         ProxyServer.shared.register(canal)
         return (ProxyServer.shared.link(for: canal), true)
     }
@@ -694,6 +695,27 @@ final class PlayerModel: NSObject, ObservableObject {
     /// Encerra qualquer arquivo de VOD (filme/série) em reprodução e retorna
     /// imediatamente ao canal de TV ao vivo ativo.
     func voltarAoVivo() {
+        limparArquivo()
+        if let canal = canalAtivo ?? channels.first(where: { $0.id == selection }) ?? channels.first {
+            if selection != canal.id {
+                selection = canal.id
+            } else {
+                play()
+            }
+        } else {
+            play()
+        }
+    }
+
+    /// O botão Voltar do player: para o filme ou episódio (guardando onde
+    /// parou) e volta para a tela de onde ele foi aberto.
+    func sairDoArquivo() {
+        limparArquivo()
+        let estado = VodEstado.shared
+        estado.secao = estado.secaoDeOnde ?? .ondemand
+    }
+
+    private func limparArquivo() {
         guardarProgresso(forcado: true)
         stop()
         playingFile = nil
@@ -707,15 +729,6 @@ final class PlayerModel: NSObject, ObservableObject {
         fileSourceLabels = []
         fileBaseDetail = ""
         aoVivoPendente = false
-        if let canal = canalAtivo ?? channels.first(where: { $0.id == selection }) ?? channels.first {
-            if selection != canal.id {
-                selection = canal.id
-            } else {
-                play()
-            }
-        } else {
-            play()
-        }
     }
 
     /// Toca um arquivo — filme ou episódio — em vez de um canal.
