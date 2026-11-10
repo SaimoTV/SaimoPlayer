@@ -50,18 +50,13 @@ Versão atual: **2.0.0** — [notas da versão](https://github.com/gabrielsaimo/
 Os instaladores saem juntos em
 [Releases](https://github.com/gabrielsaimo/SaimoPlayer/releases/latest).
 
-### De onde o app Mac lê catálogos e atualizações
+### De onde o app Mac lê listas e atualizações
 
-O app não aponta para o GitHub: usa dois endereços estáveis, definidos num só
-lugar (`Sources/Enderecos.swift`), para o repositório poder mudar de conta sem
-quebrar quem já instalou.
+O app não traz endereço de lista nenhum (nem no código, nem no binário). Quem usa
+adiciona a própria lista; veja "Listas" abaixo.
 
-- `https://saimo-canais.pages.dev/`: `catalogo.txt`, `canais.txt`,
-  `restritos.txt`, `radios.txt` e `versao.json`.
-- `https://saimo-filmes.pages.dev/`: espelho da pasta `vod/` (índice, filmes,
-  séries, destaques, fichas, gêneros, imdb).
-
-A atualização lê o `versao.json` anexado à última release (`VersaoPublicada.anuncio`, sem depender de endereço de lista; `arquivos.mac.url`, `bytes`, `sha256`). O app só
+A atualização lê o `versao.json` anexado à última release
+(`VersaoPublicada.anuncio`; `arquivos.mac.url`, `bytes`, `sha256`). O app só
 aceita um instalador `https` em `github.com/<dono>/<repo>/releases/download/…`
 (redirecionando apenas para a CDN do GitHub) e recusa o arquivo se o SHA-256
 não bater. Se `versao.json` não puder ser lido, é como "sem atualização".
@@ -271,43 +266,47 @@ régua: o celular toca o som sem o acerto fino.
 ./make_dmg.sh     # gera o DMG
 ```
 
-### Listas: dois endereços, sem lista no código
+### Listas: o app vem vazio
 
-O app do Mac não carrega lista nenhuma no código nem no binário (`Channels.swift`
-só define os tipos); só dois endereços-base, constantes em `Enderecos.swift`, já ativos
-de fábrica: `https://canais-saimo.pages.dev/` e `https://filmes-saimo.pages.dev/`.
-Ninguém precisa digitar nada. Em Ajustes > Listas dá para trocar cada um, deixar em
-branco para desligar aquela lista (guardado como valor vazio explícito: estado vazio,
-nenhum pedido de rede) ou usar "Restaurar padrão". Desde a 2.8.0, quem nunca escolheu
-um endereço o tem gravado no `UserDefaults` (`linkCanais`, `linkFilmes`) na abertura
-(`Enderecos.guardarPadroesDeQuemNuncaEscolheu`; não muda `linksEm`, a data da escolha
-usada na sincronia). Não há diálogo na primeira abertura. `scripts/testar_enderecos.sh`.
+O app do Mac não carrega lista nenhuma. Na primeira abertura as telas mostram
+"Bem-vindo ao Saimo!" com dois caminhos (`SemListaView.swift`):
+
+- **Adicionar lista** (`MinhasListas.pedirNova`): um link **M3U** (só ele já
+  basta) ou **servidor + usuário + senha** (Xtream; usuário e senha são
+  opcionais, só para listas que pedem login). Cole direto um link
+  `…/get.php?username=…&password=…` e o app o reconhece como conta Xtream
+  (`Xtream.swift`): lê os canais pela API do servidor (`player_api.php`, com as
+  categorias) e, se a API não responde, pelo M3U. Cada canal ganha as fontes
+  `.m3u8` e `.ts`. A conta é guardada como esse link, então viaja pelo Saimo
+  Connect como qualquer outra lista. Mesmo nome = fontes do mesmo canal.
+  `scripts/testar_xtream.sh`, `scripts/testar_minhas_listas.sh`.
+- **Endereços do Saimo** (Ajustes > Listas): os dois endereços-base (canais, e
+  filmes e séries) no formato do Saimo, sem padrão de fábrica. Em branco = lista
+  desligada, sem pedido de rede. Quem já usava um endereço o mantém
+  (`UserDefaults` `linkCanais`/`linkFilmes`). `Enderecos.swift`,
+  `scripts/testar_enderecos.sh`.
+
+Na sincronia pelo Saimo Connect, quem nunca escolheu endereço (`linksEm` 0)
+adota o que o outro aparelho enviou.
+
+Formato do Saimo (quando há endereço):
 
 - Canais: o app só concatena `catalogo.txt`, `canais.txt`, `restritos.txt`,
   `radios.txt` e `guia.txt` ao endereço. A seção de cada canal vem do campo
   `categoria:` (sem ele, "Outros").
 - Filmes e séries: a pasta `vod/` inteira, com os mesmos nomes de sempre.
-- `guia.txt` traz as tabelas do guia por canal (códigos do meuguia, endereços do
-  guiadetv, apelidos para o feed, feeds XMLTV e o guia da Pluto), em linhas com TAB;
-  `GuiaTabelas.swift` lê e guarda em cache.
-- `Links.swift` normaliza o que foi digitado (`https://` se faltar, sem `?query` nem
-  `#fragmento`, sem o nome do arquivo, `/` no fim) e `FormularioListas.swift` testa
-  (`catalogo.txt` / `indice.txt` devem dar 200).
-- `Migracao.swift` apaga, uma vez, os caches de listas das versões anteriores; favoritos,
-  progresso e ajustes ficam. O endereço do atualizador é um só, fixo
-  (`Atualizacao.enderecoDoAnuncio`).
+- `guia.txt` traz as tabelas do guia por canal; `GuiaTabelas.swift` lê e guarda
+  em cache.
+- Filmes e séries das listas da própria pessoa (M3U/Xtream) ainda não entram no
+  On Demand: por ora as listas da pessoa alimentam o Ao vivo.
 
-Testes sem rede: `scripts/testar_links.sh`, `scripts/testar_versao.sh`,
-`scripts/testar_amostra.sh`.
+Telemetria: desligada (nenhum dado de uso sai do aparelho).
 
 ## Dados publicados
 
-Os apps baixam estes arquivos de dois endereços fixos no Cloudflare Pages —
-`https://saimo-canais.pages.dev/` (`catalogo.txt`, `canais.txt`, `restritos.txt`,
-`radios.txt`, `versao.json`) e `https://saimo-filmes.pages.dev/` (o `vod/`) —, e
-não do GitHub. O `scripts/publicar_catalogos.sh` coloca lá o que está neste
-repositório (veja `docs/MIGRACAO-GITHUB.md`, também sobre trocar de GitHub).
-Os arquivos:
+No formato do Saimo, os apps leem estes arquivos do endereço que a pessoa
+informou (os apps não trazem endereço nenhum; o aviso de versão vem do
+`versao.json` da última release do GitHub). Os arquivos:
 
 - `catalogo.txt` — a lista de canais, com fontes em ordem de preferência. Cada
   fonte pode ter um `nome:` ("Temporada 3", "Legendado") que os apps mostram no
@@ -356,8 +355,10 @@ Windows e inclui o APK do celular se ele estiver montado. As notas saem de
 
 Depois de publicar o release (no repositório principal e, durante a migração, no
 `legado`), o script grava o `versao.json` — versão, link, tamanho e SHA-256 de
-cada arquivo —, commita só esse arquivo e o publica em
-`saimo-canais.pages.dev`: é ele que os apps leem para saber que há versão nova.
+cada arquivo — e o anexa ao release: é ele que os apps leem
+(`releases/latest/download/versao.json`) para saber que há versão nova. Só a série
+2.x publicava também no endereço antigo da Cloudflare (`SAIMO_PUBLICAR_ENDERECO_ANTIGO=1`);
+a 3.0 não, para ele ficar parado na 2.8.x.
 O repositório dos downloads vem de `scripts/release-repo.txt` (ou de
 `SAIMO_REPO_RELEASE`); sem eles, é o `origin`. O `make_dmg.sh` apaga `build/`, e
 com ele o `NOTAS.md` que você deixou: escreva as notas depois ou espere o

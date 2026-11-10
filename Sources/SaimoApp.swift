@@ -20,7 +20,6 @@ struct SaimoApp: App {
     @ObservedObject private var model = PlayerModel.shared
 
     init() {
-        Enderecos.guardarPadroesDeQuemNuncaEscolheu()
         do {
             try ProxyServer.shared.start()
         } catch {

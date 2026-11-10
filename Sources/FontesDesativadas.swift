@@ -45,7 +45,6 @@ enum FontesDesativadas {
         "clickhost.xyz",
         "playercdnx.workers.dev",
         "146.0.32.89",
-        "corruptx.org",
         "governosptx.org",
         "desativado.invalid"
     ]

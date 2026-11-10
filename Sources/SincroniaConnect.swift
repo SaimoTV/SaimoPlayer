@@ -108,11 +108,10 @@ enum SincroniaConnect {
             if em > local {
                 c = canais; f = filmes
             } else if local == 0 {
-                // Aqui nunca se escolheu nada: fica o que o outro escolheu, sem
-                // trocar um endereço próprio por um padrão.
-                func fraco(_ v: String, _ padrao: String) -> Bool { v.isEmpty || v == padrao }
-                if fraco(c, Enderecos.padraoCanais) && !fraco(canais, Enderecos.padraoCanais) { c = canais }
-                if fraco(f, Enderecos.padraoFilmes) && !fraco(filmes, Enderecos.padraoFilmes) { f = filmes }
+                // Aqui nunca se escolheu nada: fica o que o outro escolheu (e um
+                // endereço que o outro não tem não apaga o daqui).
+                if !canais.isEmpty { c = canais }
+                if !filmes.isEmpty { f = filmes }
             }
             if c != Enderecos.canais || f != Enderecos.filmes {
                 Enderecos.canais = c

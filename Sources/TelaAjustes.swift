@@ -210,7 +210,7 @@ struct TelaAjustes: View {
                                 }
                             }
 
-                            TextField("https://canais-saimo.pages.dev/", text: $urlCanais)
+                            TextField("https://exemplo.dev/canais/", text: $urlCanais)
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 13, design: .monospaced))
                                 .foregroundStyle(.white)
@@ -255,7 +255,7 @@ struct TelaAjustes: View {
                                 }
                             }
 
-                            TextField("https://filmes-saimo.pages.dev/", text: $urlFilmes)
+                            TextField("https://exemplo.dev/filmes/", text: $urlFilmes)
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 13, design: .monospaced))
                                 .foregroundStyle(.white)
@@ -274,25 +274,6 @@ struct TelaAjustes: View {
 
                         // Ações de Listas
                         HStack(spacing: 12) {
-                            Button {
-                                Enderecos.restaurarPadroes()
-                                urlCanais = Enderecos.canais
-                                urlFilmes = Enderecos.filmes
-                                recarregarTudo()
-                                mostrarStatus("✓ Endereços padrão restaurados")
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "arrow.counterclockwise")
-                                    Text("Restaurar padrão")
-                                }
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.8))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                            }
-                            .buttonStyle(.plain)
-
                             Spacer()
 
                             if let status = statusListas {

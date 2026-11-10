@@ -20,6 +20,9 @@ final class Telemetria {
 
     enum Tipo: String { case live, vod }
 
+    /// Desligada em todos os apps Saimo: nenhum dado de uso sai do aparelho.
+    private static let desligada = true
+
     private let base = URL(string: "https://saimo-monitor.gabrielsaimo68.workers.dev/v1")!
     private let plataforma = "mac"
     /// Zapeando, cada canal que passa não vira batida: só quem ficou.
@@ -286,6 +289,8 @@ final class Telemetria {
 
     private func enviar(_ rota: String, _ corpo: [String: Any], esperar: Bool = false,
                         resposta: (@MainActor @Sendable ([String: Any]?) -> Void)? = nil) {
+        // Telemetria desligada (como nos outros apps): nada sai do aparelho, nem quebra.
+        guard !Self.desligada else { return }
         // Fora da amostra só o relatório de quebra sai.
         guard naAmostra || (rota == "event" && corpo["type"] as? String == "crash") else { return }
         var corpo = corpo

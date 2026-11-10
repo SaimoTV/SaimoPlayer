@@ -179,7 +179,10 @@ echo "==> publicando v$versao"
 # Os arquivos para baixar ficam num repositório público só para isso: o código
 # é privado, mas o app precisa baixar sem login. O `versao.json` vai junto, como
 # arquivo do release: o endereço fixo que os apps leem é
-#   https://canais-saimo.pages.dev/versao.json  (copia do arquivo do release, servida pelo Cloudflare)
+#   https://github.com/<dono>/<repo>/releases/latest/download/versao.json
+# Desde a 3.0 os apps não leem mais o endereço antigo da Cloudflare (canais-saimo).
+# Esse arquivo antigo FICA PARADO na 2.8.x de propósito: quem tem app antigo só
+# enxerga a 2.8.x, e é a 2.8.x que grava o endereço da lista antes de oferecer a 3.0.
 # Com mais de uma conta no gh, o release sai pela conta dona do repositório.
 REPO_DOWNLOADS="${SAIMO_REPO_DOWNLOADS:-SaimoTV/saimo-downloads}"
 export GH_TOKEN="${GH_TOKEN:-$(gh auth token -u "${REPO_DOWNLOADS%%/*}" 2>/dev/null || true)}"
@@ -223,7 +226,8 @@ gh release create "v$versao" --repo "$REPO_DOWNLOADS" \
 
 # Endereço fixo que os apps leem: o versao.json sai pelo Cloudflare Pages (conta nova, Saimo.tv.gs),
 # não pelo GitHub. Os arquivos para baixar continuam no release acima.
-if [ -z "${extra:-}" ] && [ -d ../SaimoCatalogos ]; then
+# Só com SAIMO_PUBLICAR_ENDERECO_ANTIGO=1 (releases da série 2.x). Na 3.0 em diante, não.
+if [ "${SAIMO_PUBLICAR_ENDERECO_ANTIGO:-0}" = "1" ] && [ -z "${extra:-}" ] && [ -d ../SaimoCatalogos ]; then
   echo "==> publicando versao.json em canais-saimo.pages.dev"
   cp build/release/versao.json ../SaimoCatalogos/versao.json
   # A cópia que o agendamento (11h/18h) publica também: senão ela republicaria o versao.json velho.

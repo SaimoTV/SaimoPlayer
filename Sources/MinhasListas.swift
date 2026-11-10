@@ -128,6 +128,10 @@ final class MinhasListas: ObservableObject {
     private func arquivo(_ id: String) -> URL { pasta.appendingPathComponent("\(id).m3u") }
 
     private static func baixar(_ link: String) async throws -> String {
+        // Conta com usuário e senha (Xtream): lê pela API do servidor.
+        if let conta = Xtream.deLink(link) {
+            do { return try await Xtream.m3uDosCanais(conta) } catch let e as Xtream.Erro { throw Erro(e.texto) }
+        }
         guard let url = URL(string: link) else { throw Erro("Link inválido") }
         var pedido = URLRequest(url: url, timeoutInterval: 30)
         pedido.setValue(agente, forHTTPHeaderField: "User-Agent")
@@ -145,6 +149,7 @@ final class MinhasListas: ObservableObject {
     /// nome) vai para a seção Adulto, que o controle dos pais protege.
     static func ler(_ texto: String) -> [Channel] {
         var out: [Channel] = []
+        var indice: [String: Int] = [:]
         var nome: String?
         var grupo = ""
         var logo: URL?
@@ -167,9 +172,16 @@ final class MinhasListas: ObservableObject {
             if linha.hasPrefix("#") { continue }
             guard let url = URL(string: linha), url.scheme?.hasPrefix("http") == true else { continue }
             let n = (nome?.isEmpty == false ? nome! : url.host) ?? "Canal \(out.count + 1)"
+            // Mesmo nome de novo (a mesma emissora com outra fonte): vira mais uma fonte do canal.
+            if let i = indice[n.lowercased()] {
+                if !out[i].variants.contains(where: { $0.url == url }) { out[i].variants.append(Variant(url: url)) }
+                nome = nil; grupo = ""; logo = nil
+                continue
+            }
             let g = grupo.lowercased()
             let adulto = Categoria.de(n) == .adulto
                 || ["adult", "xxx", "+18", "18+", "porn", "sexy"].contains { g.contains($0) }
+            indice[n.lowercased()] = out.count
             out.append(Channel(name: n, variants: [Variant(url: url)], logo: logo,
                                categoria: adulto ? Categoria.adulto.rawValue : categoria))
             nome = nil; grupo = ""; logo = nil
@@ -181,23 +193,34 @@ final class MinhasListas: ObservableObject {
     func pedirNova() {
         let alerta = NSAlert()
         alerta.messageText = "Adicionar lista"
-        alerta.informativeText = "Cole o link de uma lista .m3u. Os canais aparecem no Ao vivo, em \"Minhas listas\"."
+        alerta.informativeText = "Cole o link da sua lista M3U: só isso já basta. Usuário e senha são opcionais, para listas que pedem login. Os canais aparecem no Ao vivo, em \"Minhas listas\"."
         alerta.addButton(withTitle: "Adicionar")
         alerta.addButton(withTitle: "Cancelar")
-        let pilha = NSStackView(frame: NSRect(x: 0, y: 0, width: 420, height: 56))
+        let pilha = NSStackView(frame: NSRect(x: 0, y: 0, width: 420, height: 124))
         pilha.orientation = .vertical
         pilha.spacing = 6
         let campoNome = NSTextField(string: "")
         campoNome.placeholderString = "Nome (opcional)"
         let campoLink = NSSecureTextField(string: "")
-        campoLink.placeholderString = "https://…/lista.m3u"
-        for c in [campoNome, campoLink] as [NSTextField] {
+        campoLink.placeholderString = "Link da lista (M3U) ou servidor"
+        let campoUsuario = NSTextField(string: "")
+        campoUsuario.placeholderString = "Usuário (opcional: deixe em branco se a lista é só um link)"
+        let campoSenha = NSSecureTextField(string: "")
+        campoSenha.placeholderString = "Senha (opcional)"
+        for c in [campoLink, campoUsuario, campoSenha, campoNome] as [NSTextField] {
             pilha.addArrangedSubview(c)
             c.widthAnchor.constraint(equalToConstant: 420).isActive = true
         }
         alerta.accessoryView = pilha
         guard alerta.runModal() == .alertFirstButtonReturn else { return }
-        let nome = campoNome.stringValue, link = campoLink.stringValue
+        let nome = campoNome.stringValue
+        let link: String
+        switch Xtream.linkDoFormulario(campoLink.stringValue, usuario: campoUsuario.stringValue, senha: campoSenha.stringValue) {
+        case .success(let l): link = l
+        case .failure(let e):
+            PlayerModel.shared.aviso = e.texto
+            return
+        }
         Task { @MainActor in
             do {
                 try await adicionar(nome: nome, link: link)
