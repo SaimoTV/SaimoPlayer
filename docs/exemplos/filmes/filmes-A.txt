@@ -1,0 +1,2 @@
+A Casa de Exemplo (2026)	dub=0:1001,https://example.com/espelho/casa.mp4	leg=0:1002
+Aventura de Exemplo	dub=https://example.com/aventura.mp4

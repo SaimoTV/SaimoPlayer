@@ -1,0 +1,5 @@
+base: 0 https://example.com/movie/usuario/senha/
+base: 1 https://example.com/series/usuario/senha/
+#	1	0	0
+A	2	1	0
+F	1	0	0

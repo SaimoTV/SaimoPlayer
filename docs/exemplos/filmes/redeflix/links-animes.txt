@@ -1,0 +1,3 @@
+@Anime de Exemplo	2024	99
+1	1	dub	1:9101
+1	1	leg	1:9102

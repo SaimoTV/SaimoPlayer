@@ -1,0 +1,3 @@
+# tipo	título	id TMDB	pôster	gêneros
+capa: https://image.tmdb.org/t/p/w342
+f	A Casa de Exemplo (2026)	123456	/caminho-do-poster.jpg	Terror,Suspense

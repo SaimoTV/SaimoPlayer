@@ -1,0 +1,5 @@
+2026 Um Filme Sem Letra (2026)	f	#	2026
+A Casa de Exemplo (2026)	f	A	2026
+Aventura de Exemplo	f	A
+A Série de Exemplo	s	A	2025
+Filme de Exemplo (2024)	f	F	2024

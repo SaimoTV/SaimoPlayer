@@ -1,0 +1,5 @@
+@A Série de Exemplo	2025
+1	1	dub	1:9001,https://example.com/espelho/s01e01.mp4
+1	1	leg	1:9002
+1	2	dub	1:9003
+2	1	dub	1:9004

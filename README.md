@@ -288,7 +288,9 @@ O app do Mac não carrega lista nenhuma. Na primeira abertura as telas mostram
 Na sincronia pelo Saimo Connect, quem nunca escolheu endereço (`linksEm` 0)
 adota o que o outro aparelho enviou.
 
-Formato do Saimo (quando há endereço):
+Formato do Saimo (quando há endereço). **Quer montar a sua própria lista? O formato
+completo, com exemplos prontos, está em [`docs/formato-saimo.md`](docs/formato-saimo.md)**
+e dá para conferir com `python3 scripts/validar_formato_saimo.py` antes de usar:
 
 - Canais: o app só concatena `catalogo.txt`, `canais.txt`, `restritos.txt`,
   `radios.txt` e `guia.txt` ao endereço. A seção de cada canal vem do campo

@@ -1,0 +1,7 @@
+# Fileiras da tela inicial
+capa: https://image.tmdb.org/t/p/w342
+fila	Em alta
+f	A Casa de Exemplo (2026)	A	2026	/caminho-do-poster.jpg
+s	A Série de Exemplo	A	2025	/outro-poster.jpg
+fila	Para a família
+f	Filme de Exemplo (2024)	F	2024	https://example.com/capas/filme.jpg

@@ -1,0 +1,4 @@
+# guia.txt de exemplo. Linhas com TAB entre os campos.
+meuguia	Canal de Exemplo	GLB
+alias	esporte de exemplo hd	Esporte Exemplo
+feed	-	https://example.com/guia/xmltv.xml
