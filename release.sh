@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Publica uma versão: monta o DMG, o APK da TV e o app do Windows, e sobe tudo
+# Publica uma versão: monta o DMG, o APK da TV, o app do Windows e o do Linux, e sobe tudo
 # no mesmo release, junto do APK do celular quando ele já estiver montado.
 #
 # A versão sai do Info.plist e é gravada também no APK, para que os dois lados
@@ -125,6 +125,16 @@ echo "==> montando o app do Windows"
 ( cd ../SaimoWin && ./empacotar.sh >/dev/null )
 cp "../SaimoWin/dist/SaimoTV-Windows.zip" "build/release/SaimoTV-Windows.zip"
 
+# Linux: o mesmo código do Windows. Precisa da libmpv do Ubuntu 22.04 em
+# SaimoWin/mpv/linux-<arq> e do runtime do AppImage (ver o README do SaimoWin).
+if [ -x "../SaimoWin/empacotar-linux.sh" ] && [ -f "../SaimoWin/mpv/linux-x86_64/libmpv.so.1" ]; then
+  echo "==> montando o app do Linux"
+  ( cd ../SaimoWin && ./empacotar-linux.sh >/dev/null )
+  cp ../SaimoWin/dist/linux/SaimoTV-Linux-x86_64.AppImage ../SaimoWin/dist/linux/SaimoTV-Linux-aarch64.AppImage build/release/
+  cp "../SaimoWin/dist/linux/saimo-tv_${versao}_amd64.deb" build/release/SaimoTV-Linux-amd64.deb
+  cp "../SaimoWin/dist/linux/saimo-tv_${versao}_arm64.deb" build/release/SaimoTV-Linux-arm64.deb
+fi
+
 if [ -d "../Saimo-Cell-V2/android" ]; then
   echo "==> montando o APK do celular"
   ( cd ../Saimo-Cell-V2/android && JAVA_HOME="$JAVA17" ANDROID_HOME="$HOME/Library/Android/sdk" \
@@ -206,7 +216,9 @@ def arq(nome):
 arquivos = {k: arq(n) for k, n in [("tvbox", "SaimoTV.apk"), ("celular", "SaimoCell.apk"),
                                     ("mac", "SaimoTV.dmg"), ("windows", "SaimoTV-Windows.zip"),
                                     ("tizen", "SaimoTV-Samsung.wgt"), ("webos", "SaimoTV-LG.ipk"),
-                                    ("roku", "SaimoTV-Roku.zip")]}
+                                    ("roku", "SaimoTV-Roku.zip"),
+                                    ("linux", "SaimoTV-Linux-x86_64.AppImage"),
+                                    ("linux-arm64", "SaimoTV-Linux-aarch64.AppImage")]}
 doc = {"versao": versao, "tag": f"v{versao}",
        "publicadoEm": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
        "notas": notas.read_text(encoding="utf-8") if notas.exists() else "",
@@ -221,7 +233,7 @@ gh release create "v$versao" --repo "$REPO_DOWNLOADS" \
   build/release/SaimoTV.dmg build/release/SaimoTV.apk \
   build/release/SaimoTV-Windows.zip \
   build/release/versao.json \
-  $(ls build/release/SaimoTV-Samsung.wgt build/release/SaimoTV-LG.ipk build/release/SaimoTV-Roku.zip 2>/dev/null || true) \
+  $(ls build/release/SaimoTV-Samsung.wgt build/release/SaimoTV-LG.ipk build/release/SaimoTV-Roku.zip build/release/SaimoTV-Linux-* 2>/dev/null || true) \
   ${cell:-}
 
 # Endereço fixo que os apps leem: o versao.json sai pelo Cloudflare Pages (conta nova, Saimo.tv.gs),

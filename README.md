@@ -1,17 +1,15 @@
 <div align="center">
 
-<a href="https://saimo-tv.pages.dev"><img src="https://raw.githubusercontent.com/gabrielsaimo/gabrielsaimo/main/saimo-tv/banner.svg" alt="Saimo TV: canais ao vivo, filmes e séries em qualquer tela" width="100%"></a>
-
 <h1>Saimo TV</h1>
 
 ### canais ao vivo, filmes e séries — na TV, no celular, no computador e no navegador
 
 <p>
-  <a href="https://github.com/gabrielsaimo/SaimoPlayer/releases/latest">
-    <img src="https://img.shields.io/github/v/release/gabrielsaimo/SaimoPlayer?label=vers%C3%A3o" alt="Versão">
+  <a href="https://github.com/SaimoTV/SaimoPlayer/releases/latest">
+    <img src="https://img.shields.io/github/v/release/SaimoTV/SaimoPlayer?label=vers%C3%A3o" alt="Versão">
   </a>
-  <a href="https://github.com/gabrielsaimo/SaimoPlayer/releases">
-    <img src="https://img.shields.io/github/downloads/gabrielsaimo/SaimoPlayer/total?label=downloads" alt="Downloads">
+  <a href="https://github.com/SaimoTV/SaimoPlayer/releases">
+    <img src="https://img.shields.io/github/downloads/SaimoTV/SaimoPlayer/total?label=downloads" alt="Downloads">
   </a>
 </p>
 
@@ -26,7 +24,7 @@
 </div>
 
 <p align="center">
-  Saimo TV: <a href="https://github.com/gabrielsaimo/SaimoTV-Android">TV Box</a> · <a href="https://github.com/gabrielsaimo/Saimo-Cell-V2">Celular</a> · <a href="https://github.com/gabrielsaimo/SaimoWin">Windows</a> · <b>Mac e catálogo</b> · <a href="https://github.com/gabrielsaimo/Saimo-TV">Site</a> · <a href="https://github.com/gabrielsaimo">todos os apps</a>
+  Saimo TV: <a href="https://github.com/SaimoTV/SaimoTV-Android">TV Box</a> · <a href="https://github.com/SaimoTV/Saimo-Cell-V2">Celular</a> · <a href="https://github.com/SaimoTV/SaimoWin">Windows</a> · <b>Mac e catálogo</b> · <a href="https://github.com/SaimoTV/Saimo-Site">Site</a> · <a href="https://github.com/SaimoTV">todos os apps</a>
 </p>
 
 ## Sobre
@@ -35,20 +33,21 @@ Este repositório é o centro do Saimo TV: o **app do Mac**, a **lista de canais
 o acervo publicados** (que todos os apps leem daqui), os scripts que mantêm esses
 dados e o **release único** que distribui todos os apps.
 
-Versão atual: **2.0.0** — [notas da versão](https://github.com/gabrielsaimo/SaimoPlayer/releases/tag/v2.0.0).
+Versão atual: **2.0.0** — [notas da versão](https://github.com/SaimoTV/SaimoPlayer/releases/tag/v2.0.0).
 
 ## Os apps
 
 | Plataforma | Onde está o código | Download |
 |---|---|---|
-| TV Box / Android TV / Google TV | [SaimoTV-Android](https://github.com/gabrielsaimo/SaimoTV-Android) | `SaimoTV.apk` |
-| Celular Android | [Saimo-Cell-V2](https://github.com/gabrielsaimo/Saimo-Cell-V2) | `SaimoCell.apk` |
-| Windows | [SaimoWin](https://github.com/gabrielsaimo/SaimoWin) | `SaimoTV-Instalador.msi` |
+| TV Box / Android TV / Google TV | [SaimoTV-Android](https://github.com/SaimoTV/SaimoTV-Android) | `SaimoTV.apk` |
+| Celular Android | [Saimo-Cell-V2](https://github.com/SaimoTV/Saimo-Cell-V2) | `SaimoCell.apk` |
+| Windows | [SaimoWin](https://github.com/SaimoTV/SaimoWin) | `SaimoTV-Instalador.msi` |
+| Linux (x86_64 e ARM) | [SaimoWin](https://github.com/SaimoTV/SaimoWin) (o mesmo código do Windows) | `SaimoTV-Linux-x86_64.AppImage`, `SaimoTV-Linux-amd64.deb` (e os de ARM) |
 | macOS | este repositório (`Sources/`) | `SaimoTV.dmg` |
-| Navegador | [Saimo-TV](https://github.com/gabrielsaimo/Saimo-TV) | <https://saimo-tv.pages.dev> |
+| Navegador | [Saimo-TV](https://github.com/SaimoTV/Saimo-Site) | <https://saimo-tv.pages.dev> |
 
 Os instaladores saem juntos em
-[Releases](https://github.com/gabrielsaimo/SaimoPlayer/releases/latest).
+[Releases](https://github.com/SaimoTV/SaimoPlayer/releases/latest).
 
 ### De onde o app Mac lê listas e atualizações
 
