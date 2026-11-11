@@ -1,12 +1,13 @@
 import Foundation
 import os
 
-/// Servidores desligados à mão, no painel do monitor.
+/// Servidores desligados à mão, na lista publicada pelo site
+/// (`fontes-desativadas.json`, a mesma que a TV Box e o Windows leem).
 ///
 /// Quando um provedor cai, cai inteiro: não é a fonte 3 de um canal que
 /// morreu, é o servidor que parou de responder para todo mundo. Editar o
 /// catálogo publicado a cada queda é lento e some com o link, que depois
-/// precisa voltar. Desligar o servidor no painel some com ele de todo canal e
+/// precisa voltar. Desligar o servidor na lista some com ele de todo canal e
 /// de todo filme, em todos os aplicativos, e religar devolve tudo.
 ///
 /// A lista é baixada sem chave nenhuma: são nomes de servidor, que o catálogo
@@ -15,11 +16,11 @@ import os
 ///
 /// Na primeira abertura sem rede a lista vem vazia, e nada é escondido — o
 /// erro certo a cometer: um canal a mais na tela é melhor que a lista inteira
-/// sumindo porque o monitor não respondeu.
+/// sumindo porque o site não respondeu.
 enum FontesDesativadas {
 
     private static let endereco = URL(
-        string: "https://saimo-monitor.gabrielsaimo68.workers.dev/v1/fontes")!
+        string: "https://saimo-tv.pages.dev/fontes-desativadas.json")!
     /// Uma leitura por hora. Cada aparelho perguntando de dois em dois minutos
     /// custava caro no monitor (cobrado por pedido); desligar um servidor
     /// agora leva até uma hora para chegar a todos. A última lista boa fica

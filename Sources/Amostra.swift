@@ -16,7 +16,7 @@ enum Amostra {
     static let padraoPct: Double = 5
 
     private static let endereco = URL(
-        string: "https://saimo-monitor.gabrielsaimo68.workers.dev/telemetria.json")!
+        string: "https://saimo-tv.pages.dev/telemetria.json")!
     private static let validade: TimeInterval = 24 * 3600
     private static let chavePct = "telemetria.amostraPct"
     private static let chaveLidoEm = "telemetria.amostraLidaEm"

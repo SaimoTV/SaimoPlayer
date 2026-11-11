@@ -23,7 +23,7 @@ final class Telemetria {
     /// Desligada em todos os apps Saimo: nenhum dado de uso sai do aparelho.
     private static let desligada = true
 
-    private let base = URL(string: "https://saimo-monitor.gabrielsaimo68.workers.dev/v1")!
+    private let base = URL(string: "https://saimo-tv.pages.dev/v1")!
     private let plataforma = "mac"
     /// Zapeando, cada canal que passa não vira batida: só quem ficou.
     private let minimoParaContar: TimeInterval = 20
