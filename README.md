@@ -179,8 +179,9 @@ andamento; "Atualizar agora" abre o DMG e fecha o app, e é só arrastar o Saimo
 TV para Aplicativos. Se o download falhar, o botão abre a página da versão.
 
 Eventos (`Events.swift`, seção Eventos do acervo): a mesma tela do TV Box. Junta a
-agenda da embedtv e a do monitor (`/v1/eventos`: jogos da CazéTV, Disney+, Prime,
-Paramount+, GOAT, ge tv, N Sports e SportyNet, sem repetir) com os placares da ESPN (23 ligas, buscados juntos) e mostra só
+agenda do Saimo (`/v1/eventos`) com os placares da ESPN (23 ligas, buscados juntos);
+nenhum site de streaming de terceiros é consultado (desde a 3.0.1 o app só toca o
+que a lista traz) e mostra só
 os jogos que passam num canal da lista (adultos fora; encerrados saem), agrupados
 em Ao vivo agora, Começa em breve, Hoje mais tarde, Amanhã e Próximos dias. Cada
 cartão traz liga, horário ou "AO VIVO" com o tempo de jogo, escudos, placar e o
