@@ -155,8 +155,6 @@ final class PrevisaoDeQuadro: ObservableObject {
     }
 
     private static func cabecalhos(_ url: URL) -> [String: String] {
-        var h = ["User-Agent": Upstream.userAgent, "Accept": "*/*"]
-        if url.host?.contains("embedplayer2.xyz") == true { h["Referer"] = "https://embedplayer2.xyz/" }
-        return h
+        ["User-Agent": Upstream.userAgent, "Accept": "*/*"]
     }
 }

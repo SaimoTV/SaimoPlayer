@@ -5,11 +5,9 @@ import AppKit
 /// Os jogos de hoje e dos próximos dias que passam em algum canal da lista,
 /// com a mesma lógica da tela de Eventos do TV Box e do celular.
 ///
-/// Três fontes: a agenda da embedtv diz em que canal cada jogo passa; a do
-/// monitor traz os jogos dos canais de streaming (CazéTV, Disney+, Prime,
-/// Paramount+, GOAT, ge tv, N Sports, SportyNet) que a embedtv não tem, no
-/// mesmo formato e com placar; os placares da ESPN dizem se já começou, o
-/// placar e o tempo de jogo, e trazem escudos melhores. Só entra jogo que tem canal (sem canal não há o que
+/// Duas fontes: a agenda do Saimo diz em que canal cada jogo passa; os
+/// placares da ESPN dizem se já começou, o placar e o tempo de jogo, e trazem
+/// escudos melhores. Nenhum site de streaming de terceiros é consultado. Só entra jogo que tem canal (sem canal não há o que
 /// assistir), e jogo encerrado sai.
 struct Jogo: Identifiable, Sendable {
     var casa: String
@@ -36,7 +34,6 @@ struct Jogo: Identifiable, Sendable {
 }
 
 enum Eventos {
-    static let agenda = URL(string: "https://embedtv.cc/api/events")!
     static let streaming = URL(string: "https://saimo-tv.pages.dev/v1/eventos")!
     static let ligas = [
         "soccer/bra.1", "soccer/bra.2", "soccer/bra.copa_do_brazil", "soccer/conmebol.libertadores",
@@ -58,7 +55,7 @@ enum Eventos {
     }
 
     private static func baixar(_ url: URL) async -> Data? {
-        // Prazo de 8 s: a embedtv às vezes não responde, e a tela não espera por ela.
+        // Prazo de 8 s: a tela não espera por fonte que não responde.
         var pedido = URLRequest(url: url, timeoutInterval: 8)
         pedido.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", forHTTPHeaderField: "User-Agent")
         guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
@@ -88,7 +85,7 @@ enum Eventos {
         return canais.first { chave($0) == slug } ?? canais.first { chave($0).contains(slug) }
     }
 
-    /// A agenda (da embedtv ou do monitor): só jogos cujo canal existe na nossa lista.
+    /// A agenda do Saimo: só jogos cujo canal existe na nossa lista.
     private static func lerAgenda(_ dados: Data, _ canais: [Channel]) -> [Jogo] {
         guard let lista = (try? JSONSerialization.jsonObject(with: dados)) as? [[String: Any]] else { return [] }
         var vistos = Set<String>()
@@ -159,7 +156,6 @@ enum Eventos {
 
     /// Nulo quando a agenda não veio.
     static func buscarJogos(_ canais: [Channel]) async -> [Jogo]? {
-        async let corpo = baixar(agenda)
         async let doMonitor = baixar(streaming)
         let espn = await withTaskGroup(of: [Placar].self) { grupo in
             for liga in ligas {
@@ -170,21 +166,8 @@ enum Eventos {
             for await lidos in grupo { todos += lidos }
             return todos
         }
-        let dados = await corpo
-        let respostaMonitor = await doMonitor
-        // Sem a embedtv a tela continua com os jogos do monitor; só some se as duas caírem.
-        if dados == nil && respostaMonitor == nil { return nil }
-        let daEmbed = dados.map { lerAgenda($0, canais) } ?? []
-        // Jogo do monitor que a embedtv já tem (mesmos times, começo a menos de
-        // meia hora) não entra de novo.
-        let extras = respostaMonitor.map { lerAgenda($0, canais) }?.filter { x in
-            !daEmbed.contains { e in
-                abs(e.inicio.timeIntervalSince(x.inicio)) < hora / 2 &&
-                    ((mesmoTime(e.casa, x.casa) && mesmoTime(e.fora, x.fora)) ||
-                        (mesmoTime(e.casa, x.fora) && mesmoTime(e.fora, x.casa)))
-            }
-        } ?? []
-        return (daEmbed + extras).map { jogo in
+        guard let respostaMonitor = await doMonitor else { return nil }
+        return lerAgenda(respostaMonitor, canais).map { jogo in
             // O mesmo jogo na ESPN: mesmos times (em qualquer ordem) e começo
             // a menos de quatro horas um do outro.
             guard let par = espn.first(where: { e in

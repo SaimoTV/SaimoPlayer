@@ -77,64 +77,12 @@ final class Upstream: @unchecked Sendable {
         return URL(string: texto.replacingCharacters(in: inicio..<fim, with: aberto)) ?? url
     }
 
-    private var dadinhoCache: [String: (quando: Date, m3u8: URL)] = [:]
-
-    private func resolverDadinhoSeNecessario(_ url: URL) -> (url: URL, referer: String?) {
-        let abs = url.absoluteString
-        guard abs.contains("dadinhodetapioca.fun/play/") else { return (url, nil) }
-
-        lock.lock()
-        if let entry = dadinhoCache[abs], Date().timeIntervalSince(entry.quando) < 5400 {
-            lock.unlock()
-            return (entry.m3u8, "https://dadinhodetapioca.fun/")
-        }
-        lock.unlock()
-
-        var req = URLRequest(url: url)
-        req.setValue("https://rdcanais.org/", forHTTPHeaderField: "Referer")
-        req.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
-        let sem = DispatchSemaphore(value: 0)
-        let caixaHtml = Caixa<String>()
-        session.dataTask(with: req) { data, _, _ in
-            defer { sem.signal() }
-            if let data, let str = String(data: data, encoding: .utf8) {
-                caixaHtml.valor = str
-            }
-        }.resume()
-        _ = sem.wait(timeout: .now() + 5)
-
-        if let html = caixaHtml.valor,
-           let range = html.range(of: "STREAM_URLS\\s*=\\s*\\[\\s*\"([^\"]+)\"", options: .regularExpression) {
-            let match = String(html[range])
-            if let start = match.firstIndex(of: "\""),
-               let end = match.lastIndex(of: "\""), start < end {
-                let raw = String(match[match.index(after: start)..<end]).replacingOccurrences(of: "\\/", with: "/")
-                if let m3u8Url = URL(string: raw) {
-                    lock.lock()
-                    dadinhoCache[abs] = (Date(), m3u8Url)
-                    lock.unlock()
-                    return (m3u8Url, "https://dadinhodetapioca.fun/")
-                }
-            }
-        }
-        return (url, nil)
-    }
-
     /// `agente` troca o User-Agent de sempre (o do Safari) só neste pedido:
     /// o Saimo Connect pede a lista com o mesmo agente que o celular usa.
     func fetch(_ endereco: URL, method: String = "GET", referer: String? = nil,
                agente: String? = nil) throws -> UpstreamResponse {
-        var url = Upstream.hostLegivel(endereco)
-        var ref = referer
-        if url.absoluteString.contains("dadinhodetapioca.fun/play/") {
-            let res = resolverDadinhoSeNecessario(url)
-            url = res.url
-            if let r = res.referer { ref = r }
-        } else if url.host?.contains("tiktokcdn") == true {
-            ref = "https://dadinhodetapioca.fun/"
-        } else if (url.host?.contains("embedtvproxy.workers.dev") == true || url.host?.contains("cloudfront-net.lat") == true) && ref == nil {
-            ref = "https://nexustvplay.bbroot.com/"
-        }
+        let url = Upstream.hostLegivel(endereco)
+        let ref = referer
         do {
             return try fetchViaURLSession(url, method: method, referer: ref, agente: agente)
         } catch let e as NSError where e.domain == NSURLErrorDomain

@@ -307,123 +307,6 @@ final class PlayerModel: NSObject, ObservableObject {
             return destinoResolvido
         }
 
-        // Se a API remota falhou, deu timeout ou retornou somenteApp (bloqueio anti-bot
-        // na borda do Cloudflare), o app nativo do Mac resolve a fonte diretamente.
-        if let direto = await resolverRedeFlixDireto(url: url) {
-            Log.shared.write("PlayerModel: resolvido diretamente via RedeFlix nativo")
-            return direto
-        }
-
-        return nil
-    }
-
-    /// Resolve diretamente na RedeFlix a partir da conexão nativa do Mac
-    /// quando o endpoint remoto do Cloudflare Pages falhar ou for bloqueado por anti-bot.
-    static func resolverRedeFlixDireto(url: URL) async -> URL? {
-        guard let partes = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let queryItems = partes.queryItems else { return nil }
-
-        let params = Dictionary(queryItems.compactMap { item in
-            item.value.map { (item.name, $0) }
-        }, uniquingKeysWith: { first, _ in first })
-
-        guard let id = params["id"], !id.isEmpty else { return nil }
-        let tipo = params["tipo"] ?? "movie"
-        let season = params["s"] ?? "1"
-        let episode = params["e"] ?? "1"
-        let versao = params["versao"] ?? "dub"
-
-        let isSerie = (tipo == "series" || tipo == "serie")
-        let paginaStr = isSerie
-            ? "https://redeflixapi.click/serie/\(id)/\(season)/\(episode)"
-            : "https://redeflixapi.click/filme/\(id)"
-        guard let paginaUrl = URL(string: paginaStr) else { return nil }
-
-        let chromeUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-
-        var req1 = URLRequest(url: paginaUrl)
-        req1.timeoutInterval = 8
-        req1.setValue(chromeUA, forHTTPHeaderField: "User-Agent")
-        req1.setValue("https://redeflixapi.click/", forHTTPHeaderField: "Referer")
-        req1.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-        req1.setValue("pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7", forHTTPHeaderField: "Accept-Language")
-
-        guard let (dadosHtml, resp1) = try? await URLSession.shared.data(for: req1),
-              (resp1 as? HTTPURLResponse)?.statusCode == 200,
-              let html = String(data: dadosHtml, encoding: .utf8) else {
-            return nil
-        }
-
-        var ticketFinal: String? = nil
-        let patternFast = #"fastLaunchTickets\s*=\s*(\{[^}]+\})"#
-        if let regex = try? NSRegularExpression(pattern: patternFast),
-           let match = regex.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)),
-           let jsonRange = Range(match.range(at: 1), in: html) {
-            let jsonStr = String(html[jsonRange])
-            if let jsonData = jsonStr.data(using: .utf8),
-               let tickets = try? JSONSerialization.jsonObject(with: jsonData) as? [String: String] {
-                let servidor = (versao == "leg") ? "legendado" : "default"
-                ticketFinal = (tickets[servidor]?.isEmpty == false ? tickets[servidor] : nil)
-                    ?? (tickets["default"]?.isEmpty == false ? tickets["default"] : nil)
-                    ?? (tickets["legendado"]?.isEmpty == false ? tickets["legendado"] : nil)
-            }
-        }
-
-        if ticketFinal == nil || ticketFinal?.isEmpty == true {
-            let patResolve = #"playbackResolveTicket\s*=\s*["']([^"']+)["']"#
-            if let regResolve = try? NSRegularExpression(pattern: patResolve),
-               let matchResolve = regResolve.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)),
-               let ticketRange = Range(matchResolve.range(at: 1), in: html) {
-                let resolveTicket = String(html[ticketRange])
-                if let resolveUrl = URL(string: "https://redeflixapi.click/playback-resolve.php") {
-                    var reqResolve = URLRequest(url: resolveUrl)
-                    reqResolve.httpMethod = "POST"
-                    reqResolve.timeoutInterval = 8
-                    reqResolve.setValue(chromeUA, forHTTPHeaderField: "User-Agent")
-                    reqResolve.setValue(paginaStr, forHTTPHeaderField: "Referer")
-                    reqResolve.setValue("https://redeflixapi.click", forHTTPHeaderField: "Origin")
-                    reqResolve.setValue("RedeFlixPlayer", forHTTPHeaderField: "X-Requested-With")
-                    reqResolve.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                    let servidor = (versao == "leg") ? "legendado" : "default"
-                    reqResolve.httpBody = try? JSONSerialization.data(withJSONObject: ["ticket": resolveTicket, "server": servidor])
-                    if let (resolveData, rResp) = try? await URLSession.shared.data(for: reqResolve),
-                       (rResp as? HTTPURLResponse)?.statusCode == 200,
-                       let jResolve = try? JSONSerialization.jsonObject(with: resolveData) as? [String: Any],
-                       let lt = jResolve["launchTicket"] as? String, !lt.isEmpty {
-                        ticketFinal = lt
-                    }
-                }
-            }
-        }
-
-        guard let ticket = ticketFinal, !ticket.isEmpty else { return nil }
-
-        guard let sourceUrl = URL(string: "https://redeflixapi.click/playerkys/source.php") else { return nil }
-        var req2 = URLRequest(url: sourceUrl)
-        req2.httpMethod = "POST"
-        req2.timeoutInterval = 8
-        req2.setValue(chromeUA, forHTTPHeaderField: "User-Agent")
-        req2.setValue(paginaStr, forHTTPHeaderField: "Referer")
-        req2.setValue("https://redeflixapi.click", forHTTPHeaderField: "Origin")
-        req2.setValue("RedeFlixPlayer", forHTTPHeaderField: "X-Requested-With")
-        req2.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req2.setValue("application/json, text/plain, */*", forHTTPHeaderField: "Accept")
-        req2.httpBody = try? JSONSerialization.data(withJSONObject: ["ticket": ticket])
-
-        guard let (dadosSource, resp2) = try? await URLSession.shared.data(for: req2),
-              (resp2 as? HTTPURLResponse)?.statusCode == 200,
-              let jsonRes = try? JSONSerialization.jsonObject(with: dadosSource) as? [String: Any] else {
-            return nil
-        }
-
-        if let urlStr = jsonRes["url"] as? String, let finalUrl = URL(string: urlStr) {
-            return finalUrl
-        }
-        if let dataObj = jsonRes["data"] as? [String: Any],
-           let urlStr = dataObj["video_url"] as? String,
-           let finalUrl = URL(string: urlStr) {
-            return finalUrl
-        }
         return nil
     }
 
@@ -893,13 +776,10 @@ final class PlayerModel: NSObject, ObservableObject {
         }
         tearDownItemObservers()
 
-        var headers: [String: String] = [
+        let headers: [String: String] = [
             "User-Agent": Upstream.userAgent,
             "Accept": "*/*",
         ]
-        if let host = link.host, host.contains("embedplayer2.xyz") {
-            headers["Referer"] = "https://embedplayer2.xyz/"
-        }
 
         let asset = AVURLAsset(url: link, options: [
             // O "Accept" vai junto porque há origem que recusa quem não manda
