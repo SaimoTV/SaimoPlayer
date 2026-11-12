@@ -77,6 +77,11 @@ PY
     fi
   fi
 
+  if [ -f "../SaimoRoku/manifest" ]; then
+    IFS=. read -r v_maior v_menor v_build <<< "$versao"
+    sed -i '' -e "s/^major_version=.*/major_version=$v_maior/" -e "s/^minor_version=.*/minor_version=$v_menor/" \
+      -e "s/^build_version=.*/build_version=${v_build:-0}/" "../SaimoRoku/manifest"
+  fi
   if [ -f "../SaimoWin/Cargo.toml" ]; then
     sed -i '' "s/^version = \".*\"/version = \"$versao\"/" "../SaimoWin/Cargo.toml"
   fi
