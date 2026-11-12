@@ -21,6 +21,9 @@ PLIST="Info.plist"
 GRADLE="../SaimoTV-Android/app/build.gradle.kts"
 JAVA17="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
 
+# Pasta do app de celular (padrão ../Saimo-Cell-V2). Use SAIMO_CELL_DIR para montar o APK de
+# outra cópia, por exemplo um worktree da main quando a pasta principal está em outro branch.
+CELL_DIR="${SAIMO_CELL_DIR:-../Saimo-Cell-V2}"
 versao="${1:-}"
 if [ -n "$versao" ] && [ "${versao:0:2}" != "--" ]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $versao" "$PLIST"
@@ -36,7 +39,6 @@ PY
   sed -i '' "s/versionName = \".*\"/versionName = \"$versao\"/" "$GRADLE"
   sed -i '' "s/versionCode = .*/versionCode = $codigo/" "$GRADLE"
 
-  CELL_DIR="../Saimo-Cell-V2"
   if [ -d "$CELL_DIR" ]; then
     python3 - "$CELL_DIR" "$versao" "$codigo" <<'PY'
 import sys, json
@@ -135,13 +137,13 @@ if [ -x "../SaimoWin/empacotar-linux.sh" ] && [ -f "../SaimoWin/mpv/linux-x86_64
   cp "../SaimoWin/dist/linux/saimo-tv_${versao}_arm64.deb" build/release/SaimoTV-Linux-arm64.deb
 fi
 
-if [ -d "../Saimo-Cell-V2/android" ]; then
+if [ -d "$CELL_DIR/android" ]; then
   echo "==> montando o APK do celular"
-  ( cd ../Saimo-Cell-V2/android && JAVA_HOME="$JAVA17" ANDROID_HOME="$HOME/Library/Android/sdk" \
+  ( cd "$CELL_DIR/android" && JAVA_HOME="$JAVA17" ANDROID_HOME="$HOME/Library/Android/sdk" \
     ./gradlew assembleRelease -q )
-  cp "../Saimo-Cell-V2/android/app/build/outputs/apk/release/app-release.apk" "build/release/SaimoCell.apk"
-elif [ -f "../Saimo-Cell-V2/android/app/build/outputs/apk/release/app-release.apk" ]; then
-  cp "../Saimo-Cell-V2/android/app/build/outputs/apk/release/app-release.apk" "build/release/SaimoCell.apk"
+  cp "$CELL_DIR/android/app/build/outputs/apk/release/app-release.apk" "build/release/SaimoCell.apk"
+elif [ -f "$CELL_DIR/android/app/build/outputs/apk/release/app-release.apk" ]; then
+  cp "$CELL_DIR/android/app/build/outputs/apk/release/app-release.apk" "build/release/SaimoCell.apk"
 fi
 
 if [ -x "../Saimo-TV/scripts/montar_tv.sh" ]; then
