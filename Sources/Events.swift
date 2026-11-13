@@ -18,7 +18,7 @@ struct Jogo: Identifiable, Sendable {
     var ligaLogo: String
     var inicio: Date
     var fim: Date
-    var canal: Channel
+    var canal: Channel?
     /// "pre", "in" ou "post", quando a ESPN conhece o jogo.
     var estado = ""
     var placar = ""
@@ -34,7 +34,7 @@ struct Jogo: Identifiable, Sendable {
 }
 
 enum Eventos {
-    static let streaming = URL(string: "https://saimo-tv.pages.dev/v1/eventos")!
+    static let streaming = URL(string: "https://saimo-tv.pages.dev/eventos-extra.json")!
     static let ligas = [
         "soccer/bra.1", "soccer/bra.2", "soccer/bra.copa_do_brazil", "soccer/conmebol.libertadores",
         "soccer/conmebol.sudamericana", "soccer/uefa.champions", "soccer/uefa.europa", "soccer/eng.1",
@@ -92,9 +92,8 @@ enum Eventos {
         var jogos: [Jogo] = []
         for o in lista {
             // Jogo com dados faltando fica de fora.
-            guard let player = (o["players"] as? [String])?.first,
-                  let canal = canalDo(player, canais),
-                  let times = o["teams"] as? [String: Any],
+            let canal = (o["players"] as? [String])?.first.flatMap { canalDo($0, canais) }
+            guard let times = o["teams"] as? [String: Any],
                   let casa = times["home"] as? [String: Any], let fora = times["away"] as? [String: Any],
                   let nomeCasa = casa["name"] as? String, let nomeFora = fora["name"] as? String,
                   let inicio = data(o["time_start"] as? String) else { continue }
@@ -344,15 +343,15 @@ struct EventsView: View {
         return CartaoFila(
             id: jogo.id,
             titulo: jogo.titulo,
-            subtitulo: [jogo.canal.name, jogo.liga].filter { !$0.isEmpty }.joined(separator: " · "),
+            subtitulo: [jogo.canal?.name ?? "Sem canal", jogo.liga].filter { !$0.isEmpty }.joined(separator: " · "),
             selo: selo,
             seloAoVivo: vivo,
             meta: meta.filter { !$0.isEmpty }.joined(separator: "  ·  "),
-            sinopse: "No canal \(jogo.canal.name) · clique para assistir",
+            sinopse: jogo.canal.map { "No canal \($0.name) · clique para assistir" } ?? "Sem canal",
             escudos: (jogo.casaLogo, jogo.foraLogo, jogo.casa, jogo.fora),
             logoLiga: jogo.ligaLogo
         ) {
-            model.abrirCanalDoJogo(jogo.canal)
+            if let c = jogo.canal { model.abrirCanalDoJogo(c) }
         }
     }
 
