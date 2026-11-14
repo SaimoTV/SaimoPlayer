@@ -66,6 +66,8 @@ final class VodEstado: ObservableObject {
     @Published var filmes = true
     @Published var reservado = false
     @Published var mostrandoFavoritos = false
+    @Published var mostrarAddons = false
+    @Published var addonParaConfirmarURL: String? = nil
     /// Nula quando o vídeo está no lugar dele.
     ///
     /// Abrir o acervo para o ao vivo de vez — player e fluxo, nas duas telas

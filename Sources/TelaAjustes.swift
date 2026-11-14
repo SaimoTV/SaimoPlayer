@@ -123,6 +123,16 @@ struct TelaAjustes: View {
     @ObservedObject var model: PlayerModel
     @ObservedObject private var epg = EPGService.shared
     @ObservedObject private var connect = SaimoConnect.shared
+    @ObservedObject private var addons = AddonStore.shared
+    @ObservedObject private var debrid = DebridStore.shared
+
+    private var resumoAddonsDebrid: String {
+        let ativos = addons.ativos.count
+        let provs = debrid.ativosOrdenados.map(\.0.nome)
+        let parteAddon = ativos == 0 ? "Nenhum addon" : (ativos == 1 ? "1 addon ativo" : "\(ativos) addons ativos")
+        let parteDebrid = provs.isEmpty ? "sem Debrid" : provs.joined(separator: ", ")
+        return "\(parteAddon) · \(parteDebrid)"
+    }
     @State private var catalogoAtualizado = false
     @State private var urlCanais: String = Enderecos.canais
     @State private var urlFilmes: String = Enderecos.filmes
@@ -314,6 +324,14 @@ struct TelaAjustes: View {
                               : "Até \(MinhasListas.maximo) listas",
                               icone: "plus.circle") {
                             minhas.pedirNova()
+                        }
+                    }
+
+                    secao("Addons e Debrid") {
+                        linha("Gerenciar Addons e Debrid",
+                              resumoAddonsDebrid,
+                              icone: "puzzlepiece.extension") {
+                            VodEstado.shared.mostrarAddons = true
                         }
                     }
 

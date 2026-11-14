@@ -17,12 +17,224 @@ import Foundation
 /// player — o que de quebra permite ajustar o atraso sem baixar nada de novo.
 enum Legendas {
 
-    struct Opcao: Identifiable, Equatable {
+    struct Opcao: Identifiable, Equatable, Sendable {
         let id: String
         /// Código do OpenSubtitles: "pob", "por", "eng", "spa".
         let idioma: String
         let rotulo: String
         let url: URL
+    }
+
+    // MARK: - Extensão Addons / VTT / IdResolver
+
+    static func normalizarCodigoIdioma(_ raw: String) -> (codigo: String, rotulo: String) {
+        let low = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch low {
+        case "pob", "pt-br", "pt_br", "pb", "por-br", "brazilian", "portuguese (brazil)":
+            return ("pob", "Português (BR)")
+        case "por", "pt", "pt-pt", "pt_pt", "portuguese":
+            return ("por", "Português")
+        case "eng", "en", "en-us", "en-gb", "english":
+            return ("eng", "Inglês")
+        case "spa", "es", "es-419", "es-es", "spanish", "lat":
+            return ("spa", "Espanhol")
+        case "fre", "fra", "fr", "french":
+            return ("fra", "Francês")
+        case "ita", "it", "italian":
+            return ("ita", "Italiano")
+        case "ger", "deu", "de", "german":
+            return ("deu", "Alemão")
+        case "jpn", "ja", "japanese":
+            return ("jpn", "Japonês")
+        default:
+            let limpo = low.isEmpty ? "und" : String(low.prefix(8))
+            return (limpo, limpo.uppercased())
+        }
+    }
+
+    /// Combina legendas de `stream.subtitles[]`, addons com recurso `subtitles` e OpenSubtitles via `IdResolver`.
+    @MainActor
+    static func deComAddons(
+        tmdb: Int?,
+        imdbId: String?,
+        serie: Bool,
+        temporada: Int = 0,
+        episodio: Int = 0,
+        embutidas: [StremioSubtitle] = [],
+        addons: [AddonInstalado]? = nil,
+        videoHash: String? = nil,
+        videoSize: Int64? = nil,
+        filename: String? = nil
+    ) async -> [Opcao] {
+        let addonsAtivos = addons ?? AddonStore.shared.ativos
+        let resolved = await IdResolver.shared.resolver(
+            tmdbId: tmdb,
+            imdbId: imdbId,
+            serie: serie
+        )
+
+        async let baseOpenSubtitles: [Opcao] = {
+            if let t = resolved.tmdbId, t > 0, Enderecos.filmesAtivos {
+                return await Legendas.de(tmdb: t, serie: serie, temporada: temporada, episodio: episodio)
+            }
+            if let imdb = resolved.imdbId {
+                return await buscarOpenSubtitlesPorImdb(imdb, serie: serie, temporada: temporada, episodio: episodio)
+            }
+            return []
+        }()
+
+        async let addonSubs = SaimoAddonCoordinator.shared.buscarLegendas(
+            addons: addonsAtivos,
+            ids: resolved,
+            temporada: serie && temporada > 0 ? temporada : nil,
+            episodio: serie && episodio > 0 ? episodio : nil,
+            videoHash: videoHash,
+            videoSize: videoSize,
+            filename: filename
+        )
+
+        var resultado: [Opcao] = []
+        var urlsVistas = Set<String>()
+
+        func adicionar(id: String, langRaw: String, urlStr: String, origem: String) {
+            guard let url = URL(string: urlStr),
+                  urlsVistas.insert(url.absoluteString).inserted else { return }
+            let norm = normalizarCodigoIdioma(langRaw)
+            let sufixo = origem.isEmpty ? "" : " · \(origem)"
+            resultado.append(Opcao(id: id, idioma: norm.codigo, rotulo: "\(norm.rotulo)\(sufixo)", url: url))
+        }
+
+        for sub in embutidas {
+            adicionar(id: "stream::\(sub.id)", langRaw: sub.lang, urlStr: sub.url, origem: "Stream")
+        }
+
+        for item in await addonSubs {
+            adicionar(
+                id: "addon::\(item.addonName)::\(item.subtitle.id)",
+                langRaw: item.subtitle.lang,
+                urlStr: item.subtitle.url,
+                origem: item.addonName
+            )
+        }
+
+        for op in await baseOpenSubtitles where urlsVistas.insert(op.url.absoluteString).inserted {
+            resultado.append(op)
+        }
+
+        return resultado
+    }
+
+    private static func buscarOpenSubtitlesPorImdb(
+        _ imdbId: String,
+        serie: Bool,
+        temporada: Int,
+        episodio: Int
+    ) async -> [Opcao] {
+        let digitos = String(imdbId.dropFirst(2).split(separator: ":").first ?? "")
+        guard !digitos.isEmpty, Int(digitos) != nil else { return [] }
+        var caminho = "https://rest.opensubtitles.org/search"
+        if serie && temporada > 0 && episodio > 0 {
+            caminho += "/episode-\(episodio)/imdbid-\(digitos)/season-\(temporada)"
+        } else {
+            caminho += "/imdbid-\(digitos)"
+        }
+        guard let url = URL(string: caminho) else { return [] }
+        var req = URLRequest(url: url)
+        req.timeoutInterval = 8
+        req.setValue("TemporaryUserAgent", forHTTPHeaderField: "User-Agent")
+        guard let (data, _) = try? await URLSession.shared.data(for: req),
+              let lista = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+            return []
+        }
+
+        var saida: [Opcao] = []
+        var porIdioma: [String: Int] = [:]
+        for item in lista {
+            guard let langId = item["SubLanguageID"] as? String,
+                  ["pob", "por", "eng", "spa"].contains(langId),
+                  let dlRaw = item["SubDownloadLink"] as? String else { continue }
+            let count = porIdioma[langId, default: 0]
+            guard count < 3 else { continue }
+            let srtURLStr = dlRaw.replacingOccurrences(of: ".gz", with: "")
+            guard let srtURL = URL(string: srtURLStr) else { continue }
+            porIdioma[langId] = count + 1
+            let norm = normalizarCodigoIdioma(langId)
+            let sufixo = count == 0 ? "" : " (\(count + 1))"
+            let id = (item["IDSubtitleFile"] as? String) ?? "\(langId)-\(count)"
+            saida.append(Opcao(id: id, idioma: langId, rotulo: "\(norm.rotulo)\(sufixo)", url: srtURL))
+        }
+        return saida
+    }
+
+    /// Baixa legenda suportando tanto `.srt` quanto WebVTT (`.vtt`) usados por addons Stremio.
+    @MainActor
+    static func baixarQualquer(_ opcao: Opcao) async -> [Fala]? {
+        let ehVTTURL = opcao.url.pathExtension.lowercased() == "vtt" || opcao.url.absoluteString.lowercased().contains(".vtt")
+        if !ehVTTURL, let srt = await baixar(opcao), !srt.isEmpty {
+            return srt
+        }
+        var req = URLRequest(url: opcao.url)
+        req.timeoutInterval = 10
+        req.setValue("SaimoPlayer/1.0", forHTTPHeaderField: "User-Agent")
+        guard let (data, _) = try? await URLSession.shared.data(for: req) else { return nil }
+        let texto = String(data: data, encoding: .utf8)
+            ?? String(data: data, encoding: .isoLatin1)
+            ?? ""
+        guard !texto.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        let falas = lerWebVTTouSRT(texto)
+        return falas.isEmpty ? nil : falas
+    }
+
+    /// Analisa tanto legendas WebVTT (`WEBVTT`, `MM:SS.mmm`) quanto SRT padrão.
+    static func lerWebVTTouSRT(_ conteudo: String) -> [Fala] {
+        let norm = conteudo
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        if norm.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("WEBVTT") {
+            return parsearVTT(norm)
+        }
+        let srt = ler(norm)
+        return srt.isEmpty ? parsearVTT(norm) : srt
+    }
+
+    private static func parsearVTT(_ texto: String) -> [Fala] {
+        var falas: [Fala] = []
+        let blocos = texto.components(separatedBy: "\n\n")
+        for bloco in blocos {
+            let linhas = bloco
+                .split(separator: "\n", omittingEmptySubsequences: false)
+                .map { String($0).trimmingCharacters(in: .whitespaces) }
+            guard let linhaTempo = linhas.first(where: { $0.contains("-->") }),
+                  let rangeArrow = linhaTempo.range(of: "-->"),
+                  let idxTempo = linhas.firstIndex(where: { $0.contains("-->") }) else { continue }
+
+            let inicioStr = String(linhaTempo[..<rangeArrow.lowerBound]).trimmingCharacters(in: .whitespaces)
+            let fimResto = String(linhaTempo[rangeArrow.upperBound...]).trimmingCharacters(in: .whitespaces)
+            let fimStr = fimResto.split(separator: " ").first.map(String.init) ?? fimResto
+
+            guard let ini = segundosVTT(inicioStr), let fim = segundosVTT(fimStr), fim > ini else { continue }
+            let corpo = linhas[(idxTempo + 1)...]
+                .joined(separator: "\n")
+                .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !corpo.isEmpty else { continue }
+            falas.append(Fala(inicio: ini, fim: fim, texto: corpo))
+        }
+        return falas
+    }
+
+    private static func segundosVTT(_ s: String) -> Double? {
+        let limpo = s.replacingOccurrences(of: ",", with: ".")
+        let partes = limpo.split(separator: ":")
+        if partes.count == 3,
+           let h = Double(partes[0]), let m = Double(partes[1]), let sec = Double(partes[2]) {
+            return h * 3600 + m * 60 + sec
+        }
+        if partes.count == 2,
+           let m = Double(partes[0]), let sec = Double(partes[1]) {
+            return m * 60 + sec
+        }
+        return nil
     }
 
     struct Fala: Equatable {

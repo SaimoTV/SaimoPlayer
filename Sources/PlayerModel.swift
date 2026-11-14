@@ -260,6 +260,14 @@ final class PlayerModel: NSObject, ObservableObject {
     private var fileSourceIndex = 0
     /// Rótulos legíveis de cada fonte do arquivo no ar (sem servidor ou endereço).
     @Published private(set) var fileSourceLabels: [String] = []
+    private var fileSourceHeaders: [[String: String]] = []
+    private var fileSourceRemux: [Bool] = []
+    private var fileSourceBingeGroups: [String] = []
+    private var fileSourceSubtitles: [[StremioSubtitle]] = []
+    /// Série + `bingeGroup` ativo para priorizar a mesma origem no próximo episódio.
+    var bingeGroupPreferido: (serie: String, group: String)?
+    /// Callback opcional usado por séries reproduzidas via Addons para carregar o próximo episódio.
+    var proximoAddonHandler: ((Episodio, String?) async -> Void)?
     private var fileBaseDetail: String = ""
     /// Se a fonte atual já foi tentada pelo atalho local.
     private var fonteViaProxy = false
@@ -344,13 +352,38 @@ final class PlayerModel: NSObject, ObservableObject {
         }
     }
 
-    private func fonteDeArquivo(_ origem: URL) -> (url: URL, peloProxy: Bool) {
-        guard origem.pathExtension.lowercased() == "txt" else { return (origem, false) }
-        var canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
-                            source: origem)
-        canal.sobDemanda = true
-        ProxyServer.shared.register(canal)
-        return (ProxyServer.shared.link(for: canal), true)
+    private func cabecalhosDaFonte(_ indice: Int) -> [String: String] {
+        fileSourceHeaders.indices.contains(indice) ? fileSourceHeaders[indice] : [:]
+    }
+
+    private func precisaRemuxDaFonte(_ origem: URL, indice: Int) -> Bool {
+        let explicitRemux = fileSourceRemux.indices.contains(indice) && fileSourceRemux[indice]
+        if explicitRemux { return true }
+        let ext = origem.pathExtension.lowercased()
+        let low = origem.absoluteString.lowercased()
+        if ["mkv", "avi", "webm", "flv", "wmv", "ts", "m2t", "mpd"].contains(ext) { return true }
+        return low.contains(".mkv?") || low.contains(".mkv&") || low.hasSuffix(".mkv")
+    }
+
+    private func fonteDeArquivo(_ origem: URL, indice: Int? = nil) -> (url: URL, peloProxy: Bool) {
+        let idx = indice ?? fileSourceIndex
+        let ext = origem.pathExtension.lowercased()
+        if ext == "txt" {
+            var canal = Channel(name: playingFileName.isEmpty ? "Filme" : playingFileName,
+                                source: origem)
+            canal.sobDemanda = true
+            ProxyServer.shared.register(canal)
+            return (ProxyServer.shared.link(for: canal), true)
+        }
+        let headers = cabecalhosDaFonte(idx)
+        let titulo = playingFileName.isEmpty ? "Filme" : playingFileName
+        if precisaRemuxDaFonte(origem, indice: idx) {
+            return (ProxyServer.shared.remuxLink(for: origem, name: titulo, headers: headers), true)
+        }
+        if !headers.isEmpty && ext != "m3u8" && !origem.absoluteString.lowercased().contains(".m3u8") {
+            return (ProxyServer.shared.vodLink(for: origem, headers: headers), true)
+        }
+        return (origem, false)
     }
 
     private var sleepAssertion: NSObjectProtocol?
@@ -617,6 +650,10 @@ final class PlayerModel: NSObject, ObservableObject {
         fileSources = []
         fileSourceIndex = 0
         fileSourceLabels = []
+        fileSourceHeaders = []
+        fileSourceRemux = []
+        fileSourceBingeGroups = []
+        fileSourceSubtitles = []
         fileBaseDetail = ""
         aoVivoPendente = false
     }
@@ -632,7 +669,12 @@ final class PlayerModel: NSObject, ObservableObject {
     /// List ligada a ela, e zerá-la fazia a própria lista devolver um canal —
     /// que entrava por cima do filme antes do primeiro quadro.
     func playFile(_ urls: [URL], indiceInicial: Int = 0, rotulos: [String] = [],
-                  nome: String, detalhe: String = "", detalheBase: String? = nil, chave: String = "") {
+                  nome: String, detalhe: String = "", detalheBase: String? = nil, chave: String = "",
+                  headersPorFonte: [[String: String]] = [],
+                  remuxPorFonte: [Bool] = [],
+                  bingeGroupsPorFonte: [String] = [],
+                  legendasPorFonte: [[StremioSubtitle]] = [],
+                  manterProximoAddon: Bool = false) {
         guard !urls.isEmpty else { return }
         let indice = urls.indices.contains(indiceInicial) ? indiceInicial : 0
         let primeira = urls[indice]
@@ -665,9 +707,22 @@ final class PlayerModel: NSObject, ObservableObject {
         inicioPedido = nil
         retomandoAte = nil
         soltarItemAnterior()
+        if !manterProximoAddon {
+            proximoAddonHandler = nil
+            bingeGroupPreferido = nil
+        }
         fileSources = urls
         fileSourceIndex = indice
         fileSourceLabels = rotulos
+        fileSourceHeaders = headersPorFonte
+        fileSourceRemux = remuxPorFonte
+        fileSourceBingeGroups = bingeGroupsPorFonte
+        fileSourceSubtitles = legendasPorFonte
+        if bingeGroupsPorFonte.indices.contains(indice),
+           !bingeGroupsPorFonte[indice].isEmpty {
+            let serieNome = episodioPendente?.serie ?? nome
+            bingeGroupPreferido = (serieNome, bingeGroupsPorFonte[indice])
+        }
         fileBaseDetail = detalheBase ?? detalhe
         playingFileName = nome
         let preparada = fonteDeArquivo(primeira)
@@ -776,10 +831,15 @@ final class PlayerModel: NSObject, ObservableObject {
         }
         tearDownItemObservers()
 
-        let headers: [String: String] = [
+        var headers: [String: String] = [
             "User-Agent": Upstream.userAgent,
             "Accept": "*/*",
         ]
+        if channel == nil {
+            for (k, v) in cabecalhosDaFonte(fileSourceIndex) {
+                headers[k] = v
+            }
+        }
 
         let asset = AVURLAsset(url: link, options: [
             // O "Accept" vai junto porque há origem que recusa quem não manda
@@ -922,6 +982,13 @@ final class PlayerModel: NSObject, ObservableObject {
     /// próximo episódio: legendas, pulos e progresso seguem valendo.
     func tocarEpisodio(_ escolhido: Episodio) {
         guard let ep = episodioNoAr else { return }
+        if escolhido.urls.isEmpty, let handler = proximoAddonHandler {
+            let group = (bingeGroupPreferido?.serie == ep.serie) ? bingeGroupPreferido?.group : nil
+            Task { @MainActor in
+                await handler(escolhido, group)
+            }
+            return
+        }
         let rotulo = escolhido.versao == "leg" ? "Legendado" : "Dublado"
         let urls = fontesPreferidas(serie: ep.serie, urls: escolhido.urls)
         let total = urls.count
@@ -1104,7 +1171,7 @@ final class PlayerModel: NSObject, ObservableObject {
                fileSourceIndex < fileSources.count,
                let host = fileSources[fileSourceIndex].host, host != ProxyServer.shared.advertisedHost {
                 fonteViaProxy = true
-                let pelaCasa = ProxyServer.shared.vodLink(for: fileSources[fileSourceIndex])
+                let pelaCasa = ProxyServer.shared.vodLink(for: fileSources[fileSourceIndex], headers: cabecalhosDaFonte(fileSourceIndex))
                 playingFile = pelaCasa
                 status = "tentando pelo atalho local…"
                 Log.shared.write("\(playingFileName): \(reason) — repetindo pelo proxy local")
@@ -1490,10 +1557,44 @@ final class PlayerModel: NSObject, ObservableObject {
 
     /// Busca a lista do título (uma consulta pequena) e, se a pessoa já
     /// escolhera um idioma antes, liga a primeira versão dele sozinho.
+    private var legendasEmbutidasDaFonteAtual: [StremioSubtitle] {
+        fileSourceSubtitles.indices.contains(fileSourceIndex) ? fileSourceSubtitles[fileSourceIndex] : []
+    }
+
     func buscarLegendasExternas(tmdb: Int, serie: Bool, temporada: Int, episodio: Int) {
+        buscarLegendasExternas(
+            tmdb: tmdb > 0 ? tmdb : nil,
+            imdbId: nil,
+            serie: serie,
+            temporada: temporada,
+            episodio: episodio
+        )
+    }
+
+    func buscarLegendasExternas(
+        tmdb: Int?,
+        imdbId: String?,
+        serie: Bool,
+        temporada: Int,
+        episodio: Int,
+        videoHash: String? = nil,
+        videoSize: Int64? = nil,
+        filename: String? = nil
+    ) {
         legendaBusca?.cancel()
+        let embutidas = legendasEmbutidasDaFonteAtual
         legendaBusca = Task { @MainActor [weak self] in
-            let lista = await Legendas.de(tmdb: tmdb, serie: serie, temporada: temporada, episodio: episodio)
+            let lista = await Legendas.deComAddons(
+                tmdb: tmdb,
+                imdbId: imdbId,
+                serie: serie,
+                temporada: temporada,
+                episodio: episodio,
+                embutidas: embutidas,
+                videoHash: videoHash,
+                videoSize: videoSize,
+                filename: filename
+            )
             guard let self, !Task.isCancelled, !lista.isEmpty else { return }
             self.legendasExt = lista
             let idioma = Legendas.idiomaGuardado
@@ -1516,7 +1617,7 @@ final class PlayerModel: NSObject, ObservableObject {
         }
         legendaAviso = "Baixando a legenda…"
         legendaDownload = Task { @MainActor [weak self] in
-            let falas = await Legendas.baixar(opcao)
+            let falas = await Legendas.baixarQualquer(opcao)
             guard let self, !Task.isCancelled else { return }
             guard let falas else {
                 self.legendaAviso = "Não foi possível baixar esta legenda. Tente outra versão."

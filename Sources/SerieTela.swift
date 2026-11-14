@@ -86,12 +86,20 @@ struct SerieTela: View {
         .task(id: serie.id) {
             carregando = true
             ficha = await Fichas.de(serie.nomeCompleto, serie: true)
+            if let tid = ficha?.tmdbId, detalhes.isEmpty {
+                detalhes = await Fichas.temporadaTMDB(id: tid, numero: temporada)
+            }
             carregando = false
             if !(ficha?.elenco.isEmpty ?? true) { await Fichas.aquecer() }
         }
         .task(id: temporada) {
             detalhes = [:]
-            detalhes = await Fichas.temporada(serie.nomeCompleto, temporada)
+            let d = await Fichas.temporada(serie.nomeCompleto, temporada)
+            if !d.isEmpty {
+                detalhes = d
+            } else if let tid = ficha?.tmdbId {
+                detalhes = await Fichas.temporadaTMDB(id: tid, numero: temporada)
+            }
         }
     }
 

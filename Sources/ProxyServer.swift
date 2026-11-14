@@ -36,6 +36,7 @@ final class ProxyServer: @unchecked Sendable {
     /// variant after the first look at the upstream playlist.
     private var remuxVerdict: [String: Bool] = [:]
     private var isDirectTSVerdict: [String: Bool] = [:]
+    private var cabecalhosVod: [String: [String: String]] = [:]
     /// Which source of a channel is currently in use; advanced on failure.
     private var activeVariant: [UUID: Int] = [:]
 
@@ -87,6 +88,10 @@ final class ProxyServer: @unchecked Sendable {
 
     private func needsRemux(_ channel: Channel, _ variant: Variant) -> Bool {
         let key = "\(channel.id.uuidString)#\(variant.url.absoluteString)"
+        if variant.forceRemux || variant.isMKV {
+            lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
+            return true
+        }
         lock.lock()
         if let cached = remuxVerdict[key] { lock.unlock(); return cached }
         lock.unlock()
@@ -98,11 +103,11 @@ final class ProxyServer: @unchecked Sendable {
             if ext.hasPrefix("ts") || ext.hasPrefix("m2t") {
                 verdict = true
                 lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
-            } else if let headRes = try? Upstream.shared.fetch(variant.url, method: "HEAD", referer: variant.referer, agente: variant.userAgent),
+            } else if let headRes = try? Upstream.shared.fetch(variant.url, method: "HEAD", referer: variant.referer, agente: variant.userAgent, headers: variant.headers),
                       headRes.contentType.lowercased().contains("video/mp2t") {
                 verdict = true
                 lock.lock(); isDirectTSVerdict[key] = true; lock.unlock()
-            } else if let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent) {
+            } else if let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent, headers: variant.headers) {
                 let text = String(decoding: res.body.prefix(64_000), as: UTF8.self).lowercased()
                 verdict = text.contains("hvc1") || text.contains("hev1")
                 // O CODECS só existe na playlist mestre. Quem serve a playlist
@@ -308,7 +313,7 @@ final class ProxyServer: @unchecked Sendable {
         if segments[2].hasPrefix("manifest") {
             do {
                 let active = variant(channel)
-                let res = try Upstream.shared.fetch(active.url, referer: active.referer, agente: active.userAgent)
+                let res = try Upstream.shared.fetch(active.url, referer: active.referer, agente: active.userAgent, headers: active.headers)
                 let xml = normaliseMPD(String(decoding: res.body, as: UTF8.self),
                                        source: res.finalURL)
                 send(fd, status: 200,
@@ -409,7 +414,7 @@ final class ProxyServer: @unchecked Sendable {
             let origin = targetURL.scheme.flatMap { s in
                 targetURL.host.map { "\(s)://\($0)/" }
             }
-            let res = try Upstream.shared.fetch(targetURL, referer: active.referer ?? origin, agente: active.userAgent)
+            let res = try Upstream.shared.fetch(targetURL, referer: active.referer ?? origin, agente: active.userAgent, headers: active.headers)
             guard (200...299).contains(res.status) else {
                 Log.shared.write("upstream \(res.status) em \(targetURL.lastPathComponent)")
                 if isSegment && targetURL.host != active.url.host { anotarFalha(de: targetURL) }
@@ -527,14 +532,15 @@ final class ProxyServer: @unchecked Sendable {
             lock.lock()
             let isDirectTS = isDirectTSVerdict[key] ?? (variant.url.pathExtension.lowercased().hasPrefix("ts") || variant.url.pathExtension.lowercased().hasPrefix("m2t"))
             lock.unlock()
-            let input = isDirectTS ? variant.url : URL(string: "http://127.0.0.1:\(port)/proxy/\(id)/\(variant.isDASH ? "manifest.mpd" : "raw.m3u8")")!
+            let ehDireto = isDirectTS || variant.isMKV || variant.forceRemux
+            let input = ehDireto ? variant.url : URL(string: "http://127.0.0.1:\(port)/proxy/\(id)/\(variant.isDASH ? "manifest.mpd" : "raw.m3u8")")!
             guard let text = Remuxer.shared.playlist(for: channel, variant: variant,
                                                      sourceURL: input, rewriteBase: base)
             else { return nil }
             return Payload(contentType: "application/vnd.apple.mpegurl", body: Data(text.utf8))
         }
 
-        guard let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent),
+        guard let res = try? Upstream.shared.fetch(variant.url, referer: variant.referer, agente: variant.userAgent, headers: variant.headers),
               (200...299).contains(res.status),
               res.body.prefix(7) == Data("#EXTM3U".utf8)
         else { return nil }
@@ -779,14 +785,36 @@ final class ProxyServer: @unchecked Sendable {
     /// mandam o fim do arquivo inteiro em vez do fim do pedaço pedido, e o
     /// AVFoundation desiste com "Operation Stopped" antes de ler um quadro.
     /// Aqui a resposta é refeita com o intervalo que realmente veio.
-    func vodLink(for absolute: URL) -> URL {
+    func vodLink(for absolute: URL, headers: [String: String]? = nil) -> URL {
         if listenFD < 0 { _ = try? start() }
+        if let headers, !headers.isEmpty {
+            lock.lock()
+            cabecalhosVod[absolute.absoluteString] = headers
+            lock.unlock()
+        }
         let apelido = Data(absolute.absoluteString.utf8)
             .base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
         return URL(string: "http://\(advertisedHost):\(port)/vod/\(apelido).mp4")!
+    }
+
+    /// Gera um link HLS fMP4 local remuxado sob demanda via ffmpeg para `.mkv`,
+    /// contêineres `notWebReady` ou streams com cabeçalhos HTTP personalizados.
+    func remuxLink(for absolute: URL, name: String = "Stream", headers: [String: String] = [:]) -> URL {
+        var variant = Variant(url: absolute)
+        variant.headers = headers.isEmpty ? nil : headers
+        variant.forceRemux = true
+        var channel = Channel(name: name, variants: [variant])
+        channel.sobDemanda = true
+        let key = "\(channel.id.uuidString)#\(absolute.absoluteString)"
+        lock.lock()
+        channels[channel.id] = channel
+        remuxVerdict[key] = true
+        isDirectTSVerdict[key] = true
+        lock.unlock()
+        return link(for: channel)
     }
 
     private func endereco(doApelido apelido: String) -> URL? {
@@ -805,9 +833,18 @@ final class ProxyServer: @unchecked Sendable {
             return
         }
 
+        lock.lock()
+        let extras = cabecalhosVod[alvo.absoluteString]
+        lock.unlock()
+
         var request = URLRequest(url: alvo)
         request.timeoutInterval = 30
         request.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        if let extras {
+            for (k, v) in extras {
+                request.setValue(v, forHTTPHeaderField: k)
+            }
+        }
         let faixa = pedido.components(separatedBy: "\r\n")
             .first { $0.lowercased().hasPrefix("range:") }?
             .dropFirst("range:".count).trimmingCharacters(in: .whitespaces)

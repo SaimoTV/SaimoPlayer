@@ -16,10 +16,22 @@ struct Variant: Hashable {
     /// O que diferencia a fonte das outras do canal ("Temporada 3"), quando o
     /// catálogo sabe (campo `nome:`); senão aparece o número.
     var nome: String?
+    /// Cabeçalhos HTTP extras exigidos pela origem (ex.: Stremio `proxyHeaders.request`).
+    var headers: [String: String]? = nil
+    /// Força remux local via ffmpeg/ProxyServer (ex.: contêineres `.mkv` ou `notWebReady`).
+    var forceRemux: Bool = false
 
     /// AVFoundation cannot play DASH at all, so those always go through the
     /// ffmpeg gateway.
     var isDASH: Bool { url.absoluteString.lowercased().contains(".mpd") }
+
+    /// Indica contêiner `.mkv` pela URL (path ou query string).
+    var isMKV: Bool {
+        let ext = url.pathExtension.lowercased()
+        if ext == "mkv" { return true }
+        let low = url.absoluteString.lowercased()
+        return low.contains(".mkv?") || low.contains(".mkv&") || low.hasSuffix(".mkv")
+    }
 }
 
 struct Channel: Identifiable, Hashable {

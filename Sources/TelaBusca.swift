@@ -8,11 +8,16 @@ struct TelaBusca: View {
     @ObservedObject var model: PlayerModel
     let acoes: AcoesDoAcervo
 
+    @ObservedObject private var addons = AddonStore.shared
     @State private var destaque = DestaqueEstado()
     @State private var texto = ""
     @State private var acervo: [Vod.Achado] = []
     @State private var colecoes: [(Serie, [Episodio])] = []
     @State private var filas: [Fila] = []
+    @State private var resultadosAddons: [DescobertaItem] = []
+    @State private var resultadosTMDB: [DescobertaItem] = []
+    @State private var tarefaRemota: Task<Void, Never>?
+    @State private var termoRemotoBuscado = ""
     @State private var recentes: [String] = UserDefaults.standard.stringArray(forKey: "busca.recentes") ?? []
     @FocusState private var focado: Bool
 
@@ -67,8 +72,10 @@ struct TelaBusca: View {
             // Para conferir a tela sem digitar: `--args -buscaInicial nome`.
             if texto.isEmpty, let inicial = UserDefaults.standard.string(forKey: "buscaInicial") { texto = inicial }
             await Generos.carregar()
-            acervo = await Vod.todos()
-            colecoes = await Vod.colecao("animes") + Vod.colecao("doramas")
+            if Enderecos.filmesAtivos {
+                acervo = await Vod.todos()
+                colecoes = await Vod.colecao("animes") + Vod.colecao("doramas")
+            }
             buscar()
         }
         .task(id: texto) {
@@ -91,9 +98,13 @@ struct TelaBusca: View {
             .lowercased()
     }
 
-    private func buscar() {
+    private func buscar(agendarRemota: Bool = true) {
         let termo = Self.chave(texto.trimmingCharacters(in: .whitespaces))
         guard termo.count >= 2 else {
+            tarefaRemota?.cancel()
+            termoRemotoBuscado = ""
+            resultadosAddons = []
+            resultadosTMDB = []
             filas = []
             destaque.padrao("Buscar", "Filmes, séries, animes, doramas e canais")
             return
@@ -124,11 +135,43 @@ struct TelaBusca: View {
             out.append(Fila(titulo: "Animes e doramas",
                             cartoes: daColecao.map { CartoesDoAcervo.colecao($0.0, $0.1, acoes: acoes) }))
         }
+        if addons.temAtivos {
+            if !resultadosAddons.isEmpty {
+                out.append(Fila(titulo: "Nos Addons",
+                                cartoes: resultadosAddons.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }))
+            }
+            if !resultadosTMDB.isEmpty {
+                out.append(Fila(titulo: "Descoberta TMDB",
+                                cartoes: resultadosTMDB.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }))
+            }
+            if agendarRemota {
+                agendarBuscaRemota(termo: termo)
+            }
+        }
         filas = out
-        let total = canais.count + filmes.count + series.count + daColecao.count
+        let total = canais.count + filmes.count + series.count + daColecao.count + resultadosAddons.count + resultadosTMDB.count
         destaque.padrao("Buscar", total == 0 ? "" : "\(total) resultados para \"\(texto)\"")
         let achou = total > 0
         Telemetria.shared.buscou(.vod, texto) { achou }
+    }
+
+    private func agendarBuscaRemota(termo chaveAtual: String) {
+        let bruto = texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard chaveAtual != termoRemotoBuscado else { return }
+        tarefaRemota?.cancel()
+        resultadosAddons = []
+        resultadosTMDB = []
+        tarefaRemota = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(260))
+            guard !Task.isCancelled else { return }
+            let res = await AddonDescobertaEstado.shared.buscar(termo: bruto)
+            let chaveDepois = Self.chave(texto.trimmingCharacters(in: .whitespaces))
+            guard !Task.isCancelled, chaveDepois == chaveAtual else { return }
+            termoRemotoBuscado = chaveAtual
+            resultadosAddons = res.addons
+            resultadosTMDB = res.tmdb
+            buscar(agendarRemota: false)
+        }
     }
 
     private func guardarRecente() {

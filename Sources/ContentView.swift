@@ -61,6 +61,35 @@ struct ContentView: View {
             .sheet(isPresented: $model.showGuide) {
                 EPGGuideView(model: model)
             }
+            .sheet(isPresented: $vod.mostrarAddons) {
+                TelaAddonsView { vod.mostrarAddons = false }
+            }
+            .overlay {
+                FolhaStreamsAddon()
+            }
+            .alert(
+                "Instalar Addon Stremio?",
+                isPresented: Binding(
+                    get: { vod.addonParaConfirmarURL != nil },
+                    set: { if !$0 { vod.addonParaConfirmarURL = nil } }
+                )
+            ) {
+                Button("Instalar") {
+                    if let url = vod.addonParaConfirmarURL {
+                        vod.addonParaConfirmarURL = nil
+                        Task {
+                            _ = try? await AddonStore.shared.instalar(url: url)
+                            vod.mostrarAddons = true
+                            SaimoConnect.shared.avisarDados(atraso: 2)
+                        }
+                    }
+                }
+                Button("Cancelar", role: .cancel) {
+                    vod.addonParaConfirmarURL = nil
+                }
+            } message: {
+                Text("Deseja instalar este addon Stremio?\n\n\(vod.addonParaConfirmarURL ?? "")")
+            }
             .navigationTitle(vod.secao?.titulo ?? model.canalAtivo?.name ?? "Saimo TV")
             .onAppear {
                 // Como a TV: abre na tela inicial, a menos que os ajustes

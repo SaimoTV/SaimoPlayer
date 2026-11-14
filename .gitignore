@@ -23,3 +23,9 @@ restritos.txt
 radios.txt
 *.m3u
 *.m3u8
+
+.claude/
+*.py
+*_5gmax.json
+output/
+scripts/test_*.swift

@@ -50,7 +50,77 @@ final class Remuxer: @unchecked Sendable {
         return candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
     }
 
+    struct RemuxPlano: Equatable, Sendable {
+        var needsAudioTranscode: Bool = false
+        var needsVideoTranscode: Bool = false
+        var aplicarAdtsToAsc: Bool = true
+        var semAudio: Bool = false
+    }
+
+    /// Monta flags HTTP de `ffmpeg`/`ffprobe` (`-user_agent`, `-referer`, `-headers`) sem duplicar cabeçalhos.
+    static func argsDeCabecalhosHTTP(para variant: Variant) -> [String] {
+        var args: [String] = []
+        let extras = variant.headers ?? [:]
+
+        func buscarHeader(_ nome: String) -> String? {
+            extras.first { $0.key.lowercased() == nome }?.value
+        }
+
+        let ua = variant.userAgent ?? buscarHeader("user-agent")
+        let ref = variant.referer ?? buscarHeader("referer")
+        if let ua, !ua.isEmpty { args += ["-user_agent", ua] }
+        if let ref, !ref.isEmpty { args += ["-referer", ref] }
+
+        let linhas = extras
+            .filter {
+                let k = $0.key.lowercased()
+                return k != "user-agent" && k != "referer" && !$0.value.isEmpty
+            }
+            .sorted { $0.key.lowercased() < $1.key.lowercased() }
+            .map { chave, valor -> String in
+                let k = chave.replacingOccurrences(of: "\r", with: "").replacingOccurrences(of: "\n", with: "")
+                let v = valor.replacingOccurrences(of: "\r", with: "").replacingOccurrences(of: "\n", with: "")
+                return "\(k): \(v)\r\n"
+            }
+
+        if !linhas.isEmpty {
+            args += ["-headers", linhas.joined()]
+        }
+        return args
+    }
+
+    /// Decide copy vs transcode para fMP4 HLS compatível com `AVPlayer` no macOS.
+    static func avaliarPlano(
+        videoCodec: String?,
+        audioCodecs: [String],
+        inputURL: URL,
+        variant: Variant
+    ) -> RemuxPlano {
+        let lowAudio = audioCodecs.map { $0.lowercased() }
+        let codecsCompativeisAudio: Set<String> = ["aac", "ac3", "eac3", "mp3", "alac", "flac"]
+        let precisaAudioAAC = lowAudio.contains { !codecsCompativeisAudio.contains($0) }
+
+        let ext = inputURL.pathExtension.lowercased()
+        let vLow = videoCodec?.lowercased() ?? ""
+        let codecsIncompativeisVideo: Set<String> = ["mpeg4", "vc1", "wmv3", "msmpeg4v3", "flv1", "vp8", "vp9", "theora"]
+        let precisaVideoH264 = !vLow.isEmpty && codecsIncompativeisVideo.contains(vLow)
+
+        let ehConteinerNaoTS = variant.isDASH || variant.isMKV || variant.forceRemux
+            || ["mkv", "mp4", "m4v", "mov", "webm", "avi"].contains(ext)
+        let todosAAC = !lowAudio.isEmpty && lowAudio.allSatisfy { $0 == "aac" }
+        // `aac_adtstoasc` só se aplica a ADTS AAC dentro de MPEG-TS/AAC bruto.
+        let aplicarAdts = !ehConteinerNaoTS && (lowAudio.isEmpty || todosAAC)
+
+        return RemuxPlano(
+            needsAudioTranscode: precisaAudioAAC,
+            needsVideoTranscode: precisaVideoH264,
+            aplicarAdtsToAsc: aplicarAdts,
+            semAudio: false
+        )
+    }
+
     private var probeCache: [URL: (audioCount: Int, isHEVC: Bool)] = [:]
+    private var probePlanoCache: [URL: RemuxPlano] = [:]
 
     private func probe(for variant: Variant, input: URL) -> (audioCount: Int, isHEVC: Bool) {
         lock.lock()
@@ -76,8 +146,7 @@ final class Remuxer: @unchecked Sendable {
             if ext == "m3u8" || ext == "txt" {
                 args += ["-allowed_extensions", "ALL", "-extension_picky", "0"]
             }
-            if let ua = variant.userAgent { args += ["-user_agent", ua] }
-            if let ref = variant.referer { args += ["-referer", ref] }
+            args += Self.argsDeCabecalhosHTTP(para: variant)
             if variant.isDASH, let key = variant.clearKey, !key.isEmpty {
                 args += ["-cenc_decryption_key", key]
             }
@@ -97,23 +166,43 @@ final class Remuxer: @unchecked Sendable {
                 process.waitUntilExit()
                 
                 if let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    var videoCodec: String? = nil
+                    var audioCodecs: [String] = []
                     if let programs = root["programs"] as? [[String: Any]], !programs.isEmpty {
                         let perProgram = programs.map { program -> Int in
                             let streams = program["streams"] as? [[String: Any]] ?? []
                             if let video = streams.first(where: { $0["codec_type"] as? String == "video" }),
-                               let codec = video["codec_name"] as? String, codec.lowercased() == "hevc" {
-                                isHEVC = true
+                               let codec = video["codec_name"] as? String {
+                                videoCodec = codec
+                                if codec.lowercased() == "hevc" { isHEVC = true }
                             }
-                            return streams.filter { $0["codec_type"] as? String == "audio" }.count
+                            let audios = streams.filter { $0["codec_type"] as? String == "audio" }
+                            audioCodecs = audios.compactMap { $0["codec_name"] as? String }
+                            return max(1, audios.count)
                         }
                         count = max(1, perProgram.max() ?? 1)
                     } else {
                         let streams = root["streams"] as? [[String: Any]] ?? []
                         if let video = streams.first(where: { $0["codec_type"] as? String == "video" }),
-                           let codec = video["codec_name"] as? String, codec.lowercased() == "hevc" {
-                            isHEVC = true
+                           let codec = video["codec_name"] as? String {
+                            videoCodec = codec
+                            if codec.lowercased() == "hevc" { isHEVC = true }
                         }
-                        count = max(1, streams.filter { $0["codec_type"] as? String == "audio" }.count)
+                        let audios = streams.filter { $0["codec_type"] as? String == "audio" }
+                        audioCodecs = audios.compactMap { $0["codec_name"] as? String }
+                        count = max(1, audios.count)
+                        if audios.isEmpty && videoCodec != nil {
+                            var planoSemAudio = Self.avaliarPlano(videoCodec: videoCodec, audioCodecs: [], inputURL: input, variant: variant)
+                            planoSemAudio.semAudio = true
+                            lock.lock(); probePlanoCache[variant.url] = planoSemAudio; lock.unlock()
+                        } else {
+                            let plano = Self.avaliarPlano(videoCodec: videoCodec, audioCodecs: audioCodecs, inputURL: input, variant: variant)
+                            lock.lock(); probePlanoCache[variant.url] = plano; lock.unlock()
+                        }
+                    }
+                    if !(root["programs"] as? [[String: Any]] ?? []).isEmpty {
+                        let plano = Self.avaliarPlano(videoCodec: videoCodec, audioCodecs: audioCodecs, inputURL: input, variant: variant)
+                        lock.lock(); probePlanoCache[variant.url] = plano; lock.unlock()
                     }
                 }
             }
@@ -215,28 +304,45 @@ final class Remuxer: @unchecked Sendable {
         if ext == "m3u8" || ext == "txt" {
             args += ["-allowed_extensions", "ALL", "-extension_picky", "0"]
         }
-        if let ua = variant.userAgent { args += ["-user_agent", ua] }
-        if let ref = variant.referer { args += ["-referer", ref] }
+        args += Self.argsDeCabecalhosHTTP(para: variant)
         // CENC ClearKey — only the DASH demuxer understands this option;
         // -decryption_key belongs to the mov demuxer and breaks manifest reads.
         if variant.isDASH, let key = variant.clearKey, !key.isEmpty {
             args += ["-cenc_decryption_key", key]
         }
         let probeResult = probe(for: variant, input: sourceURL)
+        lock.lock()
+        let plano = probePlanoCache[variant.url] ?? Self.avaliarPlano(videoCodec: nil, audioCodecs: [], inputURL: sourceURL, variant: variant)
+        lock.unlock()
 
         args += [
             "-i", sourceURL.absoluteString,
             "-map", "0:v:0",
         ]
-        // Every audio track is carried through: dropping all but the first is
-        // what loses the second language on dual-audio channels.
-        args += probeResult.audioCount > 1 ? ["-map", "0:a"] : ["-map", "0:a:0"]
-        args += ["-c", "copy"]
-        if probeResult.isHEVC {
-            args += ["-tag:v", "hvc1"]
+        if !plano.semAudio {
+            // Every audio track is carried through: dropping all but the first is
+            // what loses the second language on dual-audio channels.
+            args += probeResult.audioCount > 1 ? ["-map", "0:a"] : ["-map", "0:a:0?"]
         }
-        // ADTS only exists in MPEG-TS input; the filter errors out on fMP4/DASH.
-        if !variant.isDASH { args += ["-bsf:a", "aac_adtstoasc"] }
+
+        if plano.needsVideoTranscode {
+            args += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-pix_fmt", "yuv420p"]
+        } else {
+            args += ["-c:v", "copy"]
+            if probeResult.isHEVC {
+                args += ["-tag:v", "hvc1"]
+            }
+        }
+
+        if !plano.semAudio {
+            if plano.needsAudioTranscode {
+                args += ["-c:a", "aac", "-b:a", "192k", "-ac", "2"]
+            } else {
+                args += ["-c:a", "copy"]
+                // ADTS only exists in MPEG-TS input; the filter errors out on fMP4/DASH/MKV.
+                if plano.aplicarAdtsToAsc { args += ["-bsf:a", "aac_adtstoasc"] }
+            }
+        }
 
         args += ["-f", "hls", "-hls_time", "4"]
         if channel.sobDemanda {

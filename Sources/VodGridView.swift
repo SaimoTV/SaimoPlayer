@@ -12,6 +12,9 @@ struct VodGridView: View {
     @ObservedObject private var estado = VodEstado.shared
     @ObservedObject private var favoritos = VodFavoritos.shared
     @ObservedObject private var listas = ListasEstado.shared
+    @ObservedObject private var addons = AddonStore.shared
+    @ObservedObject private var addonHist = AddonHistorico.shared
+    @State private var metadadosSerieAddon: [String: (tmdbId: Int?, imdbId: String?, poster: String?, fundo: String?)] = [:]
 
     @State private var carregando = false
     /// As fileiras publicadas, baixadas uma vez por abertura da janela.
@@ -63,13 +66,29 @@ struct VodGridView: View {
                 if let cartao = fichaAberta {
                     FichaTela(
                         alvo: FichaAlvo(titulo: cartao.titulo, serie: cartao.serie, ano: cartao.ano,
-                                        letra: cartao.letra, reservado: cartao.reservado),
+                                        letra: cartao.letra, reservado: cartao.reservado,
+                                        tmdbId: cartao.tmdbId, imdbId: cartao.imdbId,
+                                        capaURL: cartao.capaURL.flatMap(URL.init(string:)),
+                                        fundoURL: cartao.fundoURL.flatMap(URL.init(string:))),
                         assistir: {
                             fichaAberta = nil
                             cartao.abrir()
                         },
                         fechar: { fichaAberta = nil },
-                        abrirTitulo: abrirDaFilmografia)
+                        abrirTitulo: abrirDaFilmografia,
+                        abrirComAddons: (addons.temAtivos && Enderecos.filmesAtivos && !cartao.serie) ? {
+                            fichaAberta = nil
+                            AddonReproducaoEstado.shared.abrirSeletor(
+                                model: model,
+                                titulo: cartao.titulo,
+                                ano: cartao.ano,
+                                serie: cartao.serie,
+                                tmdbId: cartao.tmdbId,
+                                imdbId: cartao.imdbId,
+                                poster: cartao.capaURL,
+                                fundo: cartao.fundoURL
+                            )
+                        } : nil)
                     // Uma ficha nova para cada título: sem isto, abrir um filme a
                     // partir da filmografia reaproveitava a ficha anterior, que
                     // continuava com o ator aberto por cima do título novo.
@@ -110,6 +129,9 @@ struct VodGridView: View {
                 estado.episodios = episodios
                 estado.letraDaSerie = ""
                 estado.serieAberta = serie
+            },
+            abrirDescoberta: { item in
+                Task { await abrirItemDescoberta(item) }
             })
     }
 
@@ -119,9 +141,9 @@ struct VodGridView: View {
     private var conteudo: some View {
         if let serie = estado.serieAberta {
             episodiosDe(serie)
-        } else if let secao = estado.secao, !Enderecos.filmesAtivos,
+        } else if let secao = estado.secao, !Enderecos.filmesAtivos, !addons.temAtivos,
                   [.ondemand, .filmes, .series, .animes, .doramas, .extras].contains(secao) {
-            // Sem o endereço dos filmes não há acervo, nem pedido de rede.
+            // Sem listas de filmes nem addons ativos não há acervo nem rede.
             SemListaView(secao: .filmes)
                 .padding(.top, Tema.alturaDaBarra)
         } else {
@@ -133,7 +155,7 @@ struct VodGridView: View {
                 TelaOnDemand(model: model, tipo: nil, acoes: acoes,
                              filasDeDestaque: filasDeDestaque, nomesDoAcervo: nomesDoAcervo)
             case .filmes, .series, .animes, .doramas:
-                if estado.explorando {
+                if estado.explorando && Enderecos.filmesAtivos {
                     telaDaGrade
                 } else {
                     TelaOnDemand(model: model, tipo: estado.secao, acoes: acoes,
@@ -287,7 +309,7 @@ struct VodGridView: View {
     /// menos é o erro certo a cometer.
     private var itensEmAndamento: [Cartao] {
         Progresso.emAndamento()
-            .filter { nomesDoAcervo.contains($0.titulo) }
+            .filter { nomesDoAcervo.contains($0.titulo) || addonHist.contem(titulo: $0.titulo, serie: $0.serie) }
             .prefix(20).map { andamento in
             Cartao(titulo: andamento.rotulo,
                    ano: "",
@@ -305,13 +327,103 @@ struct VodGridView: View {
     /// O progresso guarda o nome, não a letra; a busca devolve a letra, que é
     /// o que o acervo precisa para achar o título.
     private func abrirPorNome(_ titulo: String, serie: Bool) async {
-        let achados = await Vod.todos()
-        let alvo = achados.first {
-            $0.titulo.compare(titulo, options: .caseInsensitive) == .orderedSame
-                && $0.serie == serie
-        } ?? achados.first
-        guard let alvo else { return }
-        await abrirAchado(alvo, reservado: false)
+        if Enderecos.filmesAtivos {
+            let achados = await Vod.todos()
+            if let alvo = achados.first(where: {
+                $0.titulo.compare(titulo, options: .caseInsensitive) == .orderedSame
+                    && $0.serie == serie
+            }) {
+                await abrirAchado(alvo, reservado: false)
+                return
+            }
+        }
+        if addons.temAtivos {
+            if let reg = addonHist.buscar(titulo: titulo, serie: serie) {
+                let item = DescobertaItem(
+                    id: "hist:\(reg.titulo)",
+                    tmdbId: reg.tmdbId,
+                    imdbId: reg.imdbId,
+                    titulo: reg.titulo,
+                    ano: reg.ano,
+                    serie: reg.serie,
+                    capa: reg.poster,
+                    fundo: reg.fundo,
+                    sinopse: nil,
+                    nota: nil,
+                    addonOrigemId: nil
+                )
+                await abrirItemDescoberta(item)
+                return
+            }
+            await abrirDescobertaDeNome(titulo: titulo, ano: "", serie: serie)
+        }
+    }
+
+    private func abrirItemDescoberta(_ item: DescobertaItem) async {
+        if item.serie {
+            carregando = true
+            defer { carregando = false }
+            if let tmdb = item.tmdbId {
+                IdResolver.shared.registrarTitulo(item.nomeCompleto, tmdbId: tmdb, serie: true)
+                IdResolver.shared.registrarTitulo(item.titulo, tmdbId: tmdb, serie: true)
+            }
+            let eps = await AddonDescobertaEstado.shared.episodiosDaSerie(tmdbId: item.tmdbId, imdbId: item.imdbId)
+            let serie = Serie(titulo: item.titulo, ano: item.ano, pedaco: 0, episodios: eps.count)
+            metadadosSerieAddon[serie.nomeCompleto] = (item.tmdbId, item.imdbId, item.capa, item.fundo)
+            estado.episodios = eps
+            estado.letraDaSerie = ""
+            estado.serieAberta = serie
+        } else {
+            if let tmdb = item.tmdbId {
+                IdResolver.shared.registrarTitulo(item.nomeCompleto, tmdbId: tmdb, serie: false)
+                IdResolver.shared.registrarTitulo(item.titulo, tmdbId: tmdb, serie: false)
+            }
+            fichaAberta = Cartao(
+                titulo: item.titulo,
+                ano: item.ano,
+                serie: false,
+                detalhe: "Filme",
+                progresso: Progresso.fracao(Progresso.chaveFilme(item.nomeCompleto)),
+                letra: "f",
+                reservado: false,
+                tmdbId: item.tmdbId,
+                imdbId: item.imdbId,
+                capaURL: item.capa,
+                fundoURL: item.fundo
+            ) {
+                AddonReproducaoEstado.shared.abrirSeletor(
+                    model: model,
+                    titulo: item.titulo,
+                    ano: item.ano,
+                    serie: false,
+                    tmdbId: item.tmdbId,
+                    imdbId: item.imdbId,
+                    poster: item.capa,
+                    fundo: item.fundo
+                )
+            }
+        }
+    }
+
+    private func abrirDescobertaDeNome(titulo: String, ano: String, serie: Bool) async {
+        var tid = IdResolver.shared.cachedTmdbPorTitulo(titulo, serie: serie)
+        if tid == nil {
+            tid = await IdResolver.shared.buscarTmdbPorTitulo(titulo, ano: Int(ano), serie: serie)
+        }
+        let item = DescobertaItem(
+            id: "nome:\(serie):\(titulo)",
+            tmdbId: tid,
+            imdbId: nil,
+            titulo: titulo,
+            ano: ano,
+            serie: serie,
+            capa: addonHist.poster(titulo: titulo, serie: serie),
+            fundo: addonHist.buscar(titulo: titulo, serie: serie)?.fundo,
+            sinopse: nil,
+            nota: nil,
+            addonOrigemId: nil
+        )
+        await abrirItemDescoberta(item)
     }
 
     /// O que uma célula precisa mostrar, venha de filme, série ou favorito.
@@ -328,6 +440,10 @@ struct VodGridView: View {
         /// Toca sem passar pela ficha: é o caso do "Continue assistindo", em
         /// que a pessoa já sabe o que quer e só quer voltar ao ponto.
         var direto = false
+        var tmdbId: Int? = nil
+        var imdbId: String? = nil
+        var capaURL: String? = nil
+        var fundoURL: String? = nil
         let abrir: () -> Void
         var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
         var id: String { (serie ? "s:" : "f:") + nomeCompleto }
@@ -767,6 +883,24 @@ struct VodGridView: View {
             estado.secao = nil
             return
         }
+        if episodio.urls.isEmpty, addons.temAtivos {
+            let meta = metadadosSerieAddon[serie.nomeCompleto]
+            let hist = addonHist.buscar(titulo: serie.nomeCompleto, serie: true)
+            AddonReproducaoEstado.shared.abrirSeletor(
+                model: model,
+                titulo: serie.titulo,
+                ano: serie.ano,
+                serie: true,
+                tmdbId: meta?.tmdbId ?? hist?.tmdbId ?? IdResolver.shared.cachedTmdbPorTitulo(serie.nomeCompleto, serie: true),
+                imdbId: meta?.imdbId ?? hist?.imdbId,
+                temporada: episodio.temporada,
+                episodio: episodio.numero,
+                poster: meta?.poster ?? hist?.poster,
+                fundo: meta?.fundo ?? hist?.fundo,
+                todosEpisodios: estado.episodios
+            )
+            return
+        }
         let chave = Progresso.chaveEpisodio(
             serie.nomeCompleto, episodio.temporada, episodio.numero)
         model.episodioPendente = EpisodioNoAr(
@@ -899,6 +1033,10 @@ struct VodGridView: View {
     }
 
     private func abrirFavorito(_ item: VodFavoritos.Item) async {
+        if !Enderecos.filmesAtivos && addons.temAtivos {
+            await abrirDescobertaDeNome(titulo: item.titulo, ano: item.ano, serie: item.serie)
+            return
+        }
         carregando = true
         defer { carregando = false }
         if item.serie {

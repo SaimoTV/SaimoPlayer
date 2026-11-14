@@ -9,6 +9,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         true
     }
 
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let primeiro = urls.first(where: { $0.scheme?.lowercased() == "stremio" }) else { return }
+        let raw = primeiro.absoluteString
+        Task { @MainActor in
+            VodEstado.shared.addonParaConfirmarURL = raw
+        }
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         Remuxer.shared.stopAll()
     }

@@ -52,8 +52,18 @@ enum SincroniaConnect {
             "em": Int(Enderecos.escolhidosEm),
             "minhas": MinhasListas.shared.listas.map { ["nome": $0.nome, "link": $0.link] },
         ]
-        return ["t": "dados", "progresso": progresso, "favTitulos": favTitulos,
-                "favCanais": favCanais, "listas": listas]
+        var saida: [String: Any] = [
+            "t": "dados",
+            "progresso": progresso,
+            "favTitulos": favTitulos,
+            "favCanais": favCanais,
+            "listas": listas,
+            "addons": AddonStore.shared.paraConnect(),
+        ]
+        if DebridStore.shared.sincronizarConnect {
+            saida["debrid"] = DebridStore.shared.paraConnect()
+        }
+        return saida
     }
 
     /// Junta o que veio do celular ao que o Mac tem.
@@ -96,6 +106,18 @@ enum SincroniaConnect {
         }
 
         if let l = j["listas"] as? [String: Any] { aplicarListas(l, model: model) }
+        aplicarAddonsSePresente(j)
+        if DebridStore.shared.sincronizarConnect,
+           let debridObj = j["debrid"] as? [String: Any] {
+            DebridStore.shared.aplicarConnect(debridObj)
+        }
+    }
+
+    /// Retrocompatibilidade: pacotes `{t:"dados"}` antigos sem `"addons"` não apagam os addons locais.
+    static func aplicarAddonsSePresente(_ j: [String: Any], store: AddonStore = .shared) {
+        if let addonsRecebidos = j["addons"] as? [[String: Any]] {
+            store.aplicarConnect(addonsRecebidos)
+        }
     }
 
     private static func aplicarListas(_ l: [String: Any], model: PlayerModel) {

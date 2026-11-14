@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.0.4</string>
+	<string>3.0.5</string>
 	<key>CFBundleVersion</key>
-	<string>3.0.4</string>
+	<string>3.0.5</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>15.0</string>
 	<key>NSAppTransportSecurity</key>
@@ -38,6 +38,17 @@
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Encontrar Chromecast e aparelhos Google TV na sua rede para transmitir os canais, e deixar o celular com o app Saimo controlar o Mac pelo Saimo Connect.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>dev.saimo.player.stremio</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>stremio</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

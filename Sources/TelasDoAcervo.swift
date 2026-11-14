@@ -12,6 +12,8 @@ struct AcoesDoAcervo {
     let abrirFavorito: (VodFavoritos.Item) -> Void
     /// Anime ou dorama: já vem com os episódios.
     let abrirColecao: (Serie, [Episodio]) -> Void
+    /// Item de catálogo dos Addons ou descoberta TMDB.
+    var abrirDescoberta: ((DescobertaItem) -> Void)? = nil
 }
 
 /// Monta os cartões das fileiras do acervo, iguais em todas as telas.
@@ -55,15 +57,37 @@ enum CartoesDoAcervo {
     }
 
     static func andamento(_ a: Progresso.Andamento, acoes: AcoesDoAcervo) -> CartaoFila {
-        CartaoFila(
+        let capaSalva = Generos.capa(a.titulo, serie: a.serie)
+            ?? AddonHistorico.shared.poster(titulo: a.titulo, serie: a.serie)
+        let fundoSalvo = AddonHistorico.shared.buscar(titulo: a.titulo, serie: a.serie)?.fundo
+        return CartaoFila(
             id: "c:" + a.chave,
             titulo: a.rotulo,
-            capa: Generos.capa(a.titulo, serie: a.serie),
+            capa: capaSalva,
             procurar: (a.titulo, a.serie),
             progresso: a.fracao,
             alvo: (a.titulo, a.serie),
+            fundo: fundoSalvo,
             remover: { Progresso.remover(a.chave) }
         ) { acoes.continuar(a) }
+    }
+
+    static func descoberta(_ item: DescobertaItem, acoes: AcoesDoAcervo) -> CartaoFila {
+        let letra = item.serie ? "s" : "f"
+        return CartaoFila(
+            id: item.id,
+            titulo: item.nomeCompleto,
+            capa: item.capa,
+            procurar: (item.nomeCompleto, item.serie),
+            progresso: item.serie ? nil : Progresso.fracao(Progresso.chaveFilme(item.nomeCompleto)),
+            alvo: (item.nomeCompleto, item.serie),
+            meta: item.ano.isEmpty ? (item.serie ? "Série" : "Filme") : item.ano,
+            sinopse: item.sinopse,
+            fundo: item.fundo,
+            favorito: favorito(titulo: item.titulo, serie: item.serie, letra: letra, ano: item.ano)
+        ) {
+            acoes.abrirDescoberta?(item)
+        }
     }
 
     static func favoritoItem(_ item: VodFavoritos.Item, acoes: AcoesDoAcervo) -> CartaoFila {
@@ -134,9 +158,12 @@ struct TelaInicio: View {
     @State private var versaoProgresso = 0
     @ObservedObject private var favoritos = VodFavoritos.shared
     @ObservedObject private var epg = EPGService.shared
+    @ObservedObject private var addons = AddonStore.shared
+    @ObservedObject private var descoberta = AddonDescobertaEstado.shared
+    @ObservedObject private var addonHist = AddonHistorico.shared
 
     var body: some View {
-        TelaEmFileiras(destaque: destaque, filas: filas, carregando: carregando)
+        TelaEmFileiras(destaque: destaque, filas: filas, carregando: carregando || (addons.temAtivos && descoberta.carregando && filas.isEmpty))
             .onAppear {
                 progressoMudou()
                 destaque.padrao(saudacao, "O que vamos assistir?",
@@ -144,6 +171,11 @@ struct TelaInicio: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .init("saimoProgressoMudou"))) { _ in
                 progressoMudou()
+            }
+            .task(id: addons.temAtivos) {
+                if addons.temAtivos {
+                    await descoberta.carregarSePreciso()
+                }
             }
     }
 
@@ -154,9 +186,10 @@ struct TelaInicio: View {
     private var filas: [Fila] {
         _ = versaoProgresso
         var out: [Fila] = []
-        // Só o que existe no acervo comum: a tela inicial abre sem código
-        // nenhum, e não pode ser por onde um título reservado aparece.
-        let andamento = Progresso.emAndamento().filter { nomesDoAcervo.contains($0.titulo) }.prefix(20)
+        // Só o que existe no acervo comum ou no histórico dos addons.
+        let andamento = Progresso.emAndamento().filter {
+            nomesDoAcervo.contains($0.titulo) || addonHist.contem(titulo: $0.titulo, serie: $0.serie)
+        }.prefix(20)
         if !andamento.isEmpty {
             out.append(Fila(titulo: "Continue assistindo",
                             cartoes: andamento.map { CartoesDoAcervo.andamento($0, acoes: acoes) }))
@@ -173,6 +206,18 @@ struct TelaInicio: View {
         for fila in filasDeDestaque {
             let cartoes = fila.itens.map { CartoesDoAcervo.destaque($0, acoes: acoes) }
             if !cartoes.isEmpty { out.append(Fila(titulo: fila.titulo, cartoes: cartoes)) }
+        }
+        if addons.temAtivos {
+            for fila in descoberta.catalogosFilas {
+                let cartoes = fila.itens.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }
+                if !cartoes.isEmpty { out.append(Fila(titulo: fila.titulo, cartoes: cartoes)) }
+            }
+            if !Enderecos.filmesAtivos {
+                for fila in descoberta.filasTMDB {
+                    let cartoes = fila.itens.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }
+                    if !cartoes.isEmpty { out.append(Fila(titulo: fila.titulo, cartoes: cartoes)) }
+                }
+            }
         }
         return out
     }
@@ -215,6 +260,9 @@ struct TelaOnDemand: View {
     @State private var destaque = DestaqueEstado()
     private var estado: VodEstado { .shared }
     @ObservedObject private var favoritos = VodFavoritos.shared
+    @ObservedObject private var addons = AddonStore.shared
+    @ObservedObject private var descoberta = AddonDescobertaEstado.shared
+    @ObservedObject private var addonHist = AddonHistorico.shared
     @State private var acervo: [Vod.Achado] = []
     @State private var colecoes: [String: [(Serie, [Episodio])]] = [:]
     @State private var carregando = true
@@ -250,6 +298,8 @@ struct TelaOnDemand: View {
             .onChange(of: favoritos.itens) { _, _ in prontas = filas }
             .onChange(of: filasDeDestaque) { _, _ in prontas = filas }
             .onChange(of: nomesDoAcervo) { _, _ in prontas = filas }
+            .onChange(of: descoberta.catalogosFilas) { _, _ in prontas = filas }
+            .onChange(of: descoberta.filasTMDB) { _, _ in prontas = filas }
             .onChange(of: cargas) { _, _ in
                 prontas = filas
                 padrao()
@@ -262,18 +312,25 @@ struct TelaOnDemand: View {
 
     private func padrao() {
         let total = contagem(tipo)
-        destaque.padrao(nome, total.map { "\($0.formatted()) títulos" } ?? "Carregando…",
+        let sub = total.map { "\($0.formatted()) títulos" }
+            ?? (addons.temAtivos ? "Catálogos dos Addons e TMDB" : "Carregando…")
+        destaque.padrao(nome, sub,
                         tipo.flatMap { Self.sobre[$0] } ?? "Filmes, séries, animes e doramas.")
     }
 
     private func carregar() async {
         carregando = true
         prontas = []
-        await Generos.carregar()
-        await InfoDosTitulos.carregar()
-        acervo = await Vod.todos()
-        if tipo == nil || tipo == .animes { colecoes["animes"] = await Vod.colecao("animes") }
-        if tipo == nil || tipo == .doramas { colecoes["doramas"] = await Vod.colecao("doramas") }
+        if Enderecos.filmesAtivos {
+            await Generos.carregar()
+            await InfoDosTitulos.carregar()
+            acervo = await Vod.todos()
+            if tipo == nil || tipo == .animes { colecoes["animes"] = await Vod.colecao("animes") }
+            if tipo == nil || tipo == .doramas { colecoes["doramas"] = await Vod.colecao("doramas") }
+        }
+        if addons.temAtivos {
+            await descoberta.carregarSePreciso()
+        }
         carregando = false
         // Montar aqui usaria a cópia da tela de quando a tarefa começou, com
         // os destaques de então; o `onChange` monta com a de agora.
@@ -305,7 +362,7 @@ struct TelaOnDemand: View {
     // MARK: Fileiras
 
     private var filas: [Fila] {
-        guard !carregando || !filasDeDestaque.isEmpty else { return [] }
+        guard !carregando || !filasDeDestaque.isEmpty || addons.temAtivos else { return [] }
         var out: [Fila] = []
         if tipo == nil { out.append(categorias(titulo: "Categorias", az: false)) }
         if let continuar = continuar { out.append(continuar) }
@@ -315,34 +372,60 @@ struct TelaOnDemand: View {
                 out.append(Fila(titulo: fila.titulo, cartoes: itens.map { CartoesDoAcervo.destaque($0, acoes: acoes) }))
             }
         }
-        if let tipo {
-            // O acervo inteiro com filtros (gênero, ano, idade, nota) logo
-            // depois da primeira fileira, sem precisar rolar a página toda.
-            let explorarFila = Fila(titulo: "Filtrar e explorar", tipo: .secao,
-                                    cartoes: [explorar(tipo, titulo: "Todos, com filtros")])
-            out.insert(explorarFila, at: min(out.count, continuar == nil ? 1 : 2))
-            let candidatos = self.candidatos(tipo)
-            let lancamentos = candidatos.filter { $0.ano >= anoAtual - 1 }.sorted { $0.ano > $1.ano }.prefix(30)
-            if lancamentos.count >= 4 {
-                out.append(Fila(titulo: "Lançamentos", cartoes: lancamentos.map(\.cartao)))
+        if Enderecos.filmesAtivos {
+            if let tipo {
+                // O acervo inteiro com filtros (gênero, ano, idade, nota) logo
+                // depois da primeira fileira, sem precisar rolar a página toda.
+                let explorarFila = Fila(titulo: "Filtrar e explorar", tipo: .secao,
+                                        cartoes: [explorar(tipo, titulo: "Todos, com filtros")])
+                out.insert(explorarFila, at: min(out.count, continuar == nil ? 1 : 2))
+                let candidatos = self.candidatos(tipo)
+                let lancamentos = candidatos.filter { $0.ano >= anoAtual - 1 }.sorted { $0.ano > $1.ano }.prefix(30)
+                if lancamentos.count >= 4 {
+                    out.append(Fila(titulo: "Lançamentos", cartoes: lancamentos.map(\.cartao)))
+                }
+                let generos = Generos.todos.sorted { posicao($0) < posicao($1) }
+                for genero in generos {
+                    let doGenero = candidatos.filter { $0.generos.contains(genero) }.sorted { $0.ano > $1.ano }.prefix(25)
+                    guard doGenero.count >= 6 else { continue }
+                    out.append(Fila(titulo: genero, cartoes: doGenero.map(\.cartao) + [verTodos(tipo, genero)]))
+                }
+            } else {
+                let filmes = candidatos(.filmes)
+                for genero in Self.generosOnDemand where Generos.todos.contains(genero) {
+                    let doGenero = filmes.filter { $0.generos.contains(genero) }.sorted { $0.ano > $1.ano }.prefix(25)
+                    guard doGenero.count >= 6 else { continue }
+                    out.append(Fila(titulo: "Filmes de \(genero.lowercased())",
+                                    cartoes: doGenero.map(\.cartao) + [verTodos(.filmes, genero)]))
+                }
+                out.append(categorias(titulo: "Explorar", az: true))
             }
-            let generos = Generos.todos.sorted { posicao($0) < posicao($1) }
-            for genero in generos {
-                let doGenero = candidatos.filter { $0.generos.contains(genero) }.sorted { $0.ano > $1.ano }.prefix(25)
-                guard doGenero.count >= 6 else { continue }
-                out.append(Fila(titulo: genero, cartoes: doGenero.map(\.cartao) + [verTodos(tipo, genero)]))
+        }
+        if addons.temAtivos {
+            for f in filasDescobertaFiltradas(descoberta.catalogosFilas) {
+                out.append(Fila(titulo: f.titulo, cartoes: f.itens.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }))
             }
-        } else {
-            let filmes = candidatos(.filmes)
-            for genero in Self.generosOnDemand where Generos.todos.contains(genero) {
-                let doGenero = filmes.filter { $0.generos.contains(genero) }.sorted { $0.ano > $1.ano }.prefix(25)
-                guard doGenero.count >= 6 else { continue }
-                out.append(Fila(titulo: "Filmes de \(genero.lowercased())",
-                                cartoes: doGenero.map(\.cartao) + [verTodos(.filmes, genero)]))
+            if !Enderecos.filmesAtivos {
+                for f in filasDescobertaFiltradas(descoberta.filasTMDB) {
+                    out.append(Fila(titulo: f.titulo, cartoes: f.itens.map { CartoesDoAcervo.descoberta($0, acoes: acoes) }))
+                }
             }
-            out.append(categorias(titulo: "Explorar", az: true))
         }
         return out
+    }
+
+    private func filasDescobertaFiltradas(_ lista: [AddonDescobertaFila]) -> [AddonDescobertaFila] {
+        guard let tipo else { return lista }
+        let alvoTipo = (tipo == .filmes) ? "movie" : "series"
+        let filtradas = lista.filter { $0.tipo == alvoTipo || $0.tipo == "all" }
+        if tipo == .animes {
+            return filtradas.sorted { a, b in
+                let aAnime = a.titulo.lowercased().contains("anime") || a.titulo.lowercased().contains("anima")
+                let bAnime = b.titulo.lowercased().contains("anime") || b.titulo.lowercased().contains("anima")
+                return aAnime && !bAnime
+            }
+        }
+        return filtradas
     }
 
     private var anoAtual: Int { Calendar.current.component(.year, from: Date()) }
@@ -381,7 +464,7 @@ struct TelaOnDemand: View {
 
     private var continuar: Fila? {
         let itens = Progresso.emAndamento().filter { a in
-            guard nomesDoAcervo.contains(a.titulo) else { return false }
+            guard nomesDoAcervo.contains(a.titulo) || addonHist.contem(titulo: a.titulo, serie: a.serie) else { return false }
             switch tipo {
             case nil: return true
             case .filmes: return !a.serie
@@ -429,7 +512,15 @@ struct TelaOnDemand: View {
         let letra = letraDe(secao)
         let emAlta = filasDeDestaque.flatMap(\.itens).filter { $0.tipo == letra && !$0.capa.isEmpty }
         var vistas = Set<String>()
-        let colagem = emAlta.map(\.capa).filter { vistas.insert($0).inserted }.prefix(4)
+        var colagem = Array(emAlta.map(\.capa).filter { vistas.insert($0).inserted }.prefix(4))
+        if colagem.isEmpty && addons.temAtivos {
+            let alvoSerie = secao != .filmes
+            let descobertaCapas = (descoberta.catalogosFilas + descoberta.filasTMDB)
+                .flatMap(\.itens)
+                .filter { $0.serie == alvoSerie }
+                .compactMap(\.capa)
+            colagem = Array(descobertaCapas.filter { vistas.insert($0).inserted }.prefix(4))
+        }
         let primeiro = emAlta.first
         let quantos = contagem(secao).map { "\($0.formatted()) títulos" }
         let (icone, cor): (String, Color) = {

@@ -45,6 +45,7 @@ struct Ficha: Sendable {
     var temporadas: Int?
     /// A logo do título (PNG transparente), em português quando há.
     var logo: String?
+    var tmdbId: Int? = nil
 
     var vazia: Bool {
         sinopse.isEmpty && elenco.isEmpty && generos.isEmpty && duracao == nil
@@ -60,6 +61,31 @@ enum Fichas {
 
     /// Uma ficha por título aberto, guardada enquanto o app viver.
     private static var guardadas: [String: Ficha] = [:]
+
+    static func porTmdb(id: Int, serie: Bool) async -> Ficha? {
+        let chaveCache = "tmdb:\(serie ? "s" : "f"):\(id)"
+        if let pronta = guardadas[chaveCache] { return pronta }
+        guard var ficha = await baixar(id: id, serie: serie) else { return nil }
+        ficha.tmdbId = id
+        guardadas[chaveCache] = ficha
+        return ficha
+    }
+
+    static func temporadaTMDB(id: Int, numero: Int) async -> [Int: EpisodioTMDB] {
+        await buscarTemporadaTMDB(id: id, numero: numero)
+    }
+
+    static func temporadasDaSerie(tmdbId: Int) async -> [(numero: Int, episodeCount: Int)] {
+        guard let json = await pedir("\(base)/tv/\(tmdbId)?api_key=\(chave)&language=pt-BR"),
+              let seasons = json["seasons"] as? [[String: Any]] else {
+            return []
+        }
+        return seasons.compactMap { s in
+            guard let num = s["season_number"] as? Int, num > 0,
+                  let count = s["episode_count"] as? Int, count > 0 else { return nil }
+            return (num, count)
+        }.sorted { $0.numero < $1.numero }
+    }
     private static var emVoo: Set<String> = []
 
     /// A ficha de um título, pelo nome do acervo. Nula enquanto não chega.
@@ -67,10 +93,20 @@ enum Fichas {
         let marca = (serie ? "s:" : "f:") + titulo
         if let pronta = guardadas[marca] { return pronta }
         guard !emVoo.contains(marca) else { return nil }
-        guard let id = Generos.id(titulo, serie: serie) else { return nil }
         emVoo.insert(marca)
         defer { emVoo.remove(marca) }
-        guard let ficha = await baixar(id: id, serie: serie) else { return nil }
+        var id = Generos.id(titulo, serie: serie)
+        if id == nil, AddonStore.shared.temAtivos {
+            id = IdResolver.shared.cachedTmdbPorTitulo(titulo, serie: serie)
+                ?? AddonHistorico.shared.tmdbId(titulo: titulo, serie: serie)
+            if id == nil {
+                id = await IdResolver.shared.buscarTmdbPorTitulo(titulo, ano: nil, serie: serie)
+            }
+            if let achado = id { IdResolver.shared.registrarTitulo(titulo, tmdbId: achado, serie: serie) }
+        }
+        guard let id else { return nil }
+        guard var ficha = await baixar(id: id, serie: serie) else { return nil }
+        ficha.tmdbId = id
         guardadas[marca] = ficha
         return ficha
     }
@@ -276,7 +312,16 @@ enum Fichas {
     /// Os episódios de uma temporada pelo número, para o painel de episódios.
     /// Vazio quando a série não tem id do TMDB ou o pedido falhou.
     static func temporada(_ serie: String, _ numero: Int) async -> [Int: EpisodioTMDB] {
-        guard let id = Generos.id(serie, serie: true) else { return [:] }
+        var resolved = Generos.id(serie, serie: true)
+        if resolved == nil, AddonStore.shared.temAtivos {
+            resolved = IdResolver.shared.cachedTmdbPorTitulo(serie, serie: true)
+                ?? AddonHistorico.shared.tmdbId(titulo: serie, serie: true)
+            if resolved == nil {
+                resolved = await IdResolver.shared.buscarTmdbPorTitulo(serie, ano: nil, serie: true)
+            }
+            if let achado = resolved { IdResolver.shared.registrarTitulo(serie, tmdbId: achado, serie: true) }
+        }
+        guard let id = resolved else { return [:] }
         // No TMDB, Bleach (30984) reúne a fase clássica inteira (eps 1–366) na
         // temporada 1 e a Guerra Sangrenta dos Mil Anos na temporada 2.
         let numTMDB = (id == 30984) ? (numero == 17 ? 2 : 1) : numero

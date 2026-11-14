@@ -979,6 +979,26 @@ final class ServidorConnect: @unchecked Sendable {
             responder(c, 200, "OK", tipo: "application/json; charset=utf-8", corpo: dados)
             return
         }
+        if metodo == "GET", alvo == "/addons" || alvo.hasPrefix("/addons?") {
+            responder(c, 200, "OK", tipo: "text/html; charset=utf-8", corpo: ConnectAddonsWeb.paginaHTML(), semCache: true)
+            return
+        }
+        if metodo == "GET", alvo == "/api/addons" || alvo.hasPrefix("/api/addons?") {
+            responder(c, 200, "OK", tipo: "application/json; charset=utf-8", corpo: ConnectAddonsWeb.estadoJSON(), semCache: true)
+            return
+        }
+        if metodo == "POST", alvo == "/addons" || alvo.hasPrefix("/addons?") {
+            let tamanho = min(Int(campo("Content-Length") ?? "0") ?? 0, 64 * 1024)
+            var corpo = sobra
+            while corpo.count < tamanho {
+                let n = recv(c, &pedaco, pedaco.count, 0)
+                if n <= 0 { break }
+                corpo.append(contentsOf: pedaco[0..<n])
+            }
+            let r = ConnectAddonsWeb.processarPost(corpo: Data(corpo))
+            responder(c, r.codigo, r.motivo, tipo: "application/json; charset=utf-8", corpo: r.dados, semCache: true)
+            return
+        }
         if metodo == "GET", alvo.hasPrefix("/hls") {
             let r = ConnectHls.responder(alvo: alvo, cabecalho: cabecalho)
             responder(c, r.codigo, r.codigo == 200 ? "OK" : r.codigo == 400 ? "Bad Request" : "Bad Gateway",

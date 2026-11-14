@@ -9,15 +9,16 @@ struct SemListaView: View {
     let secao: SecaoSemLista
     var compacto: Bool = false
     @ObservedObject private var minhas = MinhasListas.shared
+    @ObservedObject private var addons = AddonStore.shared
 
-    /// Já há alguma lista (do Saimo ou da pessoa): o vazio é falha de carga, não falta de lista.
+    /// Já há alguma lista (do Saimo ou da pessoa) ou addon ativo: o vazio é falha de carga, não falta de configuração.
     private var temAlgumaLista: Bool {
-        Enderecos.canaisAtivos || Enderecos.filmesAtivos || !minhas.listas.isEmpty
+        Enderecos.canaisAtivos || Enderecos.filmesAtivos || !minhas.listas.isEmpty || addons.temAtivos
     }
 
     private var textoDeAjuda: String {
         if !temAlgumaLista {
-            return "Bem-vindo ao Saimo! Para começar, adicione uma lista M3U (só o link já basta), uma lista com usuário e senha ou o endereço de uma lista do Saimo."
+            return "Bem-vindo ao Saimo! Para começar, adicione uma lista M3U (só o link já basta), uma lista com usuário e senha, o endereço de uma lista do Saimo ou um addon HTTP Stremio."
         }
         return secao == .canais
             ? "Verifique a sua conexão com a internet ou adicione listas em Ajustes."
@@ -48,6 +49,10 @@ struct SemListaView: View {
                         .buttonStyle(.borderedProminent)
                         Button { VodEstado.shared.secao = .ajustes } label: {
                             Label("Endereços do Saimo", systemImage: "gearshape").font(.system(size: 13))
+                        }
+                        .buttonStyle(.bordered)
+                        Button { VodEstado.shared.mostrarAddons = true } label: {
+                            Label("Addons e Debrid", systemImage: "puzzlepiece.extension").font(.system(size: 13))
                         }
                         .buttonStyle(.bordered)
                     }

@@ -7,6 +7,10 @@ struct FichaAlvo: Identifiable, Equatable {
     let ano: String
     let letra: String
     let reservado: Bool
+    var tmdbId: Int? = nil
+    var imdbId: String? = nil
+    var capaURL: URL? = nil
+    var fundoURL: URL? = nil
     var id: String { (serie ? "s:" : "f:") + titulo + "|" + ano }
     var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
 }
@@ -27,6 +31,7 @@ struct FichaTela: View {
     let fechar: () -> Void
     /// Abre a ficha de outro título — vindo da filmografia de um ator.
     let abrirTitulo: (Vod.Achado) -> Void
+    var abrirComAddons: (() -> Void)? = nil
 
     @ObservedObject private var favoritos = VodFavoritos.shared
     @State private var ficha: Ficha?
@@ -49,7 +54,7 @@ struct FichaTela: View {
         .task(id: alvo.id) {
             ficha = nil
             carregando = true
-            ficha = await Fichas.de(alvo.titulo, serie: alvo.serie)
+            ficha = await Self.carregarFicha(alvo: alvo)
             carregando = false
             // O índice para a filmografia fica pronto enquanto se lê a ficha.
             if !(ficha?.elenco.isEmpty ?? true) { await Fichas.aquecer() }
@@ -214,6 +219,17 @@ struct FichaTela: View {
             .buttonStyle(CresceNoFoco())
             .keyboardShortcut(.defaultAction)
 
+            if let abrirComAddons {
+                Button(action: abrirComAddons) {
+                    Label("Addons", systemImage: "puzzlepiece.extension")
+                        .font(.system(size: 14, weight: .semibold))
+                        .padding(.horizontal, 16).padding(.vertical, 11)
+                        .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 9))
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(CresceNoFoco())
+            }
+
             Button { favoritos.alternar(item) } label: {
                 Label(marcado ? "Nos favoritos" : "Favoritar",
                       systemImage: marcado ? "star.fill" : "star")
@@ -260,6 +276,51 @@ struct FichaTela: View {
 /// Em cima, numa faixa, quem ela é: a foto, de onde é, a biografia. Embaixo,
 /// as capas do que dá para assistir daqui — e só isso: a filmografia inteira
 /// do TMDB, com setenta títulos que não abrem, seria uma lista que frustra.
+private extension FichaTela {
+    static func carregarFicha(alvo: FichaAlvo) async -> Ficha? {
+        if let tmdb = alvo.tmdbId, let direta = await Fichas.porTmdb(id: tmdb, serie: alvo.serie) {
+            return direta
+        }
+        if let imdb = alvo.imdbId,
+           let resolvido = await IdResolver.shared.tmdbPara(imdbId: imdb, serieHint: alvo.serie),
+           let direta = await Fichas.porTmdb(id: resolvido.tmdbId, serie: resolvido.serie) {
+            return direta
+        }
+        if let padrao = await Fichas.de(alvo.titulo, serie: alvo.serie) {
+            return padrao
+        }
+        if AddonStore.shared.temAtivos {
+            let sid = alvo.imdbId ?? alvo.tmdbId.map { "tmdb:\($0)" }
+            if let sid,
+               let meta = await SaimoAddonCoordinator.shared.buscarMeta(
+                   addons: AddonStore.shared.ativos,
+                   tipo: alvo.serie ? "series" : "movie",
+                   id: sid
+               ) {
+                return Ficha(
+                    titulo: meta.name,
+                    sinopse: meta.description ?? "",
+                    nota: meta.imdbRating.flatMap(Double.init) ?? 0,
+                    ano: meta.releaseInfo ?? alvo.ano,
+                    generos: meta.genres ?? [],
+                    assinatura: meta.director?.joined(separator: ", ") ?? "",
+                    capa: meta.poster ?? alvo.capaURL?.absoluteString,
+                    fundo: meta.background ?? alvo.fundoURL?.absoluteString ?? meta.poster
+                )
+            }
+            if alvo.capaURL != nil || alvo.fundoURL != nil {
+                return Ficha(
+                    titulo: alvo.titulo,
+                    ano: alvo.ano,
+                    capa: alvo.capaURL?.absoluteString,
+                    fundo: alvo.fundoURL?.absoluteString ?? alvo.capaURL?.absoluteString
+                )
+            }
+        }
+        return nil
+    }
+}
+
 struct AtorTela: View {
     let pessoa: Ficha.Pessoa
     let voltar: () -> Void
