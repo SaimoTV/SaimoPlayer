@@ -331,7 +331,9 @@ struct FileiraView: View {
                                         .overlay(Circle().stroke(.white.opacity(0.35), lineWidth: 1))
                                 }
                                 .buttonStyle(.plain)
+                                .contentShape(Circle())
                                 .padding(6)
+                                .zIndex(2)
                                 .help("Remover de Continue assistindo")
                             }
                         }

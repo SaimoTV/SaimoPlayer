@@ -131,16 +131,28 @@ struct TelaInicio: View {
     let carregando: Bool
 
     @State private var destaque = DestaqueEstado()
+    @State private var versaoProgresso = 0
     @ObservedObject private var favoritos = VodFavoritos.shared
     @ObservedObject private var epg = EPGService.shared
 
     var body: some View {
         TelaEmFileiras(destaque: destaque, filas: filas, carregando: carregando)
-            .onAppear { destaque.padrao(saudacao, "O que vamos assistir?",
-                                        "Passe o mouse num título para ver do que se trata; clique para abrir. Botão direito favorita.") }
+            .onAppear {
+                progressoMudou()
+                destaque.padrao(saudacao, "O que vamos assistir?",
+                                "Passe o mouse num título para ver do que se trata; clique para abrir. Botão direito favorita.")
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .init("saimoProgressoMudou"))) { _ in
+                progressoMudou()
+            }
+    }
+
+    private func progressoMudou() {
+        versaoProgresso &+= 1
     }
 
     private var filas: [Fila] {
+        _ = versaoProgresso
         var out: [Fila] = []
         // Só o que existe no acervo comum: a tela inicial abre sem código
         // nenhum, e não pode ser por onde um título reservado aparece.
