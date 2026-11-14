@@ -77,22 +77,29 @@ enum Eventos {
     }
 
     /// O canal pelo fim do endereço do player ("…/premiere-fc" é o Premiere FC).
-    static func canalDo(_ url: String, _ canais: [Channel]) -> Channel? {
-        let fim = url.split(separator: "/", omittingEmptySubsequences: false).last.map(String.init) ?? ""
-        let slug = fim.lowercased().replacingOccurrences(of: "-", with: "").replacingOccurrences(of: " ", with: "")
-        guard !slug.isEmpty else { return nil }
-        func chave(_ c: Channel) -> String { c.name.lowercased().replacingOccurrences(of: " ", with: "") }
-        return canais.first { chave($0) == slug } ?? canais.first { chave($0).contains(slug) }
+    private static func limparNomeCanal(_ texto: String) -> String {
+        let semAcento = texto.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current).lowercased()
+        let partes = semAcento.components(separatedBy: CharacterSet.alphanumerics.inverted)
+        let ignorar: Set<String> = ["fhd", "uhd", "4k", "hd", "sd", "h265", "hevc", "br", "pt", "tv", ""]
+        return partes.filter { !ignorar.contains($0) }.joined()
     }
 
-    /// A agenda do Saimo: só jogos cujo canal existe na nossa lista.
+    static func canalDo(_ url: String, _ canais: [Channel]) -> Channel? {
+        let fim = url.split(separator: "/", omittingEmptySubsequences: false).last.map(String.init) ?? ""
+        let slug = limparNomeCanal(fim)
+        guard !slug.isEmpty else { return nil }
+        return canais.first { limparNomeCanal($0.name) == slug }
+            ?? canais.first { limparNomeCanal($0.name).contains(slug) }
+    }
+
+    /// A agenda do Saimo: todos os jogos, vinculando ao canal quando encontrado.
     private static func lerAgenda(_ dados: Data, _ canais: [Channel]) -> [Jogo] {
         guard let lista = (try? JSONSerialization.jsonObject(with: dados)) as? [[String: Any]] else { return [] }
         var vistos = Set<String>()
         var jogos: [Jogo] = []
         for o in lista {
             // Jogo com dados faltando fica de fora.
-            let canal = (o["players"] as? [String])?.first.flatMap { canalDo($0, canais) }
+            let canal = (o["players"] as? [String])?.lazy.compactMap { canalDo($0, canais) }.first
             guard let times = o["teams"] as? [String: Any],
                   let casa = times["home"] as? [String: Any], let fora = times["away"] as? [String: Any],
                   let nomeCasa = casa["name"] as? String, let nomeFora = fora["name"] as? String,
