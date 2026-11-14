@@ -43,6 +43,8 @@ struct CartaoFila: Identifiable {
     var logoLiga: String? = nil
     /// Estrela no canto: favoritar sem abrir.
     var favorito: (marcado: Bool, alternar: () -> Void)? = nil
+    /// Botão no canto: remover de "Continue assistindo".
+    var remover: (() -> Void)? = nil
     /// Menu do botão direito (tirar do "continue assistindo"...).
     var menu: [(String, () -> Void)] = []
     let acao: () -> Void
@@ -299,21 +301,40 @@ struct FileiraView: View {
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 18) {
                     ForEach(fila.cartoes) { cartao in
-                        Button(action: cartao.acao) {
-                            CartaoView(cartao: cartao, tipo: fila.tipo, largura: largura)
-                        }
-                        .buttonStyle(CartaoEmFoco(raio: fila.tipo == .capa ? 10 : 14))
-                        .onHover { if $0 { destaque.mostrar(cartao) } }
-                        .contextMenu {
-                            if let favorito = cartao.favorito {
-                                Button(favorito.marcado ? "Remover dos favoritos" : "Favoritar",
-                                       action: favorito.alternar)
+                        ZStack(alignment: .topTrailing) {
+                            Button(action: cartao.acao) {
+                                CartaoView(cartao: cartao, tipo: fila.tipo, largura: largura)
                             }
-                            ForEach(Array(cartao.menu.enumerated()), id: \.offset) { _, item in
-                                Button(item.0, action: item.1)
+                            .buttonStyle(CartaoEmFoco(raio: fila.tipo == .capa ? 10 : 14))
+                            .onHover { if $0 { destaque.mostrar(cartao) } }
+                            .contextMenu {
+                                if let remover = cartao.remover {
+                                    Button("Remover de Continue assistindo", role: .destructive, action: remover)
+                                }
+                                if let favorito = cartao.favorito {
+                                    Button(favorito.marcado ? "Remover dos favoritos" : "Favoritar",
+                                           action: favorito.alternar)
+                                }
+                                ForEach(Array(cartao.menu.enumerated()), id: \.offset) { _, item in
+                                    Button(item.0, action: item.1)
+                                }
+                            }
+                            .help(cartao.titulo)
+
+                            if let remover = cartao.remover {
+                                Button(action: remover) {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .padding(6)
+                                        .background(.black.opacity(0.78), in: Circle())
+                                        .overlay(Circle().stroke(.white.opacity(0.35), lineWidth: 1))
+                                }
+                                .buttonStyle(.plain)
+                                .padding(6)
+                                .help("Remover de Continue assistindo")
                             }
                         }
-                        .help(cartao.titulo)
                         .id(cartao.id)
                     }
                 }

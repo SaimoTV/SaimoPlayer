@@ -49,6 +49,18 @@ enum Progresso {
         defaults.synchronize()
     }
 
+    /// Remove um título da fileira "Continue assistindo".
+    static func remover(_ chave: String) {
+        guard !chave.isEmpty else { return }
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: chaveBase + chave)
+        defaults.removeObject(forKey: chaveBase + chave + "|d")
+        defaults.removeObject(forKey: chaveBase + chave + "|t")
+        defaults.synchronize()
+        NotificationCenter.default.post(name: .init("saimoProgressoMudou"), object: nil)
+        Task { @MainActor in SaimoConnect.shared.avisarDados(atraso: 5) }
+    }
+
     /// Posição guardada, ou zero.
     static func posicao(_ chave: String) -> Double {
         UserDefaults.standard.double(forKey: chaveBase + chave)

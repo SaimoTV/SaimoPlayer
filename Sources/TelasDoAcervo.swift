@@ -61,7 +61,8 @@ enum CartoesDoAcervo {
             capa: Generos.capa(a.titulo, serie: a.serie),
             procurar: (a.titulo, a.serie),
             progresso: a.fracao,
-            alvo: (a.titulo, a.serie)
+            alvo: (a.titulo, a.serie),
+            remover: { Progresso.remover(a.chave) }
         ) { acoes.continuar(a) }
     }
 
@@ -240,6 +241,9 @@ struct TelaOnDemand: View {
             .onChange(of: cargas) { _, _ in
                 prontas = filas
                 padrao()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .init("saimoProgressoMudou"))) { _ in
+                prontas = filas
             }
             .task(id: tipo) { await carregar() }
     }
