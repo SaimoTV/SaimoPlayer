@@ -269,7 +269,7 @@ enum Vod {
                     separator: "\t", omittingEmptySubsequences: false)
                 let titulo = identidade.first.map(String.init) ?? ""
                 let ano = identidade.count > 1 ? String(identidade[1]) : ""
-                dentro = titulo == serie.titulo && ano == serie.ano
+                dentro = titulo == serie.titulo && (ano == serie.ano || ano.isEmpty || serie.ano.isEmpty)
                 continue
             }
             guard dentro else { continue }
