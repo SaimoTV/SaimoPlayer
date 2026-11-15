@@ -29,6 +29,15 @@ swiftc \
   -o "$APP/Contents/MacOS/SaimoTV" \
   Sources/*.swift
 
+# Motor de torrent (SaimoTorrent, Rust): toca fonte de addon sem Debrid.
+MOTOR="${SAIMO_TORRENT_DIR:-../SaimoTorrent}/target/aarch64-apple-darwin/release/saimo-torrent"
+[ -x "$MOTOR" ] || MOTOR="${SAIMO_TORRENT_DIR:-../SaimoTorrent}/target/release/saimo-torrent"
+if [ -x "$MOTOR" ]; then
+  cp "$MOTOR" "$APP/Contents/MacOS/saimo-torrent"
+else
+  echo "aviso: motor de torrent não encontrado (cargo build --release em ../SaimoTorrent)" >&2
+fi
+
 codesign --force --sign - --identifier dev.saimo.player "$APP" >/dev/null 2>&1 || true
 
 echo "built: $APP"

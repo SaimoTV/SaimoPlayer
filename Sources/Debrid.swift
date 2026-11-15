@@ -296,11 +296,15 @@ enum DebridResolver {
             throw DebridErro.respostaInvalida("Stream", "Este stream não possui URL nem infoHash torrent.")
         }
 
-        guard !ativos.isEmpty else {
+        let magnet = DebridUtils.montarMagnet(infoHash: infoHash, sources: stream.sources, titulo: nomeTitulo ?? stream.behaviorHints?.filename)
+
+        // Sem Debrid: toca pelo motor de torrent embutido, como o Stremio.
+        if ativos.isEmpty {
+            if await MotorTorrent.shared.disponivel {
+                return try await MotorTorrent.shared.endereco(infoHash: infoHash, fileIdx: stream.fileIdx, magnet: magnet)
+            }
             throw DebridErro.nenhumConfigurado
         }
-
-        let magnet = DebridUtils.montarMagnet(infoHash: infoHash, sources: stream.sources, titulo: nomeTitulo ?? stream.behaviorHints?.filename)
         var ultimoErro: Error?
 
         for (provedor, apiKey) in ativos {

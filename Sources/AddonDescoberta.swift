@@ -544,7 +544,7 @@ final class AddonReproducaoEstado: ObservableObject {
             return
         }
 
-        if stream.ehTorrent && !DebridStore.shared.temAlgumAtivo {
+        if stream.ehTorrent && !DebridStore.shared.temAlgumAtivo && !MotorTorrent.shared.disponivel {
             precisaConfigurarDebrid = true
             mensagemErro = DebridErro.nenhumConfigurado.localizedDescription
             return

@@ -595,6 +595,7 @@ final class PlayerModel: NSObject, ObservableObject {
         marcas = nil
         zerarLegendasExternas()
         proximoDesde = nil
+        if MotorTorrent.ehEnderecoDoMotor(fonteDoArquivoNoAr) { MotorTorrent.shared.limpar() }
         playingFile = nil
         chaveArquivo = ""
         duration = 0
@@ -640,7 +641,9 @@ final class PlayerModel: NSObject, ObservableObject {
 
     private func limparArquivo() {
         guardarProgresso(forcado: true)
+        let eraTorrent = MotorTorrent.ehEnderecoDoMotor(fonteDoArquivoNoAr)
         stop()
+        if eraTorrent { MotorTorrent.shared.limpar() }
         playingFile = nil
         playingFileName = ""
         playingFileDetail = ""
