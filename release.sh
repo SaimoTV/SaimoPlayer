@@ -203,7 +203,7 @@ echo "==> publicando v$versao"
 # Com mais de uma conta no gh, o release sai pela conta dona do repositório.
 REPO_DOWNLOADS="${SAIMO_REPO_DOWNLOADS:-SaimoTV/saimo-downloads}"
 export GH_TOKEN="${GH_TOKEN:-$(gh auth token -u "${REPO_DOWNLOADS%%/*}" 2>/dev/null || true)}"
-[ -n "$GH_TOKEN" ] || { echo "gh sem login na conta ${REPO_DOWNLOADS%%/*} (gh auth login)" >&2; exit 1; }
+[ -n "$GH_TOKEN" ] || [ "${SAIMO_SO_MONTAR:-0}" = "1" ] || { echo "gh sem login na conta ${REPO_DOWNLOADS%%/*} (gh auth login)" >&2; exit 1; }
 
 # O que os apps leem para saber que há versão nova e de onde baixar.
 python3 - "$versao" "$REPO_DOWNLOADS" "$notas" <<'PY'
@@ -232,6 +232,15 @@ doc = {"versao": versao, "tag": f"v{versao}",
        "arquivos": {k: v for k, v in arquivos.items() if v}}
 (pasta / "versao.json").write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 PY
+
+# SAIMO_SO_MONTAR=1: monta tudo e o versao.json, mas não publica. Mostra o
+# comando para publicar depois (por exemplo, quando outra pessoa publica).
+if [ "${SAIMO_SO_MONTAR:-0}" = "1" ]; then
+  echo "==> montado em build/release (não publicado). Para publicar:"
+  echo "    cd \"$PWD\" && gh release create v$versao --repo $REPO_DOWNLOADS --title \"Saimo TV $versao\" --notes-file $notas \\"
+  echo "      $(cd build/release && ls SaimoTV.dmg SaimoTV.apk SaimoTV-Windows.zip versao.json SaimoTV-Samsung.wgt SaimoTV-LG.ipk SaimoTV-Roku.zip SaimoTV-Linux-* SaimoCell.apk 2>/dev/null | sed 's#^#build/release/#' | tr '\n' ' ')"
+  exit 0
+fi
 
 gh release create "v$versao" --repo "$REPO_DOWNLOADS" \
   --title "Saimo TV $versao" \
