@@ -253,8 +253,8 @@ if [ "${SAIMO_PUBLICAR_ENDERECO_ANTIGO:-0}" = "1" ] && [ -z "${extra:-}" ] && [ 
   COPIA_AGENDADA="$HOME/Library/Application Support/SaimoTV/SaimoCatalogos"
   [ -d "$COPIA_AGENDADA" ] && cp build/release/versao.json "$COPIA_AGENDADA/versao.json"
   ( cd ../SaimoCatalogos && bash scripts/montar_publico.sh canais >/dev/null \
-    && XDG_CONFIG_HOME="${SAIMO_CF_CONFIG:-$HOME/Library/Application Support/SaimoTV/wrangler-novo}" \
-       CLOUDFLARE_ACCOUNT_ID="${SAIMO_CF_CONTA:-e074091e48d179d86d956620fc8fa5f6}" \
+    && XDG_CONFIG_HOME="${SAIMO_CF_CONFIG:-$HOME/Library/Application Support/SaimoTV/wrangler-97}" \
+       CLOUDFLARE_ACCOUNT_ID="${SAIMO_CF_CONTA:-968be6f37516925498f07fe527c0f42d}" \
        npx wrangler pages deploy publico/canais --project-name canais-saimo --branch main --commit-dirty=true >/dev/null )
 fi
 
