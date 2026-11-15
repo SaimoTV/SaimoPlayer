@@ -359,6 +359,9 @@ final class PlayerModel: NSObject, ObservableObject {
     private func precisaRemuxDaFonte(_ origem: URL, indice: Int) -> Bool {
         let explicitRemux = fileSourceRemux.indices.contains(indice) && fileSourceRemux[indice]
         if explicitRemux { return true }
+        // Torrent pelo motor: o endereço não tem extensão e quase todo torrent
+        // é MKV, que o AVPlayer não abre. Vai sempre pelo ffmpeg (sem recodificar).
+        if MotorTorrent.ehEnderecoDoMotor(origem) { return true }
         let ext = origem.pathExtension.lowercased()
         let low = origem.absoluteString.lowercased()
         if ["mkv", "avi", "webm", "flv", "wmv", "ts", "m2t", "mpd"].contains(ext) { return true }

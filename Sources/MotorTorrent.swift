@@ -96,7 +96,7 @@ final class MotorTorrent {
         URLSession.shared.dataTask(with: url).resume()
     }
 
-    static func ehEnderecoDoMotor(_ url: URL?) -> Bool {
+    nonisolated static func ehEnderecoDoMotor(_ url: URL?) -> Bool {
         url?.host == "127.0.0.1" && url?.path == "/tocar"
     }
 }
