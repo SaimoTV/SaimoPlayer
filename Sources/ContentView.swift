@@ -182,6 +182,10 @@ struct ContentView: View {
                 .background(Color.black)
                 .ignoresSafeArea()
 
+            // Carregando: o logo do canal (ou do Saimo) enchendo de cor no meio do vídeo.
+            LogoAoAbrir(model: model)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+
             // O véu de baixo e o de cima deixam o vidro e o texto legíveis
             // sobre qualquer imagem, sem caixa preta.
             VStack(spacing: 0) {
