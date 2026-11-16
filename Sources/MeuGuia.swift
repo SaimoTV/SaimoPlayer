@@ -36,13 +36,25 @@ enum MeuGuia {
     private static let timeZone = TimeZone(identifier: "America/Sao_Paulo") ?? .current
 
     static func fetch(wanted: [(id: UUID, name: String)],
-                      from: Date, to: Date) async -> [UUID: [Programme]] {
-        let targets = wanted.compactMap { entry -> (UUID, String)? in
+                      from: Date, to: Date,
+                      central: [String: [Programme]]? = nil) async -> [UUID: [Programme]] {
+        var targets = wanted.compactMap { entry -> (UUID, String)? in
             let key = XMLTVParser.normalise(entry.name)
             guard let code = codes[entry.name] ?? codes[key] else { return nil }
             return (entry.id, code)
         }
         guard !targets.isEmpty else { return [:] }
+
+        // O que já está no guia central não é baixado.
+        var doCentral: [UUID: [Programme]] = [:]
+        if let central {
+            targets = targets.filter { id, code in
+                guard let lista = central[code] else { return true }
+                doCentral[id] = lista
+                return false
+            }
+            if targets.isEmpty { return doCentral }
+        }
 
         let config = URLSessionConfiguration.ephemeral
         config.timeoutIntervalForRequest = 25
@@ -70,7 +82,7 @@ enum MeuGuia {
                 out[id] = programmes
             }
         }
-        return out
+        return out.merging(doCentral) { atual, _ in atual }
     }
 
     /// The page is a flat list of `<li>` items: day headers followed by their

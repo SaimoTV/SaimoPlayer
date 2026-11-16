@@ -232,12 +232,14 @@ final class EPGService: ObservableObject {
 
                 // guiadetv.com vem primeiro: cobre 121+ canais com horários precisos
                 // no fuso de Brasília, sem 429 e com sinopse em 99,8% dos programas.
-                var merged = await GuiaDeTv.fetch(wanted: wanted, from: from, to: to)
+                // Guia central (um arquivo, montado no servidor): o que estiver nele não é baixado.
+                let central = await GuiaCentral.carregar(from: from, to: to)
+                var merged = await GuiaDeTv.fetch(wanted: wanted, from: from, to: to, central: central?.guiadetv)
 
                 // meuguia.tv entra como reserva para os canais que o guiadetv não lista (ex: Canal Brasil)
                 let faltandoMeuGuia = wanted.filter { merged[$0.id] == nil }
                 if !faltandoMeuGuia.isEmpty {
-                    for (id, programmes) in await MeuGuia.fetch(wanted: faltandoMeuGuia, from: from, to: to) {
+                    for (id, programmes) in await MeuGuia.fetch(wanted: faltandoMeuGuia, from: from, to: to, central: central?.meuguia) {
                         merged[id] = programmes
                     }
                 }

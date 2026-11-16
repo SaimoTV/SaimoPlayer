@@ -226,7 +226,8 @@ enum GuiaDeTv {
     }
 
     static func fetch(wanted: [(id: UUID, name: String)],
-                      from: Date, to: Date) async -> [UUID: [Programme]] {
+                      from: Date, to: Date,
+                      central: [String: [Programme]]? = nil) async -> [UUID: [Programme]] {
         // Agrupar canais por slug para baixar cada página apenas uma vez
         var slugToIDs: [String: [UUID]] = [:]
         for entry in wanted {
@@ -234,6 +235,17 @@ enum GuiaDeTv {
             slugToIDs[s, default: []].append(entry.id)
         }
         guard !slugToIDs.isEmpty else { return [:] }
+
+        // O que já está no guia central não é baixado.
+        var doCentral: [UUID: [Programme]] = [:]
+        if let central {
+            for (slug, ids) in slugToIDs {
+                guard let lista = central[slug] else { continue }
+                for id in ids { doCentral[id] = lista }
+                slugToIDs[slug] = nil
+            }
+            if slugToIDs.isEmpty { return doCentral }
+        }
 
         let config = URLSessionConfiguration.ephemeral
         config.timeoutIntervalForRequest = 25
@@ -265,7 +277,7 @@ enum GuiaDeTv {
                 }
             }
         }
-        return out
+        return out.merging(doCentral) { atual, _ in atual }
     }
 
     /// `https://www.guiadetv.com/canal/<slug>`
