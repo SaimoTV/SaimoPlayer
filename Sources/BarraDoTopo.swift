@@ -206,9 +206,7 @@ struct BarraDoTopo: View {
                         .matchedGeometryEffect(id: "aba", in: espaco)
                 } else if aba == .apoie {
                     // Apoie fica sempre em destaque, chamando atenção na barra.
-                    Capsule().fill(LinearGradient(colors: [Color(red: 0.06, green: 0.66, blue: 0.60),
-                                                           Color(red: 0.15, green: 0.39, blue: 0.92)],
-                                                  startPoint: .leading, endPoint: .trailing))
+                    FundoApoie()
                 }
             }
             .contentShape(Capsule())
@@ -264,6 +262,31 @@ private struct RadioNaBarra: View {
             .vidroCapsula(interativo: true)
             .onTapGesture { Aba.radios.abrir() }
             .help("Abrir Rádios")
+        }
+    }
+}
+
+
+/// Fundo da aba Apoie: as cores correm pelo arco-íris e um brilho pulsa em
+/// volta. Com "reduzir movimento" ligado no sistema, fica colorido e parado.
+private struct FundoApoie: View {
+    @Environment(\.accessibilityReduceMotion) private var reduzir
+    private let cores: [Color] = [
+        Color(red: 1.0, green: 0.30, blue: 0.55), Color(red: 0.66, green: 0.33, blue: 0.97),
+        Color(red: 0.23, green: 0.51, blue: 0.96), Color(red: 0.08, green: 0.72, blue: 0.65),
+        Color(red: 0.96, green: 0.62, blue: 0.04), Color(red: 1.0, green: 0.30, blue: 0.55),
+    ]
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduzir)) { contexto in
+            let t = reduzir ? 0 : contexto.date.timeIntervalSinceReferenceDate
+            let volta = t.truncatingRemainder(dividingBy: 4) / 4
+            let pulso = 0.5 + 0.5 * sin(t * 2 * .pi / 1.6)
+            Capsule()
+                .fill(LinearGradient(colors: cores,
+                                     startPoint: UnitPoint(x: -2 + 2 * volta, y: 0.5),
+                                     endPoint: UnitPoint(x: 1 + 2 * volta, y: 0.5)))
+                .shadow(color: cores[Int(volta * 5) % 5].opacity(0.75), radius: 4 + 8 * pulso)
         }
     }
 }
