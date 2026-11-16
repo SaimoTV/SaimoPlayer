@@ -97,7 +97,14 @@ enum Progresso {
                                  fracao: min(max(posicao / duracao, 0), 1),
                                  quando: quando))
         }
-        return out.sorted { $0.quando > $1.quando }
+        // Série aparece uma vez só, no episódio assistido por último: cada
+        // episódio tem a sua marca, e sem isto a fileira mostrava vários
+        // episódios da mesma série (inclusive os anteriores).
+        var vistas = Set<String>()
+        return out.sorted { $0.quando > $1.quando }.filter { a in
+            guard a.serie else { return true }
+            return vistas.insert(a.titulo).inserted
+        }
     }
 
     struct Andamento: Identifiable {
