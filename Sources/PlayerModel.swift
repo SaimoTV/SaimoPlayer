@@ -337,27 +337,33 @@ final class PlayerModel: NSObject, ObservableObject {
         let isSerie = tipo == "series" || tipo == "tv"
         let s = itens.first(where: { $0.name == "s" || $0.name == "temporada" })?.value ?? "1"
         let e = itens.first(where: { $0.name == "e" || $0.name == "episodio" })?.value ?? "1"
+        let versao = itens.first(where: { $0.name == "versao" || $0.name == "v" })?.value?.lowercased() ?? "dub"
 
-        let nixStr = isSerie
+        let baseNix = isSerie
             ? "https://nixplay.lat/series/saimo-vods/221097/\(cleanId)/\(s)/\(e).mp4"
             : "https://nixplay.lat/movie/saimo-vods/221097/\(cleanId).mp4"
-        guard let nixURL = URL(string: nixStr) else { return nil }
 
-        var req = URLRequest(url: nixURL)
-        req.httpMethod = "GET"
-        req.setValue("bytes=0-1023", forHTTPHeaderField: "Range")
-        req.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
-        req.timeoutInterval = 4
+        // Se o usuário pediu legendado, testa com ?lang=leg primeiro
+        let candidatos = versao == "leg" ? ["\(baseNix)?lang=leg", baseNix] : [baseNix]
 
-        if let (dados, resp) = try? await URLSession.shared.data(for: req),
-           let http = resp as? HTTPURLResponse {
-            if http.statusCode == 200 || http.statusCode == 206 {
-                let txt = String(data: dados.prefix(64), encoding: .utf8) ?? ""
-                if !txt.contains("ERRO:") && !txt.contains("não encontrado") {
+        for candStr in candidatos {
+            guard let nixURL = URL(string: candStr) else { continue }
+            var req = URLRequest(url: nixURL)
+            req.httpMethod = "GET"
+            req.setValue("bytes=0-1023", forHTTPHeaderField: "Range")
+            req.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+            req.timeoutInterval = 4
+
+            if let (dados, resp) = try? await URLSession.shared.data(for: req),
+               let http = resp as? HTTPURLResponse {
+                if http.statusCode == 200 || http.statusCode == 206 {
+                    let txt = String(data: dados.prefix(64), encoding: .utf8) ?? ""
+                    if !txt.contains("ERRO:") && !txt.contains("não encontrado") {
+                        return nixURL
+                    }
+                } else if (300...399).contains(http.statusCode) {
                     return nixURL
                 }
-            } else if (300...399).contains(http.statusCode) {
-                return nixURL
             }
         }
         return nil
