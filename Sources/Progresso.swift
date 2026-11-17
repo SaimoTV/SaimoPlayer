@@ -29,7 +29,7 @@ enum Progresso {
 
     static func salvar(_ chave: String, posicao: Double, duracao: Double) {
         guard !chave.isEmpty, duracao > 0, posicao.isFinite else { return }
-        let defaults = UserDefaults.standard
+        let defaults = Perfis.defaults
         guard posicao >= minimo, posicao <= duracao - sobra else {
             // Acabou de começar ou já terminou: nada a retomar.
             if posicao > duracao - sobra, duracao > 300 {
@@ -52,7 +52,7 @@ enum Progresso {
     /// Remove um título da fileira "Continue assistindo".
     static func remover(_ chave: String) {
         guard !chave.isEmpty else { return }
-        let defaults = UserDefaults.standard
+        let defaults = Perfis.defaults
         defaults.removeObject(forKey: chaveBase + chave)
         defaults.removeObject(forKey: chaveBase + chave + "|d")
         defaults.removeObject(forKey: chaveBase + chave + "|t")
@@ -63,7 +63,7 @@ enum Progresso {
 
     /// Posição guardada, ou zero.
     static func posicao(_ chave: String) -> Double {
-        UserDefaults.standard.double(forKey: chaveBase + chave)
+        Perfis.defaults.double(forKey: chaveBase + chave)
     }
 
     /// O que está pela metade, do visto mais recentemente para o mais antigo.
@@ -73,7 +73,7 @@ enum Progresso {
     /// o último, e uma fileira em ordem alfabética não continua coisa nenhuma.
     /// Quem gravou antes disso não tem horário e fica no fim, uma vez só.
     static func emAndamento() -> [Andamento] {
-        let tudo = UserDefaults.standard.dictionaryRepresentation()
+        let tudo = Perfis.defaults.dictionaryRepresentation()
         var out: [Andamento] = []
         for (chaveCompleta, valor) in tudo {
             guard chaveCompleta.hasPrefix(chaveBase) else { continue }
@@ -121,13 +121,13 @@ enum Progresso {
 
     /// Visto até o fim (os dois minutos finais contam como fim).
     static func visto(_ chave: String) -> Bool {
-        UserDefaults.standard.bool(forKey: chaveVisto + chave)
+        Perfis.defaults.bool(forKey: chaveVisto + chave)
     }
 
     /// Quanto do título já foi visto, de 0 a 1, ou nil se nunca foi aberto.
     static func fracao(_ chave: String) -> Double? {
-        let posicao = UserDefaults.standard.double(forKey: chaveBase + chave)
-        let duracao = UserDefaults.standard.double(forKey: chaveBase + chave + "|d")
+        let posicao = Perfis.defaults.double(forKey: chaveBase + chave)
+        let duracao = Perfis.defaults.double(forKey: chaveBase + chave + "|d")
         guard posicao > 0, duracao > 0 else { return nil }
         return min(max(posicao / duracao, 0), 1)
     }

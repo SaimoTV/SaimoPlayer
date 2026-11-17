@@ -131,14 +131,14 @@ final class Radios: ObservableObject {
     private static let chaveRecentes = "radios.recentes"
 
     var recentes: [Radio] {
-        let nomes = UserDefaults.standard.stringArray(forKey: Self.chaveRecentes) ?? []
+        let nomes = Perfis.defaults.stringArray(forKey: Self.chaveRecentes) ?? []
         let porNome = Dictionary(lista.map { ($0.nome, $0) }, uniquingKeysWith: { a, _ in a })
         return nomes.compactMap { porNome[$0] }
     }
 
     private func ouviu(_ nome: String) {
-        let nomes = UserDefaults.standard.stringArray(forKey: Self.chaveRecentes) ?? []
-        UserDefaults.standard.set(Array(([nome] + nomes.filter { $0 != nome }).prefix(12)),
+        let nomes = Perfis.defaults.stringArray(forKey: Self.chaveRecentes) ?? []
+        Perfis.defaults.set(Array(([nome] + nomes.filter { $0 != nome }).prefix(12)),
                                   forKey: Self.chaveRecentes)
     }
 

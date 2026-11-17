@@ -11,6 +11,9 @@ cp Info.plist "$APP/Contents/Info.plist"
 ./make_icon.sh >/dev/null
 cp build/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp abertura/abertura-h.mp4 "$APP/Contents/Resources/abertura-h.mp4"
+# Avatares dos perfis (docs/avatares, gerados por scripts/avatares/gerar.py).
+mkdir -p "$APP/Contents/Resources/avatares"
+cp docs/avatares/png/*.png "$APP/Contents/Resources/avatares/"
 
 swiftc \
   -module-cache-path build/ModuleCache \

@@ -137,18 +137,49 @@ struct TelaAjustes: View {
     @State private var urlCanais: String = Enderecos.canais
     @State private var urlFilmes: String = Enderecos.filmes
     @State private var statusListas: String? = nil
+    /// No perfil Kids os Ajustes pedem o código (a criança não mexe nas listas nem nos ajustes).
+    @State private var liberado = false
+    /// Controle parental: "liberar" ou "trocar" com o formulário aberto.
+    @State private var parental: String?
+    @State private var senha = ""
+    @State private var senhaNova = ""
+    @State private var avisoParental = ""
 
     private var versao: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
     }
 
     var body: some View {
+        if Perfis.pedeCodigo(Perfis.ativo) && !liberado {
+            PedirCodigoView(perfil: Perfis.ativo, motivo: "Os Ajustes ficam trancados no perfil Kids. Digite o código para abrir.") {
+                liberado = true
+            } aoCancelar: {
+                NotificationCenter.default.post(name: .abrirPerfis, object: nil)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            conteudo
+        }
+    }
+
+    private var conteudo: some View {
         ZStack(alignment: .top) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     Text("Ajustes")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(.white)
+
+                    secao("Perfis") {
+                        linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
+                              icone: "person.crop.circle") {
+                            NotificationCenter.default.post(name: .abrirPerfis, object: nil)
+                        }
+                        linha("Gerenciar perfis", "Criar, editar, avatares e perfil Kids (até \(Perfis.maximo))",
+                              icone: "person.2.fill") {
+                            NotificationCenter.default.post(name: .abrirPerfis, object: "gerenciar")
+                        }
+                    }
 
                     secao("Reprodução") {
                         linha("Super Resolução (Upscaling)", Preferencias.rotuloUpscaling(model.upscaling),
@@ -384,6 +415,35 @@ struct TelaAjustes: View {
                         }
                     }
 
+                    // Controle parental: no fim, separado e discreto. No Kids não aparece.
+                    if !Perfis.kidsAtivo {
+                        secao("Controle parental") {
+                            linha("Conteúdo adulto",
+                                  model.restrictedUnlocked ? "Liberado · clique para bloquear" : "Bloqueado · clique para liberar com a senha",
+                                  icone: model.restrictedUnlocked ? "lock.open" : "lock") {
+                                if model.restrictedUnlocked { model.bloquearAdulto() } else { abrirParental("liberar") }
+                            }
+                            linha("Trocar a senha", Parental.ehPadrao ? "A senha inicial é \(Parental.padrao)" : "Senha própria",
+                                  icone: "key") { abrirParental("trocar") }
+                            if let modo = parental {
+                                HStack(spacing: 10) {
+                                    SecureField(modo == "trocar" ? "Senha atual" : "Senha", text: $senha)
+                                        .textFieldStyle(.roundedBorder).frame(width: 140)
+                                        .onSubmit { confirmarParental() }
+                                    if modo == "trocar" {
+                                        SecureField("Senha nova", text: $senhaNova).textFieldStyle(.roundedBorder).frame(width: 140)
+                                            .onSubmit { confirmarParental() }
+                                    }
+                                    Button(modo == "trocar" ? "Trocar" : "Liberar") { confirmarParental() }
+                                    Button("Cancelar") { parental = nil }
+                                    Text(avisoParental).font(.system(size: 12)).foregroundStyle(Color(red: 1, green: 0.7, blue: 0.7))
+                                }
+                                .padding(.horizontal, 18).padding(.vertical, 10)
+                            }
+                        }
+                        .opacity(0.72)
+                    }
+
                     Text("Saimo TV \(versao) para Mac")
                         .font(.system(size: 12))
                         .foregroundStyle(Tema.textoApagado)
@@ -399,6 +459,22 @@ struct TelaAjustes: View {
                 urlCanais = Enderecos.canais
                 urlFilmes = Enderecos.filmes
             }
+        }
+    }
+
+    private func abrirParental(_ modo: String) {
+        parental = modo
+        senha = ""
+        senhaNova = ""
+        avisoParental = ""
+    }
+
+    private func confirmarParental() {
+        if parental == "liberar" {
+            if model.liberarAdulto(senha: senha) { parental = nil } else { avisoParental = "Senha errada."; senha = "" }
+        } else {
+            guard Parental.conferir(senha) else { avisoParental = "Senha atual errada."; senha = ""; return }
+            if Parental.trocar(atual: senha, nova: senhaNova) { parental = nil } else { avisoParental = "A senha nova tem 4 números." }
         }
     }
 

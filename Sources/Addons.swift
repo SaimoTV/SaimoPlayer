@@ -702,11 +702,13 @@ final class AddonStore: ObservableObject {
     }
 
     var temAtivos: Bool {
-        addons.contains { $0.enabled }
+        !Perfis.kidsAtivo && addons.contains { $0.enabled }
     }
 
+    // Perfil Kids: addons não têm classificação indicativa, então ficam desligados lá.
     var ativos: [AddonInstalado] {
-        addons.filter { $0.enabled }.sorted { $0.order < $1.order }
+        if Perfis.kidsAtivo { return [] }
+        return addons.filter { $0.enabled }.sorted { $0.order < $1.order }
     }
 
     func catalogoPorId() -> [AddonInstalado] {

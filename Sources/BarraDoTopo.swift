@@ -133,6 +133,14 @@ struct BarraDoTopo: View {
                     RadioNaBarra()
                 }
 
+                // O perfil ativo: o avatar abre a troca de perfil.
+                Button { NotificationCenter.default.post(name: .abrirPerfis, object: nil) } label: {
+                    AvatarPerfil(nome: Perfis.ativo.nome, avatar: Perfis.ativo.avatar, tamanho: 30)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("Perfil: \(Perfis.ativo.nome) (trocar)")
+
                 Button { Aba.ajustes.abrir() } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 15, weight: .semibold))

@@ -18,7 +18,7 @@ struct TelaBusca: View {
     @State private var resultadosTMDB: [DescobertaItem] = []
     @State private var tarefaRemota: Task<Void, Never>?
     @State private var termoRemotoBuscado = ""
-    @State private var recentes: [String] = UserDefaults.standard.stringArray(forKey: "busca.recentes") ?? []
+    @State private var recentes: [String] = Perfis.defaults.stringArray(forKey: "busca.recentes") ?? []
     @FocusState private var focado: Bool
 
     var body: some View {
@@ -178,6 +178,6 @@ struct TelaBusca: View {
         let termo = texto.trimmingCharacters(in: .whitespaces)
         guard termo.count >= 2 else { return }
         recentes = Array(([termo] + recentes.filter { $0.caseInsensitiveCompare(termo) != .orderedSame }).prefix(8))
-        UserDefaults.standard.set(recentes, forKey: "busca.recentes")
+        Perfis.defaults.set(recentes, forKey: "busca.recentes")
     }
 }

@@ -50,6 +50,8 @@ final class AberturaView: NSView {
 
     /// Põe a abertura sobre a janela inteira, acima da barra de título.
     static func cobrir(_ janela: NSWindow, aoTerminar: @escaping () -> Void) {
+        // Reaberto pela troca de perfil: a abertura já passou nesta sessão.
+        if CommandLine.arguments.contains("--perfil-escolhido") { aoTerminar(); return }
         janela.backgroundColor = corDaAbertura
         guard let moldura = janela.contentView?.superview else {
             aoTerminar()

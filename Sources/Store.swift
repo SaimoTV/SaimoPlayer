@@ -34,12 +34,13 @@ enum Store {
         defaults.set(raw, forKey: customKey)
     }
 
+    /// Os favoritos são de cada perfil; canais importados e volume, do aparelho todo.
     static func favorites() -> Set<String> {
-        Set(defaults.stringArray(forKey: favoritesKey) ?? [])
+        Set(Perfis.defaults.stringArray(forKey: favoritesKey) ?? [])
     }
 
     static func setFavorites(_ f: Set<String>) {
-        defaults.set(Array(f), forKey: favoritesKey)
+        Perfis.defaults.set(Array(f), forKey: favoritesKey)
     }
 
     static func volume() -> Double {

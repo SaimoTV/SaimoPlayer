@@ -25,6 +25,8 @@ struct ContentView: View {
     /// janela, ao lado) espera ela sair.
     @State private var abertura = true
     @State private var abriu = false
+    /// Tela de perfis por cima de tudo: (obrigatória, abrir já em gerenciar).
+    @State private var perfisAberto: (obrigatoria: Bool, gerenciar: Bool)?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -34,6 +36,14 @@ struct ContentView: View {
                 .opacity(barraVisivel ? 1 : 0)
                 .allowsHitTesting(barraVisivel)
                 .animation(.easeInOut(duration: 0.22), value: barraVisivel)
+            if let p = perfisAberto {
+                TelaPerfis(obrigatoria: p.obrigatoria, modo: p.gerenciar ? .gerenciar : .escolher) { perfisAberto = nil }
+                    .transition(.opacity)
+                    .zIndex(10)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .abrirPerfis)) { n in
+            perfisAberto = (false, (n.object as? String) == "gerenciar")
         }
         .ignoresSafeArea()
         .preferredColorScheme(.dark)
@@ -42,6 +52,9 @@ struct ContentView: View {
                 // Põe a abertura por cima da janela inteira (ver `Abertura`).
                 Abertura {
                     abertura = false
+                    // Com 2 ou mais perfis, pergunta quem está assistindo (não depois da troca de perfil).
+                    if CommandLine.arguments.contains("--perfil-escolhido") { Perfis.escolhidoNestaSessao = true }
+                    if Perfis.deveEscolherAoAbrir { perfisAberto = (true, false) }
                     if model.detachedList { SidebarWindowController.shared.open(model: model) }
                 }
                 .frame(width: 0, height: 0)

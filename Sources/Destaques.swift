@@ -48,7 +48,20 @@ enum Destaques {
 
     private static var emMemoria: [Fila]?
 
+    /// As fileiras; no perfil Kids, só os títulos liberados (Kids.swift).
     static func filas() async -> [Fila] {
+        let todas = await filasBrutas()
+        guard Perfis.kidsAtivo else { return todas }
+        let c = await Kids.preparar()
+        var out: [Fila] = []
+        for f in todas {
+            let itens = Kids.filtrar(f.itens, c, titulo: \.titulo) { i in i.tipo == "f" ? false : i.tipo == "s" ? true : nil }
+            if !itens.isEmpty { out.append(Fila(titulo: f.titulo, itens: itens)) }
+        }
+        return out
+    }
+
+    private static func filasBrutas() async -> [Fila] {
         if let prontas = emMemoria { return prontas }
         guard let texto = await texto() else { return [] }
         let lidas = ler(texto)

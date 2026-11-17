@@ -102,13 +102,13 @@ final class Novelinhas: ObservableObject {
     private let chave = "novelinhas.parada"
 
     func parada(_ id: String) -> (ep: Int, t: Double)? {
-        guard let d = UserDefaults.standard.dictionary(forKey: chave)?[id] as? [String: Double],
+        guard let d = Perfis.defaults.dictionary(forKey: chave)?[id] as? [String: Double],
               let ep = d["ep"] else { return nil }
         return (Int(ep), d["t"] ?? 0)
     }
 
     func guardar(_ id: String, ep: Int, t: Double) {
-        var tudo = UserDefaults.standard.dictionary(forKey: chave) ?? [:]
+        var tudo = Perfis.defaults.dictionary(forKey: chave) ?? [:]
         tudo[id] = ["ep": Double(ep), "t": t, "quando": Date().timeIntervalSince1970]
         if tudo.count > 60 {
             let velhos = tudo.sorted {
@@ -116,11 +116,11 @@ final class Novelinhas: ObservableObject {
             }.prefix(tudo.count - 60).map(\.key)
             for k in velhos { tudo.removeValue(forKey: k) }
         }
-        UserDefaults.standard.set(tudo, forKey: chave)
+        Perfis.defaults.set(tudo, forKey: chave)
     }
 
     func recentes() -> [String] {
-        let tudo = UserDefaults.standard.dictionary(forKey: chave) ?? [:]
+        let tudo = Perfis.defaults.dictionary(forKey: chave) ?? [:]
         return tudo.sorted {
             (($0.value as? [String: Double])?["quando"] ?? 0) > (($1.value as? [String: Double])?["quando"] ?? 0)
         }.map(\.key)

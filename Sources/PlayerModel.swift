@@ -549,7 +549,7 @@ final class PlayerModel: NSObject, ObservableObject {
         observePlayer()
         setupRemoteCommands()
         // Abre no canal que estava no ar quando o app fechou, como a TV.
-        let ultimo = UserDefaults.standard.string(forKey: "ultimoCanal")
+        let ultimo = Perfis.defaults.string(forKey: "ultimoCanal")
         selection = channels.first { $0.name == ultimo }?.id ?? channels.first?.id
         EPGService.shared.load(channels: channels)
         refreshCatalog()
@@ -717,7 +717,7 @@ final class PlayerModel: NSObject, ObservableObject {
         }
         aoVivoPendente = false
         guardarProgresso(forcado: true)
-        UserDefaults.standard.set(channel.name, forKey: "ultimoCanal")
+        Perfis.defaults.set(channel.name, forKey: "ultimoCanal")
         episodioNoAr = nil
         fontePreferida = nil
         painelEpisodios = false
@@ -2117,13 +2117,22 @@ final class PlayerModel: NSObject, ObservableObject {
         if Date().timeIntervalSince(typedAt) > 2 { typed = "" }
         typedAt = Date()
         typed = String((typed + digit).suffix(8))
-        if typed.hasSuffix(Self.code) {
+        // A senha do controle parental (padrão 0000, trocável nos Ajustes) digitada no ao vivo.
+        if typed.count >= 4, Parental.conferir(String(typed.suffix(4))) {
             typed = ""
             setRestricted(!restrictedUnlocked)
         }
     }
 
-    private static let code = "1010"
+    /// Controle parental nos Ajustes: libera com a senha. No perfil Kids nunca libera.
+    @discardableResult
+    func liberarAdulto(senha: String) -> Bool {
+        guard Parental.conferir(senha) else { return false }
+        setRestricted(true)
+        return true
+    }
+
+    func bloquearAdulto() { setRestricted(false) }
 
     /// Lista restrita nova chegou: troca, e se estiver destravado, troca na tela.
     private func trocarRestritos(_ novos: [Channel]) {

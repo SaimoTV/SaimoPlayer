@@ -182,7 +182,7 @@ enum Vod {
         set { estado.withLock { $0.indiceBuscaSujo = newValue } }
     }
 
-    static func filmes(letra: String, reservados: Bool = false) async -> [Filme] {
+    fileprivate static func filmesBruto(letra: String, reservados: Bool = false) async -> [Filme] {
         guard Enderecos.filmesAtivos else { return [] }
         let prefixo = reservados ? "reservado" : "filmes"
         guard let texto = await arquivo("\(prefixo)-\(gaveta(letra)).txt") else { return [] }
@@ -203,7 +203,7 @@ enum Vod {
         }
     }
 
-    static func series(letra: String) async -> [Serie] {
+    fileprivate static func seriesBruto(letra: String) async -> [Serie] {
         guard Enderecos.filmesAtivos else { return [] }
         guard let texto = await arquivo("series-\(gaveta(letra)).txt") else { return [] }
         return texto.split(separator: "\n").compactMap { linha in
@@ -215,7 +215,7 @@ enum Vod {
     }
 
     /// Animes e doramas já trazem títulos e episódios no mesmo arquivo.
-    static func colecao(_ tipo: String) async -> [(Serie, [Episodio])] {
+    fileprivate static func colecaoBruto(_ tipo: String) async -> [(Serie, [Episodio])] {
         guard Enderecos.filmesAtivos, ["animes", "doramas"].contains(tipo) else { return [] }
         if bases.isEmpty { _ = await indice() }
         let nome = "redeflix/links-\(tipo).txt"
@@ -308,7 +308,7 @@ enum Vod {
     /// ficam de fora dele de propósito: o que não aparece sem o código também
     /// não pode aparecer numa busca geral.
     @MainActor
-    static func todos() async -> [Achado] {
+    fileprivate static func todosBruto() async -> [Achado] {
         guard Enderecos.filmesAtivos else { return [] }
         if indiceBuscaSuja {
             indiceBusca = []
@@ -334,7 +334,7 @@ enum Vod {
     /// o código também não pode aparecer numa busca comum —, então aqui a lista
     /// é montada lendo os arquivos por letra. São só os nomes: as fontes ficam
     /// para a hora de abrir, como na navegação normal.
-    static func todosReservados(_ letras: [String]) async -> [Achado] {
+    fileprivate static func todosReservadosBruto(_ letras: [String]) async -> [Achado] {
         var out: [Achado] = []
         for letra in letras {
             guard let texto = await arquivo("reservado-\(gaveta(letra)).txt") else { continue }
@@ -429,5 +429,38 @@ enum Vod {
             .appendingPathComponent("SaimoTV/vod", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         return base
+    }
+}
+
+// MARK: - Perfil Kids: o filtro mora aqui, na leitura (ver Kids.swift)
+
+extension Vod {
+    static func filmes(letra: String, reservados: Bool = false) async -> [Filme] {
+        if reservados && Perfis.kidsAtivo { return [] }
+        let lista = await filmesBruto(letra: letra, reservados: reservados)
+        let c = await Kids.preparar()
+        return Kids.filtrar(lista, c, titulo: \.titulo) { _ in false }
+    }
+
+    static func series(letra: String) async -> [Serie] {
+        let lista = await seriesBruto(letra: letra)
+        let c = await Kids.preparar()
+        return Kids.filtrar(lista, c, titulo: \.titulo) { _ in true }
+    }
+
+    static func colecao(_ tipo: String) async -> [(Serie, [Episodio])] {
+        let lista = await colecaoBruto(tipo)
+        let c = await Kids.preparar()
+        return Kids.filtrar(lista, c, titulo: { $0.0.titulo }) { _ in true }
+    }
+
+    static func todos() async -> [Achado] {
+        let lista = await todosBruto()
+        let c = await Kids.preparar()
+        return Kids.filtrar(lista, c, titulo: \.titulo) { $0.serie }
+    }
+
+    static func todosReservados(_ letras: [String]) async -> [Achado] {
+        Perfis.kidsAtivo ? [] : await todosReservadosBruto(letras)
     }
 }

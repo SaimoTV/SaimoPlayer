@@ -18,8 +18,10 @@ enum SincroniaConnect {
 
     private static let chaveProgresso = "progresso."
 
-    static func pacote(_ model: PlayerModel) -> [String: Any] {
-        let tudo = UserDefaults.standard.dictionaryRepresentation()
+    /// Onde parou, títulos e canais favoritos de um perfil (de qualquer perfil, pelo UserDefaults dele).
+    private static func dados(de id: String, model: PlayerModel) -> (progresso: [[String: Any]], favTitulos: [[String: Any]], favCanais: [String]) {
+        let defaults = Perfis.defaults(de: id)
+        let tudo = defaults.dictionaryRepresentation()
         var progresso: [[String: Any]] = []
         for (completa, valor) in tudo where completa.hasPrefix(chaveProgresso) {
             let chave = String(completa.dropFirst(chaveProgresso.count))
@@ -42,10 +44,29 @@ enum SincroniaConnect {
                 "em": Int(((tudo[completa + "|t"] as? Double ?? 0) * 1000).rounded()),
             ])
         }
-        let favTitulos: [[String: Any]] = VodFavoritos.shared.itens.map {
-            ["tipo": $0.serie ? "s" : "f", "titulo": $0.titulo, "ano": $0.ano, "letra": $0.letra]
+        let favTitulos: [[String: Any]] = (defaults.stringArray(forKey: chaveFavTitulos) ?? []).compactMap { linha in
+            let c = linha.components(separatedBy: "\t")
+            guard c.count >= 3, !c[2].isEmpty else { return nil }
+            return ["tipo": c[0] == "s" ? "s" : "f", "titulo": c[2], "ano": c.count > 4 ? c[4] : "", "letra": c[1]]
         }
-        let favCanais = model.channels.filter { model.isFavorite($0) }.map(\.name)
+        let urls = Set(defaults.stringArray(forKey: chaveFavCanais) ?? [])
+        let favCanais = model.channels.filter { urls.contains($0.source.absoluteString) }.map(\.name)
+        return (progresso, favTitulos, favCanais)
+    }
+
+    private static let chaveFavTitulos = "vodFavoritos"
+    private static let chaveFavCanais = "favorites"
+
+    static func pacote(_ model: PlayerModel) -> [String: Any] {
+        // Os campos de sempre levam o perfil principal: apps sem perfis seguem funcionando.
+        let principal = dados(de: Perfis.principal, model: model)
+        let perfis: [[String: Any]] = Perfis.todos.map { p in
+            let d = p.id == Perfis.principal ? principal : dados(de: p.id, model: model)
+            var o: [String: Any] = ["id": p.id, "nome": p.nome, "avatar": p.avatar, "em": Int(p.em),
+                                    "progresso": d.progresso, "favTitulos": d.favTitulos, "favCanais": d.favCanais]
+            if p.ehKids { o["kids"] = true; o["codigo"] = p.codigo ?? "" }
+            return o
+        }
         let listas: [String: Any] = [
             "canais": Enderecos.canais,
             "filmes": Enderecos.filmes,
@@ -54,9 +75,11 @@ enum SincroniaConnect {
         ]
         var saida: [String: Any] = [
             "t": "dados",
-            "progresso": progresso,
-            "favTitulos": favTitulos,
-            "favCanais": favCanais,
+            "progresso": principal.progresso,
+            "favTitulos": principal.favTitulos,
+            "favCanais": principal.favCanais,
+            "perfis": perfis,
+            "perfisRemovidos": Perfis.removidos.map { ["id": $0.id, "em": Int($0.em)] },
             "listas": listas,
             "addons": AddonStore.shared.paraConnect(),
         ]
@@ -68,7 +91,36 @@ enum SincroniaConnect {
 
     /// Junta o que veio do celular ao que o Mac tem.
     static func aplicar(_ j: [String: Any], model: PlayerModel) {
-        let defaults = UserDefaults.standard
+        if let lista = j["perfis"] as? [[String: Any]] {
+            let remotos: [(Perfis.Perfil, [String: Any])] = lista.compactMap { o in
+                guard let id = o["id"] as? String, !id.isEmpty else { return nil }
+                let kids = (o["kids"] as? Bool) == true
+                return (Perfis.Perfil(id: id, nome: o["nome"] as? String ?? "", avatar: o["avatar"] as? String ?? "",
+                                      em: numero(o["em"]), kids: kids ? true : nil, codigo: kids ? o["codigo"] as? String : nil), o)
+            }
+            let remocoes = (j["perfisRemovidos"] as? [[String: Any]] ?? []).compactMap { r -> Perfis.Remocao? in
+                guard let id = r["id"] as? String else { return nil }
+                return Perfis.Remocao(id: id, em: numero(r["em"]))
+            }
+            let existem = Perfis.mesclar(remotos.map(\.0), remocoes: remocoes)
+            for (p, o) in remotos where existem.contains(p.id) { aplicarDoPerfil(p.id, o, model: model) }
+        } else {
+            // Celular sem perfis: os campos de sempre são do perfil principal.
+            aplicarDoPerfil(Perfis.principal, j, model: model)
+        }
+
+        if let l = j["listas"] as? [String: Any] { aplicarListas(l, model: model) }
+        aplicarAddonsSePresente(j)
+        if DebridStore.shared.sincronizarConnect,
+           let debridObj = j["debrid"] as? [String: Any] {
+            DebridStore.shared.aplicarConnect(debridObj)
+        }
+    }
+
+    /// Onde parou e favoritos de um perfil vindos do celular.
+    private static func aplicarDoPerfil(_ id: String, _ j: [String: Any], model: PlayerModel) {
+        let defaults = Perfis.defaults(de: id)
+        let ativo = id == Perfis.idAtivo
         for p in j["progresso"] as? [[String: Any]] ?? [] {
             guard let titulo = p["titulo"] as? String, !titulo.isEmpty else { continue }
             let serie = (p["tipo"] as? String) == "s"
@@ -88,29 +140,44 @@ enum SincroniaConnect {
             defaults.set(em, forKey: base + "|t")
         }
 
-        let favoritos = VodFavoritos.shared
-        for f in j["favTitulos"] as? [[String: Any]] ?? [] {
+        let titulos = j["favTitulos"] as? [[String: Any]] ?? []
+        if ativo {
+            let favoritos = VodFavoritos.shared
+            for f in titulos {
+                guard let titulo = f["titulo"] as? String, !titulo.isEmpty else { continue }
+                let serie = (f["tipo"] as? String) == "s"
+                let ano = f["ano"] as? String ?? ""
+                if !favoritos.contem(titulo, serie: serie, ano: ano) {
+                    favoritos.alternar(.init(titulo: titulo, serie: serie, letra: f["letra"] as? String ?? letra(titulo),
+                                             reservado: false, ano: ano))
+                }
+            }
+            for nome in j["favCanais"] as? [String] ?? [] {
+                if let canal = model.channels.first(where: { $0.name == nome }), !model.isFavorite(canal) {
+                    model.toggleFavorite(canal)
+                }
+            }
+            return
+        }
+        var linhas = defaults.stringArray(forKey: chaveFavTitulos) ?? []
+        for f in titulos {
             guard let titulo = f["titulo"] as? String, !titulo.isEmpty else { continue }
             let serie = (f["tipo"] as? String) == "s"
             let ano = f["ano"] as? String ?? ""
-            if !favoritos.contem(titulo, serie: serie, ano: ano) {
-                favoritos.alternar(.init(titulo: titulo, serie: serie, letra: f["letra"] as? String ?? letra(titulo),
-                                         reservado: false, ano: ano))
+            let existe = linhas.contains { l in
+                let c = l.components(separatedBy: "\t")
+                return c.count >= 3 && c[2] == titulo && (c[0] == "s") == serie && (c.count > 4 ? c[4] : "") == ano
+            }
+            if !existe {
+                linhas.insert([serie ? "s" : "f", f["letra"] as? String ?? letra(titulo), titulo, "n", ano].joined(separator: "\t"), at: 0)
             }
         }
-
+        defaults.set(linhas, forKey: chaveFavTitulos)
+        var urls = Set(defaults.stringArray(forKey: chaveFavCanais) ?? [])
         for nome in j["favCanais"] as? [String] ?? [] {
-            if let canal = model.channels.first(where: { $0.name == nome }), !model.isFavorite(canal) {
-                model.toggleFavorite(canal)
-            }
+            if let canal = model.channels.first(where: { $0.name == nome }) { urls.insert(canal.source.absoluteString) }
         }
-
-        if let l = j["listas"] as? [String: Any] { aplicarListas(l, model: model) }
-        aplicarAddonsSePresente(j)
-        if DebridStore.shared.sincronizarConnect,
-           let debridObj = j["debrid"] as? [String: Any] {
-            DebridStore.shared.aplicarConnect(debridObj)
-        }
+        defaults.set(Array(urls), forKey: chaveFavCanais)
     }
 
     /// Retrocompatibilidade: pacotes `{t:"dados"}` antigos sem `"addons"` não apagam os addons locais.

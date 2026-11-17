@@ -43,7 +43,7 @@ final class VodFavoritos: ObservableObject {
     private let chave = "vodFavoritos"
 
     private init() {
-        itens = (UserDefaults.standard.stringArray(forKey: chave) ?? []).compactMap { linha in
+        itens = (Perfis.defaults.stringArray(forKey: chave) ?? []).compactMap { linha in
             let campos = linha.components(separatedBy: "\t")
             guard campos.count >= 3, !campos[2].isEmpty else { return nil }
             return Item(titulo: campos[2], serie: campos[0] == "s", letra: campos[1],
@@ -75,7 +75,7 @@ final class VodFavoritos: ObservableObject {
              $0.reservado ? "r" : "n", $0.ano]
                 .joined(separator: "\t")
         }
-        UserDefaults.standard.set(linhas, forKey: chave)
-        UserDefaults.standard.synchronize()
+        Perfis.defaults.set(linhas, forKey: chave)
+        Perfis.defaults.synchronize()
     }
 }
