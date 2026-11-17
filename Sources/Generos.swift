@@ -100,14 +100,27 @@ enum Generos {
         de(titulo, serie: serie).contains(genero)
     }
 
+    /// As listas do usuário mudaram: lê de novo, com as capas e grupos delas.
+    static func recarregar() async {
+        mapa = [:]
+        await carregar()
+    }
+
     /// Baixa a lista uma vez por abertura, e guarda em disco para a seguinte.
     static func carregar() async {
         if prontos || carregando { return }
         carregando = true
         defer { carregando = false }
 
-        let texto = await baixado() ?? (try? String(contentsOf: arquivo, encoding: .utf8))
-        guard let texto, !texto.isEmpty else { return }
+        var texto = Enderecos.filmesAtivos
+            ? (await baixado() ?? (try? String(contentsOf: arquivo, encoding: .utf8)) ?? "") : ""
+        // As capas e os grupos das listas do usuário (AcervoLista).
+        for pasta in Vod.pastasDeListas {
+            if let t = try? String(contentsOf: pasta.appendingPathComponent("fichas.txt"), encoding: .utf8) {
+                texto += "\n" + t
+            }
+        }
+        guard !texto.isEmpty else { return }
 
         // Ler 46 mil linhas é trabalho de CPU: fora da thread principal, e só
         // a troca dos mapas volta para ela.

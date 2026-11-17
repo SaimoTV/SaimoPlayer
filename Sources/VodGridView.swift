@@ -141,7 +141,7 @@ struct VodGridView: View {
     private var conteudo: some View {
         if let serie = estado.serieAberta {
             episodiosDe(serie)
-        } else if let secao = estado.secao, !Enderecos.filmesAtivos, !addons.temAtivos,
+        } else if let secao = estado.secao, !Vod.temAcervo, !addons.temAtivos,
                   [.ondemand, .filmes, .series, .animes, .doramas, .extras].contains(secao) {
             // Sem listas de filmes nem addons ativos não há acervo nem rede.
             SemListaView(secao: .filmes)
@@ -161,7 +161,7 @@ struct VodGridView: View {
                 TelaOnDemand(model: model, tipo: estado.secao, acoes: acoes,
                              filasDeDestaque: filasDeDestaque, nomesDoAcervo: nomesDoAcervo)
             case .filmes, .series, .animes, .doramas:
-                if estado.explorando && Enderecos.filmesAtivos {
+                if estado.explorando && Vod.temAcervo {
                     telaDaGrade
                 } else {
                     TelaOnDemand(model: model, tipo: estado.secao, acoes: acoes,
@@ -333,7 +333,7 @@ struct VodGridView: View {
     /// O progresso guarda o nome, não a letra; a busca devolve a letra, que é
     /// o que o acervo precisa para achar o título.
     private func abrirPorNome(_ titulo: String, serie: Bool) async {
-        if Enderecos.filmesAtivos {
+        if Vod.temAcervo {
             let achados = await Vod.todos()
             if let alvo = achados.first(where: {
                 $0.titulo.compare(titulo, options: .caseInsensitive) == .orderedSame
@@ -1039,7 +1039,7 @@ struct VodGridView: View {
     }
 
     private func abrirFavorito(_ item: VodFavoritos.Item) async {
-        if !Enderecos.filmesAtivos && addons.temAtivos {
+        if !Vod.temAcervo && addons.temAtivos {
             await abrirDescobertaDeNome(titulo: item.titulo, ano: item.ano, serie: item.serie)
             return
         }

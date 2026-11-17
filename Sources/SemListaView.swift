@@ -13,7 +13,7 @@ struct SemListaView: View {
 
     /// Já há alguma lista (do Saimo ou da pessoa) ou addon ativo: o vazio é falha de carga, não falta de configuração.
     private var temAlgumaLista: Bool {
-        Enderecos.canaisAtivos || Enderecos.filmesAtivos || !minhas.listas.isEmpty || addons.temAtivos
+        Enderecos.canaisAtivos || Vod.temAcervo || !minhas.listas.isEmpty || addons.temAtivos
     }
 
     private var textoDeAjuda: String {

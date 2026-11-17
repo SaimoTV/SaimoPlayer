@@ -16,7 +16,8 @@ final class MinhasListas: ObservableObject {
     static let maximo = 10
     private static let renovarApos: TimeInterval = 12 * 3600
     private static let agente = "VLC/3.0.20 LibVLC/3.0.20"
-    private static let maximoBytes = 30 * 1024 * 1024
+    /// Listas com filmes e séries passam fácil de 70 MB (300 mil itens).
+    private static let maximoBytes = 250 * 1024 * 1024
 
     struct Lista: Codable, Identifiable, Equatable {
         let id: String
@@ -24,6 +25,10 @@ final class MinhasListas: ObservableObject {
         let link: String
         var atualizadaEm: Double
         var total: Int
+        /// Filmes e séries que foram para Filmes e séries (docs/listas-m3u.md).
+        /// Nulo: lista guardada antes disso, ainda com tudo junto no arquivo.
+        var filmes: Int?
+        var series: Int?
     }
 
     struct Erro: LocalizedError {
@@ -47,12 +52,76 @@ final class MinhasListas: ObservableObject {
            let lidas = try? JSONDecoder().decode([Lista].self, from: dados) {
             listas = lidas
         }
-        for l in listas {
+        for l in listas where l.filmes != nil {
             if let texto = try? String(contentsOf: arquivo(l.id), encoding: .utf8) {
                 canaisPorLista[l.id] = Self.ler(texto)
             }
         }
-        Task { await renovarVencidas() }
+        avisarAcervos()
+        Task {
+            await separarAntigas()
+            await renovarVencidas()
+        }
+    }
+
+    /// A pasta do acervo (filmes e séries) da lista, no formato Saimo.
+    private func pastaDoAcervo(_ id: String) -> URL { pasta.appendingPathComponent("\(id)-acervo", isDirectory: true) }
+
+    /// Conta para o `Vod` quais acervos de lista existem.
+    private func avisarAcervos() {
+        Vod.definirAcervosDeListas(listas.filter { ($0.filmes ?? 0) + ($0.series ?? 0) > 0 }.map { pastaDoAcervo($0.id) })
+        Task { await Generos.recarregar() }
+    }
+
+    /// O que a lista tem: o texto só com os canais e o acervo de filmes e séries.
+    private struct Lido: Sendable {
+        var canais: String
+        var itens: [AcervoLista.Item]
+    }
+
+    /// Baixa e separa. Conta Xtream: canais pela API; filmes e séries pelo M3U completo da conta.
+    private static func obter(_ link: String) async throws -> Lido {
+        if let conta = Xtream.deLink(link) {
+            var canais: String?
+            var erro: Error?
+            do { canais = try await Xtream.m3uDosCanais(conta) } catch let e as Xtream.Erro { erro = Erro(e.texto) } catch { erro = error }
+            var itens: [AcervoLista.Item] = []
+            if let tudo = try? await baixarTexto(conta.linkM3u) {
+                itens = await Task.detached(priority: .utility) { AcervoLista.separar(tudo).itens }.value
+            }
+            if let canais { return Lido(canais: canais, itens: itens) }
+            if !itens.isEmpty { return Lido(canais: "#EXTM3U\n", itens: itens) }
+            throw erro ?? Erro("Não consegui falar com o servidor")
+        }
+        let texto = try await baixarTexto(link)
+        let (canais, itens) = await Task.detached(priority: .utility) { AcervoLista.separar(texto) }.value
+        return Lido(canais: canais, itens: itens)
+    }
+
+    /// Guarda os canais e monta o acervo; devolve (canais, filmes, séries).
+    private func guardar(_ id: String, _ lido: Lido) async -> ([Channel], AcervoLista.Resumo) {
+        try? lido.canais.write(to: arquivo(id), atomically: true, encoding: .utf8)
+        let destino = pastaDoAcervo(id)
+        let itens = lido.itens
+        let resumo = await Task.detached(priority: .utility) { AcervoLista.gravar(destino, itens) }.value
+        return (Self.ler(lido.canais), resumo)
+    }
+
+    /// Listas guardadas antes da separação: o arquivo tem tudo junto. Separa uma vez.
+    private func separarAntigas() async {
+        var mudou = false
+        for l in listas where l.filmes == nil {
+            guard let texto = try? String(contentsOf: arquivo(l.id), encoding: .utf8) else { continue }
+            let (canais, itens) = await Task.detached(priority: .utility) { AcervoLista.separar(texto) }.value
+            let (lidos, resumo) = await guardar(l.id, Lido(canais: canais, itens: itens))
+            guard let i = listas.firstIndex(where: { $0.id == l.id }) else { continue }
+            canaisPorLista[l.id] = lidos
+            listas[i].total = lidos.count
+            listas[i].filmes = resumo.filmes
+            listas[i].series = resumo.series
+            mudou = true
+        }
+        if mudou { gravar() }
     }
 
     /// Os canais de todas as listas; os de adulto só com o restrito liberado.
@@ -68,11 +137,13 @@ final class MinhasListas: ObservableObject {
         }
         guard !listas.contains(where: { $0.link == l }) else { return }
         guard listas.count < Self.maximo else { throw Erro("Você pode ter até \(Self.maximo) listas") }
-        let texto = try await Self.baixar(l)
-        let canais = Self.ler(texto)
-        guard !canais.isEmpty else { throw Erro("Essa lista não tem nenhum canal") }
+        let lido = try await Self.obter(l)
         let id = "l" + UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(8)
-        try? texto.write(to: arquivo(id), atomically: true, encoding: .utf8)
+        let (canais, resumo) = await guardar(id, lido)
+        guard !canais.isEmpty || resumo.filmes + resumo.series > 0 else {
+            try? FileManager.default.removeItem(at: arquivo(id))
+            throw Erro("Essa lista não tem canais, filmes nem séries")
+        }
         var nomeLivre = nome.trimmingCharacters(in: .whitespacesAndNewlines)
         if nomeLivre.isEmpty {
             var n = listas.count + 1
@@ -81,7 +152,7 @@ final class MinhasListas: ObservableObject {
         }
         canaisPorLista[id] = canais
         listas.append(Lista(id: id, nome: nomeLivre, link: l, atualizadaEm: Date().timeIntervalSince1970,
-                            total: canais.count))
+                            total: canais.count, filmes: resumo.filmes, series: resumo.series))
         gravar()
     }
 
@@ -89,13 +160,16 @@ final class MinhasListas: ObservableObject {
         listas.removeAll { $0.id == id }
         canaisPorLista.removeValue(forKey: id)
         try? FileManager.default.removeItem(at: arquivo(id))
+        try? FileManager.default.removeItem(at: pastaDoAcervo(id))
         gravar()
     }
 
     func confirmarRemocao(_ lista: Lista) {
         let alerta = NSAlert()
         alerta.messageText = "Remover \"\(lista.nome)\"?"
-        alerta.informativeText = "Os \(lista.total) canais dela saem do Ao vivo."
+        alerta.informativeText = (lista.filmes ?? 0) + (lista.series ?? 0) > 0
+            ? "Os canais dela saem do Ao vivo, e os filmes e séries dela saem de Filmes e séries."
+            : "Os \(lista.total) canais dela saem do Ao vivo."
         alerta.addButton(withTitle: "Remover")
         alerta.addButton(withTitle: "Cancelar")
         if alerta.runModal() == .alertFirstButtonReturn { remover(lista.id) }
@@ -105,13 +179,15 @@ final class MinhasListas: ObservableObject {
         let agora = Date().timeIntervalSince1970
         var mudou = false
         for l in listas where agora - l.atualizadaEm > Self.renovarApos {
-            guard let texto = try? await Self.baixar(l.link) else { continue }
-            let canais = Self.ler(texto)
-            guard !canais.isEmpty, let i = listas.firstIndex(where: { $0.id == l.id }) else { continue }
-            try? texto.write(to: arquivo(l.id), atomically: true, encoding: .utf8)
+            guard let lido = try? await Self.obter(l.link) else { continue }
+            let (canais, resumo) = await guardar(l.id, lido)
+            guard !canais.isEmpty || resumo.filmes + resumo.series > 0,
+                  let i = listas.firstIndex(where: { $0.id == l.id }) else { continue }
             canaisPorLista[l.id] = canais
             listas[i].atualizadaEm = agora
             listas[i].total = canais.count
+            listas[i].filmes = resumo.filmes
+            listas[i].series = resumo.series
             mudou = true
         }
         if mudou { gravar() }
@@ -122,18 +198,15 @@ final class MinhasListas: ObservableObject {
             UserDefaults.standard.set(dados, forKey: chave)
         }
         PlayerModel.shared.recarregarListas()
+        avisarAcervos()
         SaimoConnect.shared.avisarDados()
     }
 
     private func arquivo(_ id: String) -> URL { pasta.appendingPathComponent("\(id).m3u") }
 
-    private static func baixar(_ link: String) async throws -> String {
-        // Conta com usuário e senha (Xtream): lê pela API do servidor.
-        if let conta = Xtream.deLink(link) {
-            do { return try await Xtream.m3uDosCanais(conta) } catch let e as Xtream.Erro { throw Erro(e.texto) }
-        }
+    private static func baixarTexto(_ link: String) async throws -> String {
         guard let url = URL(string: link) else { throw Erro("Link inválido") }
-        var pedido = URLRequest(url: url, timeoutInterval: 30)
+        var pedido = URLRequest(url: url, timeoutInterval: 300)
         pedido.setValue(agente, forHTTPHeaderField: "User-Agent")
         let (dados, resposta) = try await URLSession.shared.data(for: pedido)
         if let http = resposta as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
@@ -193,7 +266,7 @@ final class MinhasListas: ObservableObject {
     func pedirNova() {
         let alerta = NSAlert()
         alerta.messageText = "Adicionar lista"
-        alerta.informativeText = "Cole o link da sua lista M3U: só isso já basta. Usuário e senha são opcionais, para listas que pedem login. Os canais aparecem no Ao vivo, em \"Minhas listas\"."
+        alerta.informativeText = "Cole o link da sua lista M3U: só isso já basta. Usuário e senha são opcionais, para listas que pedem login. Os canais aparecem no Ao vivo, em \"Minhas listas\"; os filmes e as séries, em Filmes e séries."
         alerta.addButton(withTitle: "Adicionar")
         alerta.addButton(withTitle: "Cancelar")
         let pilha = NSStackView(frame: NSRect(x: 0, y: 0, width: 420, height: 124))

@@ -324,7 +324,7 @@ struct TelaOnDemand: View {
     private func carregar() async {
         carregando = true
         prontas = []
-        if Enderecos.filmesAtivos {
+        if Vod.temAcervo {
             await Generos.carregar()
             await InfoDosTitulos.carregar()
             await CategoriasVod.carregar()
@@ -383,7 +383,7 @@ struct TelaOnDemand: View {
                 out.append(Fila(titulo: fila.titulo, cartoes: itens.map { CartoesDoAcervo.destaque($0, acoes: acoes) }))
             }
         }
-        if Enderecos.filmesAtivos {
+        if Vod.temAcervo {
             if let tipo {
                 // O acervo inteiro com filtros (gênero, ano, idade, nota) logo
                 // depois da primeira fileira, sem precisar rolar a página toda.

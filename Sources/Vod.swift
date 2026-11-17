@@ -15,6 +15,9 @@ struct Serie: Identifiable, Hashable {
     var ano: String
     var pedaco: Int
     var episodios: Int
+    /// De que acervo veio: nulo o publicado; o caminho da pasta, o de uma
+    /// lista do usuário (docs/listas-m3u.md).
+    var origem: String? = nil
     var nomeCompleto: String { ano.isEmpty ? titulo : "\(titulo) (\(ano))" }
     var id: String { nomeCompleto }
 }
@@ -53,6 +56,7 @@ enum Vod {
         var bases: [String] = []
         var qualidades: [String: String] = [:]
         var indiceBuscaSujo = false
+        var acervosDeListas: [URL] = []
     }
     private static let estado = OSAllocatedUnfairLock(initialState: Estado())
 
@@ -99,7 +103,50 @@ enum Vod {
     /// Validade do cache local das fatias antes de buscar da rede (3 horas).
     private static let cacheTTL: TimeInterval = 3 * 3600
 
+    /// As pastas dos acervos das listas do usuário (MinhasListas avisa).
+    static func definirAcervosDeListas(_ pastas: [URL]) {
+        estado.withLock {
+            $0.acervosDeListas = pastas
+            $0.indiceBuscaSujo = true
+        }
+    }
+
+    private static var acervosDeListas: [URL] { estado.withLock { $0.acervosDeListas } }
+    static var pastasDeListas: [URL] { acervosDeListas }
+
+    /// Há filmes e séries para mostrar: o acervo publicado ou o de alguma lista.
+    static var temAcervo: Bool { Enderecos.filmesAtivos || !acervosDeListas.isEmpty }
+
+    /// O arquivo de um acervo de lista (nulo: o publicado).
+    private static func arquivoDe(_ origem: String?, _ nome: String) async -> String? {
+        guard let origem else { return Enderecos.filmesAtivos ? await arquivo(nome) : nil }
+        let url = URL(fileURLWithPath: origem).appendingPathComponent(AcervoLista.noDisco(nome))
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
+
+    /// O publicado (nulo) e o de cada lista.
+    private static var origens: [String?] { [nil] + acervosDeListas.map { $0.path } }
+
     static func indice() async -> [Gaveta] {
+        var gavetas = await indicePublicado()
+        for pasta in acervosDeListas {
+            guard let texto = try? String(contentsOf: pasta.appendingPathComponent("indice.txt"), encoding: .utf8) else { continue }
+            for linha in texto.split(separator: "\n") {
+                let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+                guard campos.count >= 3, !campos[0].isEmpty else { continue }
+                let (f, s) = (Int(campos[1]) ?? 0, Int(campos[2]) ?? 0)
+                if let i = gavetas.firstIndex(where: { $0.letra == campos[0] }) {
+                    gavetas[i].filmes += f
+                    gavetas[i].series += s
+                } else {
+                    gavetas.append(Gaveta(letra: String(campos[0]), filmes: f, series: s, reservados: 0))
+                }
+            }
+        }
+        return gavetas.sorted { ($0.letra == "#" ? "" : $0.letra) < ($1.letra == "#" ? "" : $1.letra) }
+    }
+
+    private static func indicePublicado() async -> [Gaveta] {
         guard Enderecos.filmesAtivos else { return [] }
         conferirVersao()
         guard let texto = await indiceAtual() else { return [] }
@@ -183,10 +230,35 @@ enum Vod {
     }
 
     fileprivate static func filmesBruto(letra: String, reservados: Bool = false) async -> [Filme] {
-        guard Enderecos.filmesAtivos else { return [] }
         let prefixo = reservados ? "reservado" : "filmes"
-        guard let texto = await arquivo("\(prefixo)-\(gaveta(letra)).txt") else { return [] }
-        return texto.split(separator: "\n").compactMap { linha in
+        let nome = "\(prefixo)-\(gaveta(letra)).txt"
+        // Os reservados são só do acervo publicado.
+        var saida: [Filme] = []
+        var varias = false
+        for origem in reservados ? [nil] : origens {
+            guard let texto = await arquivoDe(origem, nome) else { continue }
+            let lidos = filmesDoTexto(texto)
+            if saida.isEmpty { saida = lidos; continue }
+            varias = true
+            // O mesmo título em outro acervo: as fontes dele viram reserva.
+            for f in lidos {
+                if let i = saida.firstIndex(where: { $0.titulo == f.titulo }) {
+                    for (v, urls) in f.fontes {
+                        saida[i].fontes[v, default: []] += urls.filter { !(saida[i].fontes[v] ?? []).contains($0) }
+                    }
+                } else {
+                    saida.append(f)
+                }
+            }
+        }
+        if varias {
+            saida.sort { $0.titulo.localizedStandardCompare($1.titulo) == .orderedAscending }
+        }
+        return saida
+    }
+
+    private static func filmesDoTexto(_ texto: String) -> [Filme] {
+        texto.split(separator: "\n").compactMap { linha in
             let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
             guard campos.count >= 2, !campos[0].isEmpty else { return nil }
             var fontes: [String: [String]] = [:]
@@ -204,14 +276,17 @@ enum Vod {
     }
 
     fileprivate static func seriesBruto(letra: String) async -> [Serie] {
-        guard Enderecos.filmesAtivos else { return [] }
-        guard let texto = await arquivo("series-\(gaveta(letra)).txt") else { return [] }
-        return texto.split(separator: "\n").compactMap { linha in
-            let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
-            guard campos.count >= 4, !campos[0].isEmpty else { return nil }
-            return Serie(titulo: String(campos[0]), ano: String(campos[1]),
-                         pedaco: Int(campos[2]) ?? 0, episodios: Int(campos[3]) ?? 0)
+        var saida: [Serie] = []
+        for origem in origens {
+            guard let texto = await arquivoDe(origem, "series-\(gaveta(letra)).txt") else { continue }
+            saida += texto.split(separator: "\n").compactMap { linha in
+                let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
+                guard campos.count >= 4, !campos[0].isEmpty else { return nil }
+                return Serie(titulo: String(campos[0]), ano: String(campos[1]),
+                             pedaco: Int(campos[2]) ?? 0, episodios: Int(campos[3]) ?? 0, origem: origem)
+            }
         }
+        return saida
     }
 
     /// Animes e doramas já trazem títulos e episódios no mesmo arquivo.
@@ -259,7 +334,7 @@ enum Vod {
     /// Episódios de uma série. Baixa só o pedaço em que ela está.
     static func episodios(letra: String, serie: Serie) async -> [Episodio] {
         let nome = "series-\(gaveta(letra))-\(serie.pedaco).txt"
-        guard let texto = await arquivo(nome) else { return [] }
+        guard let texto = await arquivoDe(serie.origem, nome) else { return [] }
         var out: [Episodio] = []
         var dentro = false
         for linha in texto.split(separator: "\n", omittingEmptySubsequences: false) {
@@ -309,13 +384,16 @@ enum Vod {
     /// não pode aparecer numa busca geral.
     @MainActor
     fileprivate static func todosBruto() async -> [Achado] {
-        guard Enderecos.filmesAtivos else { return [] }
         if indiceBuscaSuja {
             indiceBusca = []
             indiceBuscaSuja = false
         }
         if !indiceBusca.isEmpty { return indiceBusca }
-        guard let texto = await arquivo("busca.txt") else { return [] }
+        var texto = ""
+        for origem in origens {
+            if let t = await arquivoDe(origem, "busca.txt") { texto += t + "\n" }
+        }
+        guard !texto.isEmpty else { return [] }
         let lidos = texto.split(separator: "\n").compactMap { linha -> Achado? in
             let campos = linha.split(separator: "\t", omittingEmptySubsequences: false)
             guard campos.count >= 3, !campos[0].isEmpty else { return nil }

@@ -72,7 +72,7 @@ struct TelaBusca: View {
             // Para conferir a tela sem digitar: `--args -buscaInicial nome`.
             if texto.isEmpty, let inicial = UserDefaults.standard.string(forKey: "buscaInicial") { texto = inicial }
             await Generos.carregar()
-            if Enderecos.filmesAtivos {
+            if Vod.temAcervo {
                 acervo = await Vod.todos()
                 colecoes = await Vod.colecao("animes") + Vod.colecao("doramas")
             }

@@ -232,6 +232,14 @@ grupo ou nome adulto ficam de fora (o parental não é tocado). O menu "Importar
 lista .m3u…" agora cria uma lista por aqui. Teste do leitor contra o gabarito:
 `./scripts/testar_minhas_listas.sh` (os .m3u de teste ficam fora do git).
 
+**Filmes e séries das listas** (`Classificar.swift`, `AcervoLista.swift`): cada item de uma
+lista M3U ou conta Xtream é classificado em canal, filme ou episódio pelas regras de
+[`docs/listas-m3u.md`](docs/listas-m3u.md) (referência `scripts/classificar_m3u.py`, gabarito em
+`docs/exemplos/listas/`, teste `scripts/testar_classificar.sh`). Os canais ficam no
+`<id>.m3u` da lista; filmes e séries viram um acervo no formato Saimo em
+`minhas_listas/<id>-acervo/` (capa pelo `tvg-logo`, grupo como gênero) que o `Vod` lê junto
+do publicado. Conta Xtream: canais pela API, filmes e séries pelo M3U completo da conta.
+
 Sincronia pelo Saimo Connect (`{"t":"dados"}`, mesmo formato na TV Box, Mac, Windows e celular): ao conectar e a cada mudança vão onde parou em filmes e episódios, títulos favoritos, canais favoritos, os dois endereços das listas (vale o escolhido por último; quem nunca escolheu fica com o do outro aparelho) e as listas adicionadas por link (união; a que veio de arquivo fica só no aparelho). Código em `SincroniaConnect.swift`. **Minhas listas** (`MinhasListas.swift`, Ajustes > Minhas listas): listas .m3u por link, canais na seção "Minhas listas" do Ao vivo; os de adulto só com o restrito desbloqueado.
 
 Saimo Connect (`SaimoConnect.swift`, `ConnectHls.swift`, `Historico.swift`; Connect 2: a
