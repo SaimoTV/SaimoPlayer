@@ -423,7 +423,7 @@ struct TelaAjustes: View {
                                   icone: model.restrictedUnlocked ? "lock.open" : "lock") {
                                 if model.restrictedUnlocked { model.bloquearAdulto() } else { abrirParental("liberar") }
                             }
-                            linha("Trocar a senha", Parental.ehPadrao ? "A senha inicial é \(Parental.padrao)" : "Senha própria",
+                            linha("Trocar a senha", Parental.ehPadrao ? "Ainda com a senha de fábrica" : "Senha própria",
                                   icone: "key") { abrirParental("trocar") }
                             if let modo = parental {
                                 HStack(spacing: 10) {
