@@ -113,7 +113,9 @@ perfil aberto em cada aparelho.
 `kids` e `codigo` viajam junto com nome e avatar (mesmo `em`).
 
 O Roku não sincroniza dados pelo Connect (só controle remoto): lá os perfis
-ficam no aparelho.
+ficam no aparelho. No Roku o Kids também esconde filmes e séries por inteiro:
+a classificação de cada título não cabe na memória de um stick de 512 MB, e
+esconder tudo é o lado seguro.
 
 ## Avatares
 

@@ -375,3 +375,15 @@ Pré-requisitos: repositórios irmãos em `../SaimoTV-Android`, `../SaimoWin` e
   por isso.
 - Respeite direitos autorais e de distribuição do conteúdo.
 - Não coloque tokens, credenciais ou dados pessoais em catálogos e scripts.
+
+## Perfis, Kids e controle parental (3.2.0)
+
+Contrato comum dos apps: `SaimoPlayer/docs/perfis.md`. Até 10 perfis, cada um com avatar (21, de
+`SaimoPlayer/docs/avatares`), os seus favoritos, onde parou e recentes; listas, fontes e ajustes valem
+para o aparelho todo. O perfil principal usa os dados de antes (ninguém perde nada ao atualizar).
+Com 2 ou mais perfis o app abre em "Quem está assistindo?". Perfil Kids: só filmes e séries com
+classificação até 12 anos (sem classificação, escondido), nada adulto, sem addons; sair dele,
+gerenciar perfis e abrir os Ajustes pedem um código de 4 dígitos (guardado como SHA-256). Controle
+parental visível no fim dos Ajustes, discreto: senha padrão 0000, trocável; no Kids nunca libera.
+
+No Mac: `Perfis.swift` (uma suíte do UserDefaults por perfil; trocar de perfil reabre o app com `--perfil-escolhido`), `TelaPerfis.swift`, `Kids.swift`; o avatar fica na barra do topo.
