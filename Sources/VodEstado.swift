@@ -9,7 +9,7 @@ import Combine
 /// Guardando aqui fora, reabrir cai exatamente onde parou.
 /// Qual parte do acervo está aberta no lugar do vídeo.
 enum VodSecao: String, Identifiable, CaseIterable {
-    case inicio, filmes, series, animes, doramas, extras, favoritos, eventos
+    case inicio, filmes, series, animes, doramas, novelas, kids, novelinhas, extras, favoritos, eventos
     /// As telas da barra do topo que não são uma parte do acervo, mas moram
     /// no mesmo lugar dele: com uma delas aberta o ao vivo para, como em
     /// qualquer outra seção.
@@ -27,6 +27,9 @@ enum VodSecao: String, Identifiable, CaseIterable {
         case .series: return "Séries"
         case .animes: return "Animes"
         case .doramas: return "Doramas"
+        case .novelas: return "Novelas"
+        case .kids: return "Kids"
+        case .novelinhas: return "Novelinhas"
         case .extras: return "Extras"
         case .favoritos: return "Favoritos"
         case .eventos: return "Eventos"
@@ -39,6 +42,9 @@ enum VodSecao: String, Identifiable, CaseIterable {
         case .series: return "tv"
         case .animes: return "sparkles.tv"
         case .doramas: return "heart.rectangle"
+        case .novelas: return "theatermasks"
+        case .kids: return "figure.and.child.holdinghands"
+        case .novelinhas: return "iphone"
         case .extras: return "plus.rectangle.on.rectangle"
         case .favoritos: return "star.fill"
         case .eventos: return "sportscourt"
@@ -51,11 +57,21 @@ enum VodSecao: String, Identifiable, CaseIterable {
     }
     /// Extras são filmes noutro arquivo do catálogo, não outra natureza.
     var pedeFilmes: Bool {
-        ![.series, .animes, .doramas, .inicio, .eventos, .ondemand, .radios, .buscar, .ajustes, .apoie].contains(self)
+        ![.series, .animes, .doramas, .novelas, .kids, .novelinhas, .inicio, .eventos, .ondemand, .radios, .buscar, .ajustes, .apoie].contains(self)
     }
     /// As quatro categorias do On Demand: cada uma tem a página dela, em
     /// fileiras, e o acervo inteiro de A a Z por trás.
-    var ehCategoria: Bool { [.filmes, .series, .animes, .doramas].contains(self) }
+    var ehCategoria: Bool { [.filmes, .series, .animes, .doramas, .novelas, .kids].contains(self) }
+    /// A categoria do categorias.txt de cada seção que vem dele.
+    var categoriaVod: String? {
+        switch self {
+        case .animes: return "anime"
+        case .doramas: return "dorama"
+        case .novelas: return "novela"
+        case .kids: return "kids"
+        default: return nil
+        }
+    }
 }
 
 @MainActor

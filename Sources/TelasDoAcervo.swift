@@ -287,6 +287,9 @@ struct TelaOnDemand: View {
         .series: "Temporadas completas, com o próximo episódio emendando sozinho.",
         .animes: "Os animes do momento e os que marcaram época.",
         .doramas: "Romance, drama e suspense da Coreia, do Japão e da China.",
+        .novelas: "Novelas brasileiras, mexicanas e turcas, do primeiro ao último capítulo.",
+        .kids: "Desenhos, animações e filmes para a família, com classificação livre.",
+        .novelinhas: "Minisséries em pé, de um minuto por episódio, para maratonar.",
     ]
 
     private var nome: String { tipo?.titulo ?? "On Demand" }
@@ -324,6 +327,8 @@ struct TelaOnDemand: View {
         if Enderecos.filmesAtivos {
             await Generos.carregar()
             await InfoDosTitulos.carregar()
+            await CategoriasVod.carregar()
+            if tipo == nil { await Novelinhas.shared.carregar() }
             acervo = await Vod.todos()
             if tipo == nil || tipo == .animes { colecoes["animes"] = await Vod.colecao("animes") }
             if tipo == nil || tipo == .doramas { colecoes["doramas"] = await Vod.colecao("doramas") }
@@ -344,8 +349,11 @@ struct TelaOnDemand: View {
             return acervo.count + (colecoes["animes"]?.count ?? 0) + (colecoes["doramas"]?.count ?? 0)
         case .filmes: return acervo.isEmpty ? nil : acervo.filter { !$0.serie }.count
         case .series: return acervo.isEmpty ? nil : acervo.filter(\.serie).count
-        case .animes: return colecoes["animes"]?.count
-        case .doramas: return colecoes["doramas"]?.count
+        case .animes, .doramas:
+            guard let c = colecoes[secao == .animes ? "animes" : "doramas"] else { return nil }
+            return c.count + extrasDoAcervo(secao!).count
+        case .novelas, .kids: return acervo.isEmpty ? nil : doAcervoDaCategoria(secao!).count
+        case .novelinhas: return Novelinhas.shared.lista.isEmpty ? nil : Novelinhas.shared.lista.count
         default: return nil
         }
     }
@@ -367,7 +375,10 @@ struct TelaOnDemand: View {
         if tipo == nil { out.append(categorias(titulo: "Categorias", az: false)) }
         if let continuar = continuar { out.append(continuar) }
         for fila in filasDeDestaque {
-            let itens = tipo.map { t in fila.itens.filter { $0.tipo == letraDe(t) } } ?? fila.itens
+            let itens = tipo.map { t in fila.itens.filter { d in
+                if let cat = t.categoriaVod, CategoriasVod.tem(d.nomeCompleto, serie: d.serie, cat) { return true }
+                return [.filmes, .series, .animes, .doramas].contains(t) && d.tipo == letraDe(t)
+            } } ?? fila.itens
             if itens.count >= 4 {
                 out.append(Fila(titulo: fila.titulo, cartoes: itens.map { CartoesDoAcervo.destaque($0, acoes: acoes) }))
             }
@@ -378,8 +389,15 @@ struct TelaOnDemand: View {
                 // depois da primeira fileira, sem precisar rolar a página toda.
                 let explorarFila = Fila(titulo: "Filtrar e explorar", tipo: .secao,
                                         cartoes: [explorar(tipo, titulo: "Todos, com filtros")])
-                out.insert(explorarFila, at: min(out.count, continuar == nil ? 1 : 2))
+                // Novelas e Kids misturam filmes e séries: não têm grade A–Z.
+                if tipo != .novelas && tipo != .kids {
+                    out.insert(explorarFila, at: min(out.count, continuar == nil ? 1 : 2))
+                }
                 let candidatos = self.candidatos(tipo)
+                if tipo == .novelas || tipo == .kids {
+                    let populares = candidatos.sorted { $0.popularidade > $1.popularidade }.prefix(30)
+                    if populares.count >= 4 { out.append(Fila(titulo: "Mais populares", cartoes: populares.map(\.cartao))) }
+                }
                 let lancamentos = candidatos.filter { $0.ano >= anoAtual - 1 }.sorted { $0.ano > $1.ano }.prefix(30)
                 if lancamentos.count >= 4 {
                     out.append(Fila(titulo: "Lançamentos", cartoes: lancamentos.map(\.cartao)))
@@ -438,6 +456,33 @@ struct TelaOnDemand: View {
         let ano: Int
         let generos: [String]
         let cartao: CartaoFila
+        var popularidade: Int = 0
+    }
+
+    /// Nome sem ano, acento e pontuação: junta "Naruto" da coleção com o do acervo.
+    private static func nomeChave(_ titulo: String) -> String {
+        Generos.semAno(titulo).folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
+            .components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
+    /// Filmes e séries do acervo marcados no categorias.txt com a categoria da seção.
+    private func doAcervoDaCategoria(_ secao: VodSecao) -> [Vod.Achado] {
+        guard let cat = secao.categoriaVod else { return [] }
+        return acervo.filter { CategoriasVod.tem($0.nomeCompleto, serie: $0.serie, cat) || CategoriasVod.tem($0.titulo, serie: $0.serie, cat) }
+    }
+
+    /// Animes e doramas do acervo que a coleção não tem (pelo nome).
+    private func extrasDoAcervo(_ secao: VodSecao) -> [Vod.Achado] {
+        let nomes = Set((colecoes[secao == .animes ? "animes" : "doramas"] ?? []).map { Self.nomeChave($0.0.titulo) })
+        return doAcervoDaCategoria(secao).filter { !nomes.contains(Self.nomeChave($0.titulo)) }
+    }
+
+    private func candidatoDoAcervo(_ a: Vod.Achado) -> Candidato? {
+        guard Generos.capa(a.nomeCompleto, serie: a.serie) != nil || Generos.capa(a.titulo, serie: a.serie) != nil else { return nil }
+        return Candidato(ano: CartoesDoAcervo.ano(a.titulo, a.ano),
+                         generos: Generos.de(a.nomeCompleto, serie: a.serie),
+                         cartao: CartoesDoAcervo.achado(a, acoes: acoes),
+                         popularidade: InfoDosTitulos.de(a.nomeCompleto, serie: a.serie)?.popularidade ?? 0)
     }
 
     /// Só títulos com capa: fileira cheia de quadrados vazios não convida ninguém.
@@ -449,7 +494,9 @@ struct TelaOnDemand: View {
                 return Candidato(ano: CartoesDoAcervo.ano(serie.titulo, serie.ano),
                                  generos: Generos.de(serie.titulo, serie: true),
                                  cartao: CartoesDoAcervo.colecao(serie, episodios, acoes: acoes))
-            }
+            } + extrasDoAcervo(secao).compactMap(candidatoDoAcervo)
+        case .novelas, .kids:
+            return doAcervoDaCategoria(secao).compactMap(candidatoDoAcervo)
         default:
             let serie = secao == .series
             return acervo.compactMap { a in
@@ -469,6 +516,8 @@ struct TelaOnDemand: View {
             case nil: return true
             case .filmes: return !a.serie
             case .series, .animes, .doramas: return a.serie
+            case .novelas: return CategoriasVod.tem(a.titulo, serie: a.serie, "novela")
+            case .kids: return CategoriasVod.tem(a.titulo, serie: a.serie, "kids")
             default: return false
             }
         }.prefix(20)
@@ -501,18 +550,31 @@ struct TelaOnDemand: View {
     }
 
     private func categorias(titulo: String, az: Bool) -> Fila {
-        let tipos: [VodSecao] = [.filmes, .series, .animes, .doramas]
+        let tipos: [VodSecao] = [.filmes, .series, .animes, .doramas, .novelas, .novelinhas, .kids]
+            .filter { [.filmes, .series, .animes, .doramas].contains($0) || (contagem($0) ?? 0) > 0 }
         return Fila(titulo: titulo, tipo: .secao, cartoes: tipos.map { secao in
-            az ? explorar(secao, titulo: "\(secao.titulo) de A a Z") : cartaoDaCategoria(secao)
+            az && ![.novelas, .kids, .novelinhas].contains(secao)
+                ? explorar(secao, titulo: "\(secao.titulo) de A a Z") : cartaoDaCategoria(secao)
         })
     }
 
     /// O cartão grande de uma categoria: colagem com as capas em alta dela.
     private func cartaoDaCategoria(_ secao: VodSecao) -> CartaoFila {
         let letra = letraDe(secao)
-        let emAlta = filasDeDestaque.flatMap(\.itens).filter { $0.tipo == letra && !$0.capa.isEmpty }
+        let emAlta = filasDeDestaque.flatMap(\.itens).filter { d in
+            guard !d.capa.isEmpty else { return false }
+            if secao == .novelas || secao == .kids { return CategoriasVod.tem(d.nomeCompleto, serie: d.serie, secao.categoriaVod!) }
+            if secao == .novelinhas { return false }
+            return d.tipo == letra
+        }
         var vistas = Set<String>()
         var colagem = Array(emAlta.map(\.capa).filter { vistas.insert($0).inserted }.prefix(4))
+        if colagem.count < 4 {
+            let extras: [String] = secao == .novelinhas
+                ? Novelinhas.shared.lista.prefix(8).map(\.capa)
+                : (secao == .novelas || secao == .kids ? doAcervoDaCategoria(secao).prefix(30).compactMap { Generos.capa($0.nomeCompleto, serie: $0.serie) ?? Generos.capa($0.titulo, serie: $0.serie) } : [])
+            colagem += extras.filter { vistas.insert($0).inserted }.prefix(4 - colagem.count)
+        }
         if colagem.isEmpty && addons.temAtivos {
             let alvoSerie = secao != .filmes
             let descobertaCapas = (descoberta.catalogosFilas + descoberta.filasTMDB)
@@ -528,6 +590,9 @@ struct TelaOnDemand: View {
             case .series: return ("play.rectangle.on.rectangle.fill", Tema.corSeries)
             case .animes: return ("sparkles", Tema.corAnimes)
             case .doramas: return ("heart.fill", Tema.corDoramas)
+            case .novelas: return ("theatermasks.fill", Color(red: 0xC7 / 255, green: 0x92 / 255, blue: 0xEA / 255))
+            case .kids: return ("figure.and.child.holdinghands", Color(red: 0x7E / 255, green: 0xE7 / 255, blue: 0x87 / 255))
+            case .novelinhas: return ("iphone", Tema.corDoramas)
             default: return ("film.fill", Tema.corFilmes)
             }
         }()

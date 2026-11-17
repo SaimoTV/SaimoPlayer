@@ -154,6 +154,12 @@ struct VodGridView: View {
             case .ondemand:
                 TelaOnDemand(model: model, tipo: nil, acoes: acoes,
                              filasDeDestaque: filasDeDestaque, nomesDoAcervo: nomesDoAcervo)
+            case .novelinhas:
+                TelaNovelinhas()
+            case .novelas, .kids:
+                // Mistura filmes e séries: a página em fileiras faz as vezes da grade.
+                TelaOnDemand(model: model, tipo: estado.secao, acoes: acoes,
+                             filasDeDestaque: filasDeDestaque, nomesDoAcervo: nomesDoAcervo)
             case .filmes, .series, .animes, .doramas:
                 if estado.explorando && Enderecos.filmesAtivos {
                     telaDaGrade
@@ -233,7 +239,7 @@ struct VodGridView: View {
             switch estado.secao {
             case .extras: return gaveta.reservados > 0
             case .series: return gaveta.series > 0
-            case .animes, .doramas: return false
+            case .animes, .doramas, .novelas, .kids, .novelinhas: return false
             default: return gaveta.filmes > 0
             }
         }
@@ -243,7 +249,7 @@ struct VodGridView: View {
         switch estado.secao {
         case .extras: return gaveta.reservados
         case .series: return gaveta.series
-        case .animes, .doramas: return 0
+        case .animes, .doramas, .novelas, .kids, .novelinhas: return 0
         default: return gaveta.filmes
         }
     }

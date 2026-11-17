@@ -47,7 +47,7 @@ enum Aba: String, CaseIterable, Identifiable {
         case nil: return .aoVivo
         case .inicio: return .inicio
         case .eventos: return .eventos
-        case .ondemand, .filmes, .series, .animes, .doramas: return .onDemand
+        case .ondemand, .filmes, .series, .animes, .doramas, .novelas, .kids, .novelinhas: return .onDemand
         case .favoritos: return .favoritos
         case .radios: return .radios
         case .extras: return .extras
