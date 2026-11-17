@@ -315,9 +315,52 @@ final class PlayerModel: NSObject, ObservableObject {
             return destinoResolvido
         }
 
-        // Fallback: se a API remota do Pages retornou 404/520/somenteApp,
+        // Fallback 1: Nixplay determinístico direto
+        if let nixDireto = await resolverNixplayDireto(url: url) {
+            return nixDireto
+        }
+
+        // Fallback 2: se a API remota do Pages retornou 404/520/somenteApp,
         // o app resolve diretamente da conexão residencial na RedeFlix:
         return await resolverRedeFlixDireto(url: url)
+    }
+
+    /// Resolve determinístico da lista oficial Nixplay (ultra-rápido, ilimitado).
+    static func resolverNixplayDireto(url: URL) async -> URL? {
+        guard let componentes = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+        let itens = componentes.queryItems ?? []
+        guard let id = itens.first(where: { $0.name == "id" })?.value?.replacingOccurrences(of: "tmdb:", with: "") else { return nil }
+        let cleanId = id.components(separatedBy: ":").first ?? id
+        guard !cleanId.isEmpty, cleanId.allSatisfy({ $0.isNumber }) else { return nil }
+
+        let tipo = itens.first(where: { $0.name == "tipo" || $0.name == "type" })?.value?.lowercased() ?? "movie"
+        let isSerie = tipo == "series" || tipo == "tv"
+        let s = itens.first(where: { $0.name == "s" || $0.name == "temporada" })?.value ?? "1"
+        let e = itens.first(where: { $0.name == "e" || $0.name == "episodio" })?.value ?? "1"
+
+        let nixStr = isSerie
+            ? "https://nixplay.lat/series/saimo-vods/221097/\(cleanId)/\(s)/\(e).mp4"
+            : "https://nixplay.lat/movie/saimo-vods/221097/\(cleanId).mp4"
+        guard let nixURL = URL(string: nixStr) else { return nil }
+
+        var req = URLRequest(url: nixURL)
+        req.httpMethod = "GET"
+        req.setValue("bytes=0-1023", forHTTPHeaderField: "Range")
+        req.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        req.timeoutInterval = 4
+
+        if let (dados, resp) = try? await URLSession.shared.data(for: req),
+           let http = resp as? HTTPURLResponse {
+            if http.statusCode == 200 || http.statusCode == 206 {
+                let txt = String(data: dados.prefix(64), encoding: .utf8) ?? ""
+                if !txt.contains("ERRO:") && !txt.contains("não encontrado") {
+                    return nixURL
+                }
+            } else if (300...399).contains(http.statusCode) {
+                return nixURL
+            }
+        }
+        return nil
     }
 
     /// Resolve diretamente da RedeFlix (IP residencial do usuário, imune a bloqueios de datacenter da Cloudflare).
