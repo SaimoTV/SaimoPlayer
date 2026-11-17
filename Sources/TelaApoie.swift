@@ -2,10 +2,12 @@ import SwiftUI
 import AppKit
 import CoreImage.CIFilterBuiltins
 
-/// Apoie o Saimo TV: por que doar, o botão que abre a página de doação, o QR
-/// code (para doar pelo celular) e o link escrito.
+/// Apoie o Saimo TV: por que doar, o Pix direto (QR code para doar pelo
+/// celular e o botão que copia o código "copia e cola").
 struct TelaApoie: View {
-    static let link = URL(string: "https://deflow.exchange/pt/qr/saimo-tv")!
+    /// Pix "copia e cola" (BR Code estático): o valor vai direto para o desenvolvedor.
+    static let codigoPix = "00020126580014br.gov.bcb.pix0136950460d4-51c5-49ba-bf71-b720b60cde435204000053039865802BR5925GABRIEL SAIMO FERREIRA ES60085500019962070503***6304F442"
+    @State private var copiado = false
     private let turquesa = Color(red: 0.31, green: 0.89, blue: 0.82)
 
     var body: some View {
@@ -24,35 +26,31 @@ struct TelaApoie: View {
                     Text("Manter servidores rápidos, a transmissão e as atualizações de todo dia custa dinheiro todo mês. Quem puder ajudar com qualquer valor faz uma diferença enorme para o Saimo TV continuar no ar para todos.")
                         .font(.system(size: 15)).foregroundStyle(.white.opacity(0.62))
                         .fixedSize(horizontal: false, vertical: true)
+                    Text("Agora o Pix é direto: o valor vai direto para o desenvolvedor, Gabriel Saimo Ferreira, sem intermediário. Aponte a câmera do celular para o QR code ou copie o código Pix e cole no app do seu banco.")
+                        .font(.system(size: 15)).foregroundStyle(.white.opacity(0.8))
+                        .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 12) {
                         vantagem("nosign", "Zero anúncios", "Nada interrompendo o que você assiste")
                         vantagem("bolt.fill", "Servidores rápidos", "Transmissão estável e em alta qualidade")
                         vantagem("heart.fill", "Sem mensalidade", "Canais, filmes e séries para todo mundo")
                     }
                     .padding(.top, 6)
-                    HStack(spacing: 12) {
-                        Button { NSWorkspace.shared.open(Self.link) } label: {
-                            Label("Fazer doação (Pix ou cripto)", systemImage: "heart.fill")
-                                .font(.system(size: 15, weight: .bold))
-                                .padding(.horizontal, 22).padding(.vertical, 12)
-                                .foregroundStyle(.white)
-                                .background(LinearGradient(colors: [Color(red: 0.06, green: 0.66, blue: 0.60),
-                                                                    Color(red: 0.15, green: 0.39, blue: 0.92)],
-                                                           startPoint: .leading, endPoint: .trailing), in: Capsule())
-                        }
-                        .buttonStyle(.plain)
-                        Button {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(Self.link.absoluteString, forType: .string)
-                        } label: {
-                            Label("Copiar link", systemImage: "doc.on.doc")
-                                .font(.system(size: 14, weight: .semibold))
-                                .padding(.horizontal, 18).padding(.vertical, 11)
-                                .foregroundStyle(turquesa)
-                                .overlay(Capsule().stroke(turquesa.opacity(0.5)))
-                        }
-                        .buttonStyle(.plain)
+                    Button {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(Self.codigoPix, forType: .string)
+                        copiado = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiado = false }
+                    } label: {
+                        Label(copiado ? "Código copiado" : "Copiar Pix copia e cola",
+                              systemImage: copiado ? "checkmark" : "doc.on.doc")
+                            .font(.system(size: 15, weight: .bold))
+                            .padding(.horizontal, 22).padding(.vertical, 12)
+                            .foregroundStyle(.white)
+                            .background(LinearGradient(colors: [Color(red: 0.06, green: 0.66, blue: 0.60),
+                                                                Color(red: 0.15, green: 0.39, blue: 0.92)],
+                                                       startPoint: .leading, endPoint: .trailing), in: Capsule())
                     }
+                    .buttonStyle(.plain)
                     .padding(.top, 10)
                 }
                 .frame(maxWidth: 680, alignment: .leading)
@@ -63,11 +61,10 @@ struct TelaApoie: View {
                     if let qr = Self.qr {
                         Image(nsImage: qr).interpolation(.none).resizable().frame(width: 240, height: 240)
                     }
-                    Text("deflow.exchange/pt/qr/saimo-tv")
+                    Text("Pix direto")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(Color(red: 0.05, green: 0.45, blue: 0.56))
-                        .textSelection(.enabled)
-                    Text("Pagamento seguro pela Deflow")
+                    Text("Gabriel Saimo Ferreira")
                         .font(.system(size: 12)).foregroundStyle(.gray)
                 }
                 .padding(28)
@@ -95,10 +92,10 @@ struct TelaApoie: View {
         .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
     }
 
-    /// QR code do link, gerado na hora (sem imagem guardada no app).
+    /// QR code do Pix, gerado na hora (sem imagem guardada no app).
     private static let qr: NSImage? = {
         let filtro = CIFilter.qrCodeGenerator()
-        filtro.message = Data(link.absoluteString.utf8)
+        filtro.message = Data(codigoPix.utf8)
         filtro.correctionLevel = "M"
         guard let saida = filtro.outputImage?.transformed(by: CGAffineTransform(scaleX: 10, y: 10)) else { return nil }
         let rep = NSCIImageRep(ciImage: saida)
