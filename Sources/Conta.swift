@@ -104,15 +104,45 @@ final class Conta: ObservableObject {
         let j = try await chamar("POST", "/v1/tv/estado", ["aparelhoCodigo": p.aparelhoCodigo], comToken: false)
         switch j["estado"] as? String {
         case "aprovado":
-            guard let t = j["token"] as? String else { return false }
-            let e = (j["conta"] as? [String: Any])?["email"] as? String
-            padrao.set(t, forKey: chToken); padrao.set(e, forKey: chEmail)
-            email = e; erro = nil; ultimoEnviado = ""
-            Task { await sincronizar(forcar: true) }
+            guard j["token"] is String else { return false }
+            entrou(j)
             return true
         case "vencido": return nil
         default: return false
         }
+    }
+
+    // MARK: e-mail e senha (opcional)
+
+    private func entrou(_ j: [String: Any]) {
+        guard let t = j["token"] as? String else { return }
+        let e = (j["conta"] as? [String: Any])?["email"] as? String
+        padrao.set(t, forKey: chToken); padrao.set(e, forKey: chEmail)
+        email = e; erro = nil; ultimoEnviado = ""
+        Task { await sincronizar(forcar: true) }
+    }
+
+    /// Manda o código de 6 números para o e-mail (para criar ou trocar a senha).
+    /// Em teste o servidor devolve o código (`codigoDev`). Pediu há menos de 1 min: vale o que já chegou.
+    func pedirCodigoPorEmail(_ email: String) async throws -> String? {
+        do {
+            let j = try await chamar("POST", "/v1/email/codigo", ["email": email.trimmingCharacters(in: .whitespaces)], comToken: false)
+            return j["codigoDev"] as? String
+        } catch let e as Erro where e.mensagem.contains("minuto") {
+            return nil
+        }
+    }
+
+    func entrarComSenha(_ email: String, _ senha: String) async throws {
+        entrou(try await chamar("POST", "/v1/senha/entrar",
+                                ["email": email.trimmingCharacters(in: .whitespaces), "senha": senha, "aparelho": nomeDoAparelho], comToken: false))
+    }
+
+    /// Cria a conta com senha ou troca a esquecida, com o código do e-mail. Trocar encerra as outras sessões.
+    func definirSenha(_ email: String, codigo: String, senha: String) async throws {
+        entrou(try await chamar("POST", "/v1/senha/definir",
+                                ["email": email.trimmingCharacters(in: .whitespaces), "codigo": codigo, "senha": senha, "aparelho": nomeDoAparelho],
+                                comToken: false))
     }
 
     func sair() async {
