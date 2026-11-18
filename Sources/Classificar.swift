@@ -163,10 +163,14 @@ enum Classificar {
 
     static func tipo(url: String, nome: String, grupo: String, declarado: String) -> Tipo {
         let m = marca(nome)
+        let segs = caminho(url)
+        // Arquivo de vídeo (.mp4, .mkv, .avi...) nunca é canal, nem declarado "live".
+        if let u = segs.last, let p = u.lastIndex(of: "."), video.contains(String(u[u.index(after: p)...])) {
+            return m.map { .episodio($0) } ?? .filme
+        }
         let d = declarado.trimmingCharacters(in: .whitespaces).lowercased()
         if tipoCanal.contains(d) { return .canal }
         var acervo = tipoFilme.contains(d) || tipoSerie.contains(d)
-        let segs = caminho(url)
         if !acervo {
             for s in segs.dropLast() {
                 if segFilme.contains(s) || segSerie.contains(s) { acervo = true; break }

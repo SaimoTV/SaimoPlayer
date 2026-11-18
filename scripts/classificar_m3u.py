@@ -198,6 +198,12 @@ def ano_no_fim(nome):
 def tipo(url, nome, grupo, declarado):
     """'canal', 'filme' ou 'episodio' (com a marca, quando houver)."""
     m = marca(nome)
+    # Arquivo de vídeo (.mp4, .mkv, .avi...) nunca é canal, mesmo que a lista
+    # declare "live" ou o endereço tenha /live/: canal é .m3u8, .ts, .mpd, .txt
+    # ou endereço sem extensão.
+    segs0 = caminho(url)
+    if segs0 and "." in segs0[-1] and segs0[-1].rsplit(".", 1)[1] in VIDEO:
+        return ("episodio", m) if m else ("filme", None)
     d = (declarado or "").strip().lower()
     acervo = None
     if d in TIPO_CANAL:

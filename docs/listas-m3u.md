@@ -6,6 +6,11 @@ Samsung/LG e Roku). Uma lista M3U, ou uma conta Xtream lida pelo M3U dela
 episódios de séries. Cada item é classificado pelas regras abaixo, **nesta ordem**;
 a primeira que decide vale.
 
+**Antes de tudo:** endereço de **arquivo de vídeo** (`mp4 mkv avi mov wmv flv webm m4v mpg mpeg
+3gp divx ogv vob`) **nunca é canal**, mesmo que a lista declare `live` ou o caminho tenha `/live/`:
+é filme (ou episódio, com marca de episódio). Canal ao vivo é `.m3u8`, `.ts`, `.mpd`, `.txt` ou
+endereço sem extensão.
+
 Os canais vão para o Ao vivo (seção "Minhas listas", como sempre). Filmes e séries
 vão para Filmes e séries, junto do acervo do Saimo: o app monta com eles um acervo
 no **formato Saimo** (`docs/formato-saimo.md`, item 5) guardado no aparelho, um por
