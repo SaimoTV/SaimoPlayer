@@ -61,14 +61,15 @@ Grupo (`group-title`, ou `#EXTGRP`) normalizado: minúsculas, sem acento.
 Procurada no nome sem acento e em minúsculas, só no começo de palavra (antes dela
 nada ou um caractere que não é letra nem número):
 
-| Forte (vale a primeira) | Exemplo | Temporada, episódio |
+| Forte (procuradas nesta ordem, cada uma no nome inteiro) | Exemplo | Temporada, episódio |
 |---|---|---|
 | `s` + 1–3 dígitos + (espaço/`.`/`_`/`-`)* + `e`/`x` + `p`? + (espaço/`.`)* + 1–4 dígitos | `S01E02`, `s1 e2`, `S01.E02`, `S1x02` | 1, 2 |
 | `t` + 1–3 dígitos + (espaço/`.`/`_`/`-`)* + `e` + `p`? + (espaço/`.`)* + 1–4 dígitos | `T01E02`, `T1 EP2` | 1, 2 |
-| 1–2 dígitos + `x` + 1–3 dígitos | `1x02` (não pega `1920x1080`) | 1, 2 |
+| 1–2 dígitos + `x` + 1–3 dígitos, **nunca no começo do nome** | `Friends 1x02` (não pega `1920x1080`, nem `4x4 Sob Medida`) | 1, 2 |
 | `temporada`/`season` + espaços + dígitos, e em até 12 caracteres depois `episodio`/`episode`/`ep`/`capitulo`/`cap` + `.`? + espaços + dígitos | `Temporada 2 Episódio 5` | 2, 5 |
 
-Em todos, depois dos dígitos do episódio não pode vir outro dígito.
+Em todos, depois dos dígitos do episódio não pode vir outro dígito. Assim `4X4 Sob Medida
+S01E01` é a série "4X4 Sob Medida", e `4x100: Correndo por um Sonho` é um título, não um episódio.
 
 | Fraca (só se não houver forte) | Exemplo | Temporada, episódio |
 |---|---|---|

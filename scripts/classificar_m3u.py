@@ -87,30 +87,31 @@ def palavra_de_episodio(n, j):
 
 
 def marca(nome):
-    """(temporada, episodio, inicio, forte) ou None."""
+    """(temporada, episodio, inicio, forte) ou None.
+
+    Em três passadas, nesta ordem: S01E02/T01E02 no nome inteiro; depois
+    "Temporada N ... Episódio M"; depois 1x02 (nunca no começo do nome:
+    "4x4 Sob Medida", "4x100" são títulos). A fraca só sem nenhuma forte.
+    """
     n = dobrar(nome)
-    fraca = None
     for i, c in enumerate(n):
+        if not inicio_de_palavra(n, i) or c not in "st":
+            continue
+        t, j = ler_digitos(n, i + 1, 3)
+        if t is None:
+            continue
+        j = pular(n, j, " ._-")
+        if j < len(n) and (n[j] == "e" or (c == "s" and n[j] == "x")):
+            j += 1
+            if j < len(n) and n[j] == "p":
+                j += 1
+            j = pular(n, j, " .")
+            e, _ = ler_digitos(n, j, 4)
+            if e is not None:
+                return t, e, i, True
+    for i in range(len(n)):
         if not inicio_de_palavra(n, i):
             continue
-        if c in "st":
-            t, j = ler_digitos(n, i + 1, 3)
-            if t is not None:
-                j = pular(n, j, " ._-")
-                if j < len(n) and (n[j] == "e" or (c == "s" and n[j] == "x")):
-                    j += 1
-                    if j < len(n) and n[j] == "p":
-                        j += 1
-                    j = pular(n, j, " .")
-                    e, _ = ler_digitos(n, j, 4)
-                    if e is not None:
-                        return t, e, i, True
-        if c.isdigit():
-            t, j = ler_digitos_ate(n, i, 2, "x")
-            if t is not None and j < len(n) and n[j] == "x":
-                e, k = ler_digitos(n, j + 1, 3)
-                if e is not None and (k == len(n) or not n[k].isalnum()):
-                    return t, e, i, True
         for p in ("temporada", "season"):
             if n.startswith(p, i):
                 j = pular(n, i + len(p), " ")
@@ -121,11 +122,20 @@ def marca(nome):
                             e, _ = palavra_de_episodio(n, k)
                             if e is not None:
                                 return t, e, i, True
-        if fraca is None:
+    for i, c in enumerate(n):
+        if i == 0 or not inicio_de_palavra(n, i) or not c.isdigit():
+            continue
+        t, j = ler_digitos_ate(n, i, 2, "x")
+        if t is not None and j < len(n) and n[j] == "x":
+            e, k = ler_digitos(n, j + 1, 3)
+            if e is not None and (k == len(n) or not n[k].isalnum()):
+                return t, e, i, True
+    for i in range(len(n)):
+        if inicio_de_palavra(n, i):
             e, _ = palavra_de_episodio(n, i)
             if e is not None:
-                fraca = (1, e, i, False)
-    return fraca
+                return 1, e, i, False
+    return None
 
 
 def ler_digitos_ate(n, j, maximo, seguinte):

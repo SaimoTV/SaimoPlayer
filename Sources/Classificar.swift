@@ -87,43 +87,42 @@ enum Classificar {
         return (v, k)
     }
 
-    /// A marca de episódio (S01E02, 1x02, Temporada 2 Episódio 5, Ep 12…).
+    /// A marca de episódio, em três passadas: S01E02/T01E02 no nome inteiro;
+    /// "Temporada N ... Episódio M"; 1x02 (nunca no começo do nome: "4x4 Sob
+    /// Medida" e "4x100" são títulos). A fraca (Ep 12) só sem nenhuma forte.
     static func marca(_ nome: String) -> Marca? {
         let n = dobrar(nome)
-        var fraca: Marca?
         for i in 0..<n.count {
-            guard inicioDePalavra(n, i) else { continue }
             let c = n[i]
-            if c == "s" || c == "t", let (t, j0) = lerDigitos(n, i + 1, 3) {
-                var j = pular(n, j0, [" ", ".", "_", "-"])
-                if j < n.count, n[j] == "e" || (c == "s" && n[j] == "x") {
-                    j += 1
-                    if j < n.count, n[j] == "p" { j += 1 }
-                    j = pular(n, j, [" ", "."])
-                    if let (e, _) = lerDigitos(n, j, 4) {
-                        return Marca(temporada: t, episodio: e, inicio: i, forte: true)
-                    }
-                }
-            }
-            if digito(c), let (t, j) = lerDigitosAte(n, i, 2, "x"), let (e, k) = lerDigitos(n, j + 1, 3),
-               k == n.count || !alnum(n[k]) {
-                return Marca(temporada: t, episodio: e, inicio: i, forte: true)
-            }
-            for p in ["temporada", "season"] where comeca(n, i, p) {
-                let j0 = pular(n, i + p.count, [" "])
-                if let (t, j) = lerDigitos(n, j0, 3) {
-                    for k in j..<min(j + 13, n.count) where inicioDePalavra(n, k) {
-                        if let e = palavraDeEpisodio(n, k) {
-                            return Marca(temporada: t, episodio: e, inicio: i, forte: true)
-                        }
-                    }
-                }
-            }
-            if fraca == nil, let e = palavraDeEpisodio(n, i) {
-                fraca = Marca(temporada: 1, episodio: e, inicio: i, forte: false)
+            guard c == "s" || c == "t", inicioDePalavra(n, i), let (t, j0) = lerDigitos(n, i + 1, 3) else { continue }
+            var j = pular(n, j0, [" ", ".", "_", "-"])
+            if j < n.count, n[j] == "e" || (c == "s" && n[j] == "x") {
+                j += 1
+                if j < n.count, n[j] == "p" { j += 1 }
+                j = pular(n, j, [" ", "."])
+                if let (e, _) = lerDigitos(n, j, 4) { return Marca(temporada: t, episodio: e, inicio: i, forte: true) }
             }
         }
-        return fraca
+        for i in 0..<n.count where inicioDePalavra(n, i) {
+            for p in ["temporada", "season"] where comeca(n, i, p) {
+                let j0 = pular(n, i + p.count, [" "])
+                guard let (t, j) = lerDigitos(n, j0, 3) else { continue }
+                for k in j..<min(j + 13, n.count) where inicioDePalavra(n, k) {
+                    if let e = palavraDeEpisodio(n, k) { return Marca(temporada: t, episodio: e, inicio: i, forte: true) }
+                }
+            }
+        }
+        if n.count > 1 {
+            for i in 1..<n.count where digito(n[i]) && inicioDePalavra(n, i) {
+                if let (t, j) = lerDigitosAte(n, i, 2, "x"), let (e, k) = lerDigitos(n, j + 1, 3), k == n.count || !alnum(n[k]) {
+                    return Marca(temporada: t, episodio: e, inicio: i, forte: true)
+                }
+            }
+        }
+        for i in 0..<n.count where inicioDePalavra(n, i) {
+            if let e = palavraDeEpisodio(n, i) { return Marca(temporada: 1, episodio: e, inicio: i, forte: false) }
+        }
+        return nil
     }
 
     private static func caminho(_ url: String) -> [String] {
