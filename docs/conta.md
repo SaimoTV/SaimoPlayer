@@ -13,13 +13,15 @@ README de lá.
 
 | Jeito | Onde | Como |
 |---|---|---|
-| Código no e-mail | celular, site | 6 números, valem 10 min, 1 pedido por minuto |
-| E-mail e senha | celular, site, Mac, Windows/Linux, TV Box, Samsung/LG, Roku | quem criou uma senha |
+| E-mail e senha | todos os apps e o site | "Criar conta" ou "Entrar"; o e-mail não é verificado (é só o login) |
 | QR na TV | TV Box, Samsung/LG, Mac, Windows/Linux, Roku | a TV mostra QR e código `ABCD-2345`; o celular ou o site logado aprova |
 
-- **Criar ou trocar a senha** pede sempre o código do e-mail (prova que o
-  e-mail é da pessoa). Fica no celular e no site; as TVs só entram com a senha.
-  Trocar uma senha que já existia tira a conta dos outros aparelhos.
+- E-mail que já tem conta não é cadastrado de novo (entra com a senha).
+- **Trocar a senha** (logado, com a senha atual): os outros aparelhos saem.
+  Esqueceu a senha: num aparelho onde a conta já está aberta, troque por lá.
+- O código por e-mail existe no servidor mas está desligado (sem envio de
+  e-mail configurado); os apps não mostram.
+- Rotas de senha, cadastro e código da TV: no máximo 20 pedidos por minuto por IP.
 - Senha: 8 a 128 caracteres, guardada como PBKDF2-SHA256 (100 mil iterações).
   5 erros seguidos travam o login com senha por 15 min.
 - O QR leva a `https://saimo-tv.com.br/conectar?c=ABCD2345`: com a conta
@@ -56,7 +58,7 @@ criptografados no servidor (AES-GCM), até 2 MB por conta.
 
 ## Endereço do servidor por app
 
-Produção: `https://conta.saimo-tv.com.br` (ainda não criado). Para testar com
+Produção: `https://conta.saimo-tv.com.br` (Worker `saimo-conta` + D1 `saimo-conta`, conta Cloudflare gabrielsaimo97). A chave que cifra os dados (`CHAVE_DADOS`) tem cópia em `~/Library/Application Support/SaimoTV/conta-chave-dados.txt`: sem ela os dados guardados não abrem. Para testar com
 o servidor local (`npm run dev` no SaimoConta):
 
 | App | Teste |
