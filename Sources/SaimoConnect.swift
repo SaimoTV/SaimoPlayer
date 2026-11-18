@@ -240,6 +240,8 @@ final class SaimoConnect: ObservableObject {
     /// Algo da sincronia mudou aqui (progresso, favorito, listas): manda ao
     /// celular conectado, juntando as mudanças de alguns segundos num envio só.
     func avisarDados(atraso: TimeInterval = 1) {
+        // Com a Conta Saimo, a mudança também vai para a conta (em alguns segundos).
+        if !aplicandoDados { Conta.shared.agendar() }
         guard !aplicandoDados, !servidor.autenticados().isEmpty else { return }
         envioDeDados?.cancel()
         let tarefa = DispatchWorkItem { [weak self] in

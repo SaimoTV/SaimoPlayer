@@ -122,3 +122,7 @@ esconder tudo é o lado seguro.
 `scripts/avatares/gerar.py` gera `docs/avatares/<id>.svg` e `png/<id>.png`
 (256 px). Cada app leva uma cópia (site: `public/avatares/*.svg`; apps nativos:
 os PNG). Ids nunca são renomeados; avatar novo entra no fim da lista.
+
+## Conta Saimo
+
+A Conta Saimo (opcional) leva este mesmo pacote para a nuvem: ver `docs/conta.md`.

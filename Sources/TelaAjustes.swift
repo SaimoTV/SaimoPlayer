@@ -125,6 +125,8 @@ struct TelaAjustes: View {
     @ObservedObject private var connect = SaimoConnect.shared
     @ObservedObject private var addons = AddonStore.shared
     @ObservedObject private var debrid = DebridStore.shared
+    @ObservedObject private var conta = Conta.shared
+    @State private var contaAberta = false
 
     private var resumoAddonsDebrid: String {
         let ativos = addons.ativos.count
@@ -169,6 +171,15 @@ struct TelaAjustes: View {
                     Text("Ajustes")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(.white)
+
+                    if !Perfis.kidsAtivo {
+                        secao("Conta Saimo") {
+                            linha("Conta Saimo", conta.resumo, icone: "person.crop.circle.badge.checkmark") {
+                                contaAberta = true
+                            }
+                        }
+                        .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
+                    }
 
                     secao("Perfis") {
                         linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
