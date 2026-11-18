@@ -39,7 +39,7 @@ struct TelaConta: View {
                 .font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
             HStack(spacing: 12) {
                 Button("Sincronizar agora") { Task { await conta.sincronizar(forcar: true) } }.disabled(conta.sincronizando)
-                if conta.email != nil { Button("Criar ou trocar a senha") { comEmail = true } }
+                if conta.email != nil { Button("Trocar a senha") { comEmail = true } }
                 Button("Sair da conta") { Task { await conta.sair() } }
                 Spacer()
                 Button("Fechar", action: fechar).keyboardShortcut(.cancelAction)
@@ -62,7 +62,7 @@ struct TelaConta: View {
                 Text(codigo).font(.system(size: 38, weight: .heavy, design: .monospaced)).tracking(4)
                     .foregroundStyle(Color(red: 0.18, green: 0.83, blue: 0.75)).textSelection(.enabled)
                 Text(situacao).font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
-                Button("Entrar com e-mail e senha") { comEmail = true }
+                Button("E-mail e senha (entrar ou criar conta)") { comEmail = true }
                 HStack {
                     Text("Sem conta, tudo continua só neste Mac.").font(.system(size: 12)).foregroundStyle(.gray)
                     Spacer()
@@ -98,8 +98,8 @@ struct TelaConta: View {
     }
 }
 
-/// Entrar com e-mail e senha, ou criar e trocar a senha com o código do e-mail
-/// (prova que o e-mail é de quem pede). `emailFixo`: já logado, só a senha.
+/// Sem conta: entrar ou criar a conta com e-mail e senha (o e-mail não é
+/// verificado). Com conta (`emailFixo`): trocar a senha.
 private struct FormSenha: View {
     @ObservedObject private var conta = Conta.shared
     let emailFixo: String?
@@ -107,69 +107,51 @@ private struct FormSenha: View {
 
     @State private var email = ""
     @State private var senha = ""
-    @State private var codigo = ""
-    @State private var definindo = false
-    @State private var codigoPedido = false
+    @State private var nova = ""
+    @State private var criando = false
     @State private var ocupado = false
     @State private var aviso = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(emailFixo == nil ? (definindo ? "Criar ou trocar a senha" : "Entrar com e-mail e senha") : "Criar ou trocar a senha")
+            Text(emailFixo != nil ? "Trocar a senha" : (criando ? "Criar conta" : "Entrar com e-mail e senha"))
                 .font(.system(size: 24, weight: .bold)).foregroundStyle(.white)
-            if emailFixo == nil {
+            if let emailFixo {
+                Text(emailFixo).foregroundStyle(Tema.textoSecundario)
+                SecureField("Senha atual (em branco se a conta não tem)", text: $senha).textFieldStyle(.roundedBorder).textContentType(.password)
+                SecureField("Senha nova (8 ou mais)", text: $nova).textFieldStyle(.roundedBorder).textContentType(.newPassword)
+                Text("Trocar a senha tira a conta dos outros aparelhos.").font(.system(size: 12)).foregroundStyle(.gray)
+            } else {
                 TextField("Seu e-mail", text: $email).textFieldStyle(.roundedBorder).textContentType(.username)
-            } else {
-                Text(emailFixo ?? "").foregroundStyle(Tema.textoSecundario)
+                SecureField(criando ? "Crie uma senha (8 ou mais)" : "Senha", text: $senha).textFieldStyle(.roundedBorder)
+                    .textContentType(criando ? .newPassword : .password)
             }
-            if definindo {
-                Text(codigoPedido ? "Chegou um código de 6 números no e-mail. Digite o código e a senha nova (pelo menos 8 caracteres)."
-                     : "Mandamos um código para o seu e-mail.")
-                    .font(.system(size: 13)).foregroundStyle(Tema.textoSecundario).fixedSize(horizontal: false, vertical: true)
-                if codigoPedido {
-                    TextField("Código (6 números)", text: $codigo).textFieldStyle(.roundedBorder)
-                    SecureField("Senha nova", text: $senha).textFieldStyle(.roundedBorder).textContentType(.newPassword)
-                }
-                if emailFixo != nil {
-                    Text("Trocar uma senha que já existia tira a conta dos outros aparelhos.").font(.system(size: 12)).foregroundStyle(.gray)
-                }
-            } else {
-                SecureField("Senha", text: $senha).textFieldStyle(.roundedBorder).textContentType(.password)
-            }
-            if !aviso.isEmpty { Text(aviso).font(.system(size: 13)).foregroundStyle(.red) }
+            if !aviso.isEmpty { Text(aviso).font(.system(size: 13)).foregroundStyle(aviso.hasPrefix("Pronto") ? .green : .red) }
             HStack(spacing: 12) {
-                if definindo {
-                    if codigoPedido {
-                        Button("Salvar senha e entrar") { tentar { try await conta.definirSenha(alvo, codigo: codigo, senha: senha); voltar() } }
-                            .disabled(ocupado || codigo.count != 6 || senha.count < 8).keyboardShortcut(.defaultAction)
-                    } else {
-                        Button("Mandar o código") { mandarCodigo() }.disabled(ocupado || !alvo.contains("@")).keyboardShortcut(.defaultAction)
-                    }
+                if emailFixo != nil {
+                    Button("Trocar a senha") {
+                        tentar { try await conta.trocarSenha(atual: senha, nova: nova); aviso = "Pronto: senha trocada."; senha = ""; nova = "" }
+                    }.disabled(ocupado || nova.count < 8).keyboardShortcut(.defaultAction)
                 } else {
-                    Button("Entrar") { tentar { try await conta.entrarComSenha(alvo, senha); voltar() } }
-                        .disabled(ocupado || !alvo.contains("@") || senha.isEmpty).keyboardShortcut(.defaultAction)
-                    Button("Esqueci a senha / criar senha") { definindo = true; senha = ""; mandarCodigo() }.disabled(!alvo.contains("@"))
+                    Button(criando ? "Criar conta" : "Entrar") {
+                        tentar {
+                            if criando { try await conta.cadastrar(email, senha) } else { try await conta.entrarComSenha(email, senha) }
+                            voltar()
+                        }
+                    }
+                    .disabled(ocupado || !email.contains("@") || (criando ? senha.count < 8 : senha.isEmpty)).keyboardShortcut(.defaultAction)
+                    Button(criando ? "Já tenho conta" : "Criar conta") { criando.toggle(); aviso = ""; senha = "" }
                 }
                 Spacer()
                 Button("Voltar", action: voltar).keyboardShortcut(.cancelAction)
             }
-        }
-        .onAppear { if emailFixo != nil { definindo = true } }
-    }
-
-    private var alvo: String { emailFixo ?? email }
-
-    private func mandarCodigo() {
-        tentar {
-            if let dev = try await conta.pedirCodigoPorEmail(alvo) { codigo = dev } // só no servidor de teste
-            codigoPedido = true
         }
     }
 
     private func tentar(_ f: @escaping @MainActor () async throws -> Void) {
         ocupado = true; aviso = ""
         Task { @MainActor in
-            do { try await f() } catch { aviso = error.localizedDescription }
+            do { try await f() } catch { aviso = error.localizedDescription; if emailFixo == nil { senha = "" } }
             ocupado = false
         }
     }

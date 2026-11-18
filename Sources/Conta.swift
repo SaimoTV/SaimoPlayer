@@ -138,6 +138,17 @@ final class Conta: ObservableObject {
                                 ["email": email.trimmingCharacters(in: .whitespaces), "senha": senha, "aparelho": nomeDoAparelho], comToken: false))
     }
 
+    /// Cria a conta com e-mail e senha (o e-mail não é verificado: é só o login).
+    func cadastrar(_ email: String, _ senha: String) async throws {
+        entrou(try await chamar("POST", "/v1/senha/cadastrar",
+                                ["email": email.trimmingCharacters(in: .whitespaces), "senha": senha, "aparelho": nomeDoAparelho], comToken: false))
+    }
+
+    /// Troca a senha de quem está logado (os outros aparelhos saem da conta).
+    func trocarSenha(atual: String, nova: String) async throws {
+        _ = try await chamar("POST", "/v1/senha/trocar", ["senhaAtual": atual, "senhaNova": nova])
+    }
+
     /// Cria a conta com senha ou troca a esquecida, com o código do e-mail. Trocar encerra as outras sessões.
     func definirSenha(_ email: String, codigo: String, senha: String) async throws {
         entrou(try await chamar("POST", "/v1/senha/definir",
