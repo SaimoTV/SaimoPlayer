@@ -316,6 +316,7 @@ final class SaimoConnect: ObservableObject {
             "phoneAudio": somNoCelular.map { ["cid": $0.key, "name": $0.value.nome, "src": $0.value.src] },
             "multi": false,
             "active": 0,
+            "brilho": Brilho.shared.valor,
         ]
         let secao = VodEstado.shared.secao
 
@@ -384,7 +385,7 @@ final class SaimoConnect: ObservableObject {
         // Saimo Connect 2: a lista de fontes do canal ativo e o favorito.
         if let canal = model.canalAtivo {
             e["versaoConnect"] = 2
-            e["recursos"] = ["fontes", "favorito"]
+            e["recursos"] = ["fontes", "favorito", "brilho"]
             e["fontes"] = canal.variants.indices.map { i in ["rotulo": "Fonte \(i + 1)", "detalhe": ""] }
             e["fonteAtual"] = model.multiTela && model.segundaAtiva
                 ? model.segunda.fonte : ProxyServer.shared.variantIndex(canal)
@@ -497,6 +498,8 @@ final class SaimoConnect: ObservableObject {
             }
         case "fonte":
             if let indice = inteiro(j["indice"]) { escolherFonte(indice) } else { trocarFonte(inteiro(j["delta"]) ?? 1) }
+        case "brilho":
+            if let v = inteiro(j["valor"]) { Brilho.shared.valor = v }
         case "favorito":
             if let canal = model.canalAtivo { model.toggleFavorite(canal) }
         case "key":

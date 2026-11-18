@@ -200,6 +200,10 @@ struct TelaAjustes: View {
                                    icone: "speaker.slash.fill", valor: $model.isMuted)
                     }
 
+                    secao("Tela") {
+                        BrilhoDoApp()
+                    }
+
                     secao("Geral") {
                         linha("Ao abrir o app", model.abrirNoCanal ? "Ir direto ao último canal" : "Mostrar a tela inicial",
                               icone: "house.fill") {
@@ -611,5 +615,28 @@ private struct LinhaSobMouse: ButtonStyle {
                     .fill(.white.opacity(configuration.isPressed ? 0.14 : sobre ? 0.07 : 0)))
                 .onHover { sobre = $0 }
         }
+    }
+}
+
+
+/// Brilho do app (não o da tela do Mac): 0 apaga a janela; qualquer tecla ou clique volta.
+private struct BrilhoDoApp: View {
+    @ObservedObject private var brilho = Brilho.shared
+    @State private var valor: Double = Double(Brilho.shared.valor)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Label("Brilho do app", systemImage: "sun.max.fill")
+                Spacer()
+                Text("\(Int(valor))%").monospacedDigit().foregroundStyle(.secondary)
+            }
+            Slider(value: $valor, in: 0...100, step: 5) { editando in
+                if !editando { Brilho.shared.valor = Int(valor) }
+            }
+            Text("Em 0% a janela fica preta: qualquer tecla ou clique volta ao normal.")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 6)
+        .onChange(of: brilho.exibido) { _, novo in if novo >= 100 { valor = 100 } }
     }
 }

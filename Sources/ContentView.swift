@@ -41,6 +41,7 @@ struct ContentView: View {
                     .transition(.opacity)
                     .zIndex(10)
             }
+            VeuDeBrilho().zIndex(100)
         }
         .onReceive(NotificationCenter.default.publisher(for: .abrirPerfis)) { n in
             perfisAberto = (false, (n.object as? String) == "gerenciar")
