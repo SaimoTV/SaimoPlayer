@@ -396,3 +396,8 @@ gerenciar perfis e abrir os Ajustes pedem um código de 4 dígitos (guardado com
 parental visível no fim dos Ajustes, discreto: senha padrão 0000, trocável; no Kids nunca libera.
 
 No Mac: `Perfis.swift` (uma suíte do UserDefaults por perfil; trocar de perfil reabre o app com `--perfil-escolhido`), `TelaPerfis.swift`, `Kids.swift`; o avatar fica na barra do topo.
+
+## Brilho do app
+
+`Sources/Brilho.swift` (Ajustes > Tela e Saimo Connect): véu preto por cima da janela, 0 a 100. Em
+até 5% qualquer tecla ou clique traz o brilho de volta, devagar (o evento não chega ao app).
