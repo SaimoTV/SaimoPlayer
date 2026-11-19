@@ -126,6 +126,7 @@ struct TelaAjustes: View {
     @ObservedObject private var addons = AddonStore.shared
     @ObservedObject private var debrid = DebridStore.shared
     @ObservedObject private var conta = Conta.shared
+    @State private var estiloVersao = 0
     @State private var contaAberta = false
 
     private var resumoAddonsDebrid: String {
@@ -195,6 +196,25 @@ struct TelaAjustes: View {
                             NotificationCenter.default.post(name: .abrirPerfis, object: "gerenciar")
                         }
                     }
+
+                    secao("Aparência e legenda") {
+                        linha("Cor do app", EstiloLegenda.temas[EstiloLegenda.indiceTema].0 + " · vale ao reabrir o app", icone: "paintpalette") {
+                            EstiloLegenda.proximoTema(); estiloVersao += 1
+                        }
+                        linha("Tamanho da legenda", EstiloLegenda.tamanhos[EstiloLegenda.indiceTamanho].0, icone: "textformat.size") {
+                            EstiloLegenda.proximoTamanho(); estiloVersao += 1
+                        }
+                        linha("Cor da legenda", EstiloLegenda.cores[EstiloLegenda.indiceCor].0, icone: "eyedropper") {
+                            EstiloLegenda.proximaCor(); estiloVersao += 1
+                        }
+                        linha("Posição da legenda", EstiloLegenda.posicoes[EstiloLegenda.indicePosicao].0, icone: "arrow.up.and.down") {
+                            EstiloLegenda.proximaPosicao(); estiloVersao += 1
+                        }
+                        linha("Fundo da legenda", EstiloLegenda.fundo ? "Com fundo" : "Sem fundo", icone: "rectangle.dashed") {
+                            EstiloLegenda.alternarFundo(); estiloVersao += 1
+                        }
+                    }
+                    .id(estiloVersao)
 
                     secao("Reprodução") {
                         linha("Super Resolução (Upscaling)", Preferencias.rotuloUpscaling(model.upscaling),

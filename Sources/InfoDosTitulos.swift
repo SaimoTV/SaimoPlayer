@@ -13,6 +13,8 @@ enum InfoDosTitulos {
         /// 0 = Livre, 10...18 = idade; -1 = não informada.
         let idade: Int
         let popularidade: Int
+        /// País de origem (ISO), vazio se desconhecido.
+        let pais: String
     }
 
     private(set) static var mapa: [String: Info] = [:]
@@ -46,8 +48,16 @@ enum InfoDosTitulos {
             guard c.count >= 6 else { continue }
             let idade: Int = c[4] == "L" ? 0 : (Int(c[4]) ?? -1)
             out["\(c[0])|\(c[1])"] = Info(ano: Int(c[2]) ?? 0, nota: Double(c[3]) ?? 0,
-                                         idade: idade, popularidade: Int(c[5]) ?? 0)
+                                         idade: idade, popularidade: Int(c[5]) ?? 0,
+                                         pais: c.count > 6 ? String(c[6]) : "")
         }
         return out
     }
+
+    /// Países do filtro: código ISO e nome.
+    static let paises: [(String, String)] = [
+        ("BR", "Brasil"), ("US", "Estados Unidos"), ("KR", "Coreia do Sul"), ("JP", "Japão"),
+        ("GB", "Reino Unido"), ("FR", "França"), ("ES", "Espanha"), ("MX", "México"),
+        ("IN", "Índia"), ("TR", "Turquia"), ("CN", "China"), ("DE", "Alemanha"), ("IT", "Itália"),
+    ]
 }

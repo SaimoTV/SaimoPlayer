@@ -144,7 +144,9 @@ final class VodEstado: ObservableObject {
     @Published var rotuloAnos = ""
     @Published var idadeMax: Int?
     @Published var notaMin = 0
-    var filtrando: Bool { !genero.isEmpty || anos != nil || idadeMax != nil || notaMin > 0 }
+    /// País de origem (ISO) ou nil.
+    @Published var pais: String?
+    var filtrando: Bool { !genero.isEmpty || anos != nil || idadeMax != nil || notaMin > 0 || pais != nil }
     /// Último título aberto: é para ele que a lista rola ao reabrir, senão a
     /// rolagem voltaria ao topo mesmo com a letra certa escolhida.
     @Published var ancora: String?

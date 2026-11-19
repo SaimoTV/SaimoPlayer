@@ -17,6 +17,9 @@ struct TelaBusca: View {
     @State private var resultadosAddons: [DescobertaItem] = []
     @State private var resultadosTMDB: [DescobertaItem] = []
     @State private var tarefaRemota: Task<Void, Never>?
+    @State private var tarefaPessoas: Task<Void, Never>?
+    @State private var pessoasAcervo: [Fichas.Trabalho] = []
+    @State private var termoPessoas = ""
     @State private var termoRemotoBuscado = ""
     @State private var recentes: [String] = Perfis.defaults.stringArray(forKey: "busca.recentes") ?? []
     @FocusState private var focado: Bool
@@ -135,6 +138,11 @@ struct TelaBusca: View {
             out.append(Fila(titulo: "Animes e doramas",
                             cartoes: daColecao.map { CartoesDoAcervo.colecao($0.0, $0.1, acoes: acoes) }))
         }
+        if !pessoasAcervo.isEmpty, termoPessoas == termo {
+            out.append(Fila(titulo: "Atores e diretores",
+                            cartoes: pessoasAcervo.map { CartoesDoAcervo.achado($0.achado, acoes: acoes) }))
+        }
+        if agendarRemota { agendarBuscaDePessoas(termo: termo) }
         if addons.temAtivos {
             if !resultadosAddons.isEmpty {
                 out.append(Fila(titulo: "Nos Addons",
@@ -149,10 +157,25 @@ struct TelaBusca: View {
             }
         }
         filas = out
-        let total = canais.count + filmes.count + series.count + daColecao.count + resultadosAddons.count + resultadosTMDB.count
+        let total = (termoPessoas == termo ? pessoasAcervo.count : 0) + canais.count + filmes.count + series.count + daColecao.count + resultadosAddons.count + resultadosTMDB.count
         destaque.padrao("Buscar", total == 0 ? "" : "\(total) resultados para \"\(texto)\"")
         let achou = total > 0
         Telemetria.shared.buscou(.vod, texto) { achou }
+    }
+
+    private func agendarBuscaDePessoas(termo chaveAtual: String) {
+        guard chaveAtual.count >= 4, chaveAtual != termoPessoas else { return }
+        tarefaPessoas?.cancel()
+        let bruto = texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        tarefaPessoas = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard !Task.isCancelled else { return }
+            let achados = await Fichas.acervoDePessoas(nome: bruto)
+            guard !Task.isCancelled, Self.chave(texto.trimmingCharacters(in: .whitespaces)) == chaveAtual else { return }
+            termoPessoas = chaveAtual
+            pessoasAcervo = achados
+            buscar(agendarRemota: false)
+        }
     }
 
     private func agendarBuscaRemota(termo chaveAtual: String) {

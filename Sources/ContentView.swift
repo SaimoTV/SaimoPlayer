@@ -1015,16 +1015,16 @@ private struct LegendaNaTela: View {
                             .background(.black.opacity(0.6), in: Capsule())
                     } else if let fala = model.legendaExternaEm(model.player.currentTime().seconds) {
                         Text(fala)
-                            .font(.system(size: 26, weight: .medium))
+                            .font(.system(size: EstiloLegenda.tamanho, weight: .medium))
                             .multilineTextAlignment(.center)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(EstiloLegenda.cor)
                             .shadow(color: .black, radius: 2, x: 0, y: 1)
                             .padding(.horizontal, 14).padding(.vertical, 6)
-                            .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .background(.black.opacity(EstiloLegenda.fundo ? 0.55 : 0), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                             .frame(maxWidth: 900)
                     }
                 }
-                .padding(.bottom, acimaDosControles ? 130 : 50)
+                .padding(.bottom, (acimaDosControles ? 130 : 50) + EstiloLegenda.elevacao)
                 .padding(.horizontal, 40)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .allowsHitTesting(false)

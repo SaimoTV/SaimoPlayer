@@ -532,6 +532,7 @@ struct VodGridView: View {
                         menuDeAno
                         menuDeIdade
                         menuDeNota
+                        menuDePais
                     }
                     Menu {
                         ForEach(VodEstado.OrdemGrade.allCases.filter { InfoDosTitulos.prontos || $0 == .az || $0 == .novos }, id: \.self) { o in
@@ -572,18 +573,19 @@ struct VodGridView: View {
             InfoDosTitulos.de(c.titulo, serie: c.serie).map(\.ano).flatMap { $0 > 0 ? $0 : nil }
                 ?? CartoesDoAcervo.ano(c.titulo, c.ano)
         }
-        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 {
+        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 || estado.pais != nil {
             itens = itens.filter { c in
                 let d = InfoDosTitulos.de(c.titulo, serie: c.serie)
                 if let faixa = estado.anos, !faixa.contains(anoDe(c)) { return false }
                 if let max = estado.idadeMax, !(d.map { (0...max).contains($0.idade) } ?? false) { return false }
                 if estado.notaMin > 0, (d?.nota ?? 0) < Double(estado.notaMin) { return false }
+                if let p = estado.pais, d?.pais != p { return false }
                 return true
             }
         }
         // Filtrando ou ordenando, o mesmo filme em duas pastas ("Jack" e
         // "Jack (1993)") aparece uma vez só.
-        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 || estado.ordem != .az {
+        if estado.anos != nil || estado.idadeMax != nil || estado.notaMin > 0 || estado.pais != nil || estado.ordem != .az {
             var vistos = Set<String>()
             itens = itens.filter { c in
                 let base = c.titulo.replacingOccurrences(of: #"\s*\(\d{4}\)\s*$"#, with: "", options: .regularExpression)
@@ -646,6 +648,19 @@ struct VodGridView: View {
             }
         } label: {
             Label(estado.idadeMax.map { $0 == 0 ? "Livre" : "Até \($0) anos" } ?? "Idade", systemImage: "person.2")
+        }
+        .menuIndicator(.hidden).fixedSize().botaoDeVidro()
+    }
+
+    private var menuDePais: some View {
+        Menu {
+            Button { estado.pais = nil } label: { Text(marcado(estado.pais == nil, "Todos")) }
+            Divider()
+            ForEach(InfoDosTitulos.paises, id: \.0) { p in
+                Button { estado.pais = p.0 } label: { Text(marcado(estado.pais == p.0, p.1)) }
+            }
+        } label: {
+            Label(InfoDosTitulos.paises.first { $0.0 == estado.pais }?.1 ?? "País", systemImage: "globe")
         }
         .menuIndicator(.hidden).fixedSize().botaoDeVidro()
     }

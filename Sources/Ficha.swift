@@ -241,6 +241,23 @@ enum Fichas {
         return saida
     }
 
+    /// Atores e diretores pelo nome: o que fizeram e existe no acervo.
+    /// Só vale nome de pessoa; título de filme não acha ninguém conhecido.
+    static func acervoDePessoas(nome: String) async -> [Trabalho] {
+        let q = nome.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? nome
+        guard let json = await pedir("\(base)/search/person?api_key=\(chave)&language=pt-BR&query=\(q)")
+        else { return [] }
+        let pessoas = (json["results"] as? [[String: Any]] ?? [])
+            .filter { ["Acting", "Directing"].contains($0["known_for_department"] as? String ?? "") }
+            .prefix(2).compactMap { $0["id"] as? Int }
+        var vistos = Set<String>()
+        var saida: [Trabalho] = []
+        for id in pessoas {
+            for t in await acervoDe(ator: id).prefix(20) where vistos.insert(t.id).inserted { saida.append(t) }
+        }
+        return saida
+    }
+
     /// Quem é a pessoa: foto grande, biografia, nascimento, de onde é.
     struct Perfil: Sendable {
         var nome = ""

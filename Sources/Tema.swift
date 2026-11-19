@@ -6,7 +6,7 @@ import AppKit
 /// A paleta sai do ícone: fundo quase preto, um ciano como único destaque e o
 /// vermelho do "ao vivo". Uma cor de acento só é o que mantém a tela calma.
 enum Tema {
-    static let acento = Color(red: 0x4F / 255, green: 0xE3 / 255, blue: 0xD0 / 255)
+    static let acento = EstiloLegenda.temas[EstiloLegenda.indiceTema].1
     static let aoVivo = Color(red: 1, green: 0x4D / 255, blue: 0x4F / 255)
     static let fundo = Color(red: 0x0B / 255, green: 0x0E / 255, blue: 0x14 / 255)
     static let cartao = Color.white.opacity(0.07)
