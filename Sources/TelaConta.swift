@@ -6,6 +6,8 @@ import SwiftUI
 struct TelaConta: View {
     @ObservedObject private var conta = Conta.shared
     let fechar: () -> Void
+    /// Dentro de outra tela (as boas-vindas): sem moldura própria e com o QR em coluna.
+    var embutida = false
 
     @State private var codigo = "…"
     @State private var imagem: NSImage?
@@ -17,12 +19,12 @@ struct TelaConta: View {
     var body: some View {
         Group {
             if comEmail {
-                FormSenha(emailFixo: conta.logado ? conta.email : nil) { comEmail = false }
+                FormSenha(emailFixo: conta.logado ? conta.email : nil, voltarAoQr: embutida && !conta.logado) { comEmail = false }
             } else if conta.logado { logado } else { qr }
         }
-        .padding(36)
-        .frame(width: 760)
-        .background(Color(red: 0.06, green: 0.09, blue: 0.15))
+        .padding(embutida ? 0 : 36)
+        .frame(width: embutida ? nil : 760)
+        .background(embutida ? Color.clear : Color(red: 0.06, green: 0.09, blue: 0.15))
         .onAppear { if !conta.logado { esperar() } }
         // Saiu com a janela aberta: volta para o QR e pede um código novo.
         .onChange(of: conta.logado) { _, logado in if !logado { codigo = "…"; imagem = nil; esperar() } }
@@ -49,24 +51,26 @@ struct TelaConta: View {
     }
 
     private var qr: some View {
-        HStack(alignment: .center, spacing: 32) {
+        (embutida ? AnyLayout(VStackLayout(alignment: .leading, spacing: 14)) : AnyLayout(HStackLayout(alignment: .center, spacing: 32))) {
             ZStack {
                 RoundedRectangle(cornerRadius: 14).fill(.white)
                 if let imagem { Image(nsImage: imagem).interpolation(.none).resizable().scaledToFit().padding(12) }
             }
-            .frame(width: 240, height: 240)
+            .frame(width: embutida ? 190 : 240, height: embutida ? 190 : 240)
             VStack(alignment: .leading, spacing: 12) {
-                Text("Entrar na Conta Saimo").font(.system(size: 24, weight: .bold)).foregroundStyle(.white)
+                if !embutida { Text("Entrar na Conta Saimo").font(.system(size: 24, weight: .bold)).foregroundStyle(.white) }
                 Text("No celular com o Saimo e a sua conta, leia o QR com a câmera. Ou abra Ajustes > Conta Saimo > Entrar numa TV e digite o código:")
                     .font(.system(size: 14)).foregroundStyle(Tema.textoSecundario).fixedSize(horizontal: false, vertical: true)
                 Text(codigo).font(.system(size: 38, weight: .heavy, design: .monospaced)).tracking(4)
                     .foregroundStyle(Color(red: 0.18, green: 0.83, blue: 0.75)).textSelection(.enabled)
                 Text(situacao).font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
-                Button("E-mail e senha (entrar ou criar conta)") { comEmail = true }
-                HStack {
-                    Text("Sem conta, tudo continua só neste Mac.").font(.system(size: 12)).foregroundStyle(.gray)
-                    Spacer()
-                    Button("Fechar", action: fechar).keyboardShortcut(.cancelAction)
+                Button("Entrar com e-mail e senha") { comEmail = true }
+                if !embutida {
+                    HStack {
+                        Text("Sem conta, tudo continua só neste Mac.").font(.system(size: 12)).foregroundStyle(.gray)
+                        Spacer()
+                        Button("Fechar", action: fechar).keyboardShortcut(.cancelAction)
+                    }
                 }
             }
         }
@@ -103,6 +107,7 @@ struct TelaConta: View {
 private struct FormSenha: View {
     @ObservedObject private var conta = Conta.shared
     let emailFixo: String?
+    var voltarAoQr = false
     let voltar: () -> Void
 
     @State private var email = ""
@@ -143,7 +148,7 @@ private struct FormSenha: View {
                     Button(criando ? "Já tenho conta" : "Criar conta") { criando.toggle(); aviso = ""; senha = "" }
                 }
                 Spacer()
-                Button("Voltar", action: voltar).keyboardShortcut(.cancelAction)
+                Button(voltarAoQr ? "Voltar ao QR code" : "Voltar", action: voltar).keyboardShortcut(.cancelAction)
             }
         }
     }

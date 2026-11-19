@@ -12,7 +12,6 @@ struct TelaBoasVindas: View {
 
     @ObservedObject private var conta = Conta.shared
     let terminar: () -> Void
-    @State private var contaAberta = false
 
     var body: some View {
         ZStack {
@@ -26,11 +25,8 @@ struct TelaBoasVindas: View {
                              "Trocou de aparelho ou reinstalou? Nada se perde."], id: \.self) { t in
                         Text("•  \(t)").font(.system(size: 15)).foregroundStyle(Tema.textoSecundario)
                     }
-                    Button { contaAberta = true } label: {
-                        Text("Entrar ou criar conta").font(.system(size: 16, weight: .semibold)).padding(.horizontal, 22).padding(.vertical, 10)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.top, 14)
+                    // O QR já aparece aqui; o botão do formulário troca o QR por e-mail e senha.
+                    TelaConta(fechar: {}, embutida: true).padding(.top, 10)
                 }
                 cartao(destaque: false) {
                     Text("Entrar sem login").font(.system(size: 30, weight: .bold))
@@ -53,9 +49,8 @@ struct TelaBoasVindas: View {
             .padding(40)
         }
         .foregroundStyle(.white)
-        .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
         // Entrou na conta aqui mesmo: segue.
-        .onChange(of: conta.logado) { _, logado in if logado { contaAberta = false; terminar() } }
+        .onChange(of: conta.logado) { _, logado in if logado { terminar() } }
     }
 
     private func cartao<C: View>(destaque: Bool, @ViewBuilder _ conteudo: () -> C) -> some View {
