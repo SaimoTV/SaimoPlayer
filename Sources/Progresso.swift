@@ -119,6 +119,23 @@ enum Progresso {
         var id: String { chave }
     }
 
+    /// Marca ou desmarca à mão como visto; marcar tira do "Continue assistindo".
+    static func marcarVisto(_ chave: String, _ visto: Bool) {
+        guard !chave.isEmpty else { return }
+        let defaults = Perfis.defaults
+        if visto {
+            defaults.set(true, forKey: chaveVisto + chave)
+            defaults.removeObject(forKey: chaveBase + chave)
+            defaults.removeObject(forKey: chaveBase + chave + "|d")
+            defaults.removeObject(forKey: chaveBase + chave + "|t")
+        } else {
+            defaults.removeObject(forKey: chaveVisto + chave)
+        }
+        defaults.synchronize()
+        NotificationCenter.default.post(name: .init("saimoProgressoMudou"), object: nil)
+        Task { @MainActor in SaimoConnect.shared.avisarDados(atraso: 5) }
+    }
+
     /// Visto até o fim (os dois minutos finais contam como fim).
     static func visto(_ chave: String) -> Bool {
         Perfis.defaults.bool(forKey: chaveVisto + chave)

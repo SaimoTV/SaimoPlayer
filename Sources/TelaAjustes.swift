@@ -181,6 +181,10 @@ struct TelaAjustes: View {
                         .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
                     }
 
+                    secao("Estatísticas") {
+                        linha("Seu tempo no Saimo", Estatisticas.resumo(), icone: "chart.bar") { }
+                    }
+
                     secao("Perfis") {
                         linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
                               icone: "person.crop.circle") {

@@ -616,6 +616,17 @@ private struct ControlBar: View {
                 .help("Episódios (E)")
             }
 
+            if !model.chaveDoArquivo.isEmpty {
+                let visto = Progresso.visto(model.chaveDoArquivo)
+                Button {
+                    Progresso.marcarVisto(model.chaveDoArquivo, !visto)
+                    model.objectWillChange.send()
+                } label: {
+                    Image(systemName: visto ? "checkmark.circle.fill" : "checkmark.circle")
+                }
+                .help(visto ? "Desmarcar como visto" : "Marcar como visto")
+            }
+
             Menu {
                 ForEach([0.5, 0.75, 1.0, 1.25, 1.5, 2.0], id: \.self) { r in
                     Button {

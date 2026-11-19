@@ -122,6 +122,7 @@ final class PlayerModel: NSObject, ObservableObject {
     @Published private(set) var playingFileDetail = ""
     /// Onde o arquivo no ar deve ser guardado. Ver Progresso.
     private var chaveArquivo = ""
+    var chaveDoArquivo: String { chaveArquivo }
 
     /// O episódio no ar, com a lista da série para achar o seguinte.
     @Published private(set) var episodioNoAr: EpisodioNoAr?
@@ -182,6 +183,7 @@ final class PlayerModel: NSObject, ObservableObject {
         guard forcado || abs(position - ultimoGuardado) >= 5 else { return }
         ultimoGuardado = position
         Progresso.salvar(chaveArquivo, posicao: position, duracao: duration)
+        Estatisticas.tocando(isPlaying)
     }
     /// Posição e duração do arquivo, para a barra de progresso. Um canal ao
     /// vivo não tem duração, e é por isso que a barra só aparece no arquivo.
