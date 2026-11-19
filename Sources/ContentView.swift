@@ -27,6 +27,8 @@ struct ContentView: View {
     @State private var abriu = false
     /// Tela de perfis por cima de tudo: (obrigatória, abrir já em gerenciar).
     @State private var perfisAberto: (obrigatoria: Bool, gerenciar: Bool)?
+    /// Boas-vindas (conta ou sem login) por cima de tudo, na primeira abertura sem conta.
+    @State private var boasVindas = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -40,6 +42,14 @@ struct ContentView: View {
                 TelaPerfis(obrigatoria: p.obrigatoria, modo: p.gerenciar ? .gerenciar : .escolher) { perfisAberto = nil }
                     .transition(.opacity)
                     .zIndex(10)
+            }
+            if boasVindas {
+                TelaBoasVindas {
+                    boasVindas = false
+                    if Perfis.deveEscolherAoAbrir { perfisAberto = (true, false) }
+                }
+                .transition(.opacity)
+                .zIndex(20)
             }
             VeuDeBrilho().zIndex(100)
         }
@@ -55,7 +65,8 @@ struct ContentView: View {
                     abertura = false
                     // Com 2 ou mais perfis, pergunta quem está assistindo (não depois da troca de perfil).
                     if CommandLine.arguments.contains("--perfil-escolhido") { Perfis.escolhidoNestaSessao = true }
-                    if Perfis.deveEscolherAoAbrir { perfisAberto = (true, false) }
+                    if TelaBoasVindas.precisa { boasVindas = true }
+                    else if Perfis.deveEscolherAoAbrir { perfisAberto = (true, false) }
                     if model.detachedList { SidebarWindowController.shared.open(model: model) }
                 }
                 .frame(width: 0, height: 0)

@@ -179,6 +179,10 @@ struct TelaAjustes: View {
                                 contaAberta = true
                             }
                         }
+                        // Sem conta: a primeira opção fica em destaque.
+                        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(Tema.acento.opacity(conta.logado ? 0 : 0.8), lineWidth: 2)
+                            .padding(.top, 20))
                         .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
                     }
 
