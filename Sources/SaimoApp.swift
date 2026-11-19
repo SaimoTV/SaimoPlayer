@@ -37,6 +37,7 @@ struct SaimoApp: App {
         SaimoConnect.shared.iniciar()
         Conta.shared.iniciar()
         Telemetria.shared.iniciar()
+        NovosEpisodios.iniciar()
     }
 
     var body: some Scene {

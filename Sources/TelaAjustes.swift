@@ -184,7 +184,11 @@ struct TelaAjustes: View {
 
                     secao("Estatísticas") {
                         linha("Seu tempo no Saimo", Estatisticas.resumo(), icone: "chart.bar") { }
+                        linha("Séries favoritas com episódio novo", NovosEpisodios.resumo(), icone: "bell") {
+                            NovosEpisodios.dispensarTodos(); estiloVersao += 1
+                        }
                     }
+                    .id(estiloVersao)
 
                     secao("Perfis") {
                         linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
