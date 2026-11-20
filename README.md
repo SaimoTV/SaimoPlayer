@@ -413,3 +413,7 @@ Remoções (3.3.3): o que sai do Continue assistindo, dos favoritos e das Minhas
 - Estatísticas (tempo, filmes e episódios vistos) e "Marcar como visto" no player.
 - Filtro de país, busca por ator/diretor, aviso de episódio novo nas séries favoritas.
 - Ajustes: cor do app (vale ao reabrir) e estilo da legenda (tamanho, cor, posição, fundo).
+
+## Ajustes da 3.3.4
+
+- **On Demand com cache**: `Destaques` abre com a cópia em disco e a tela confere a novidade por trás (`Destaques.novidades`, no máximo 1x por minuto), trocando só se mudou.

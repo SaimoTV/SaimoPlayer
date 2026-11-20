@@ -42,9 +42,6 @@ enum Destaques {
         guard Enderecos.filmesAtivos else { return nil }
         return URL(string: Enderecos.filmes + "destaques.txt")
     }
-    /// Validade curta (15 minutos) para que novas atualizações apareçam rapidamente
-    /// no app sem atrasos de 24h.
-    private static let validade: TimeInterval = 15 * 60
 
     private static var emMemoria: [Fila]?
 
@@ -76,13 +73,38 @@ enum Destaques {
         return pasta.appendingPathComponent("destaques.txt")
     }
 
+    private static var conferidoEm = Date.distantPast
+
+    /// Confere por trás se o arquivo mudou (a tela já mostra o guardado). Devolve
+    /// as fileiras novas só quando mudou; igual (ou conferido há menos de 1 min), nil.
+    static func novidades() async -> [Fila]? {
+        guard Date().timeIntervalSince(conferidoEm) > 60 else { return nil }
+        conferidoEm = Date()
+        guard let baixado = await baixar() else { return nil }
+        let antes = try? String(contentsOf: arquivo, encoding: .utf8)
+        try? baixado.write(to: arquivo, atomically: true, encoding: .utf8)
+        guard antes != baixado else { return nil }
+        emMemoria = nil
+        return await filas()
+    }
+
+    private static func baixar() async -> String? {
+        guard let endereco else { return nil }
+        var pedido = URLRequest(url: endereco)
+        pedido.setValue(Upstream.userAgent, forHTTPHeaderField: "User-Agent")
+        pedido.setValue("*/*", forHTTPHeaderField: "Accept")
+        pedido.cachePolicy = .reloadIgnoringLocalCacheData
+        guard let (dados, resposta) = try? await URLSession.shared.data(for: pedido),
+              let http = resposta as? HTTPURLResponse, (200...299).contains(http.statusCode),
+              let texto = String(data: dados, encoding: .utf8), !texto.isEmpty else { return nil }
+        return texto
+    }
+
     private static func texto() async -> String? {
         let local = arquivo
-        if let atributos = try? FileManager.default.attributesOfItem(atPath: local.path),
-           let quando = atributos[.modificationDate] as? Date,
-           Date().timeIntervalSince(quando) < validade,
-           let guardado = try? String(contentsOf: local, encoding: .utf8),
-           !guardado.isEmpty {
+        // Já há uma cópia (de qualquer idade): abre com ela na hora; a tela
+        // confere a novidade por trás (novidades) e troca se mudou.
+        if let guardado = try? String(contentsOf: local, encoding: .utf8), !guardado.isEmpty {
             return guardado
         }
 

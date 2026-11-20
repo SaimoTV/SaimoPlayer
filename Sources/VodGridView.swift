@@ -965,6 +965,8 @@ struct VodGridView: View {
                 filasDeDestaque = await Destaques.filas()
                 carregando = false
             }
+            // Cache: o que está na tela fica; a novidade, se houver, entra quando chegar.
+            Task { if let novas = await Destaques.novidades() { filasDeDestaque = novas } }
             if nomesDoAcervo.isEmpty {
                 nomesDoAcervo = Set(await Vod.todos().map(\.titulo))
             }
