@@ -672,9 +672,12 @@ final class PlayerModel: NSObject, ObservableObject {
         Store.customChannels() + MinhasListas.shared.canais(desbloqueado: restrictedUnlocked)
     }
 
-    func toggleFavorite(_ c: Channel) {
+    /// `anotar` falso: quem mexe é a sincronia (não vira remoção nem favorito novo daqui).
+    func toggleFavorite(_ c: Channel, anotar: Bool = true) {
         let key = c.source.absoluteString
-        if favorites.contains(key) { favorites.remove(key) } else { favorites.insert(key) }
+        let tinha = favorites.contains(key)
+        if tinha { favorites.remove(key) } else { favorites.insert(key) }
+        if anotar { Remocoes.anotarCanal(nome: c.name, removido: tinha) }
         Store.setFavorites(favorites)
         SaimoConnect.shared.avisarDados()
     }

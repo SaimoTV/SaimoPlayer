@@ -53,10 +53,25 @@ enum Progresso {
     static func remover(_ chave: String) {
         guard !chave.isEmpty else { return }
         let defaults = Perfis.defaults
+        let campos = chave.components(separatedBy: "|")
+        let serie = campos.first == "s"
+        let nome = campos.count > 1 ? campos[1] : ""
+        if serie {
+            // A série sai da fileira inteira (senão o episódio anterior aparece no lugar).
+            let prefixo = chaveBase + "s|\(nome)|"
+            for k in defaults.dictionaryRepresentation().keys where k.hasPrefix(prefixo) { defaults.removeObject(forKey: k) }
+        }
         defaults.removeObject(forKey: chaveBase + chave)
         defaults.removeObject(forKey: chaveBase + chave + "|d")
         defaults.removeObject(forKey: chaveBase + chave + "|t")
         defaults.synchronize()
+        // A sincronia não traz de volta: "Nome (2020)" vira título e ano.
+        var titulo = nome, ano = ""
+        if serie, nome.hasSuffix(")"), let abre = nome.range(of: " (", options: .backwards) {
+            let a = String(nome[abre.upperBound..<nome.index(before: nome.endIndex)])
+            if a.count == 4, Int(a) != nil { titulo = String(nome[..<abre.lowerBound]); ano = a }
+        }
+        Task { @MainActor in Remocoes.anotarContinuar(serie: serie, titulo: titulo, ano: ano) }
         NotificationCenter.default.post(name: .init("saimoProgressoMudou"), object: nil)
         Task { @MainActor in SaimoConnect.shared.avisarDados(atraso: 5) }
     }

@@ -106,6 +106,33 @@ antes. Ao receber:
 4. Pacote sem `perfis` (app antigo): os campos de sempre vão para o perfil
    principal, como antes.
 
+### Remoções (desde a 3.3.3)
+
+Sem registro de remoção, a união trazia de volta o que foi tirado num
+aparelho (ex.: "remover do Continue assistindo" voltava na sincronia seguinte).
+Agora cada perfil leva também:
+
+```json
+"progressoRemovido":   [ { "tipo": "s", "titulo": "Dark", "ano": "2017", "em": 1795000300000 } ],
+"favTitulosRemovidos": [ { "tipo": "f", "titulo": "Duna", "ano": "2021", "em": 1795000300000 } ],
+"favCanaisRemovidos":  [ { "nome": "Globo", "em": 1795000300000 } ],
+"favCanaisEm":         { "SBT": 1795000400000 }
+```
+
+e `favTitulos` ganha `em` (quando virou favorito); `listas` ganha
+`minhasRemovidas: [{link, em}]` e `em` em cada item de `minhas`.
+
+- Um item só fica se for **mais novo** que a remoção (`em` do item maior que o
+  da remoção; item sem `em` conta como 0). Ano vazio na remoção (ou no item)
+  vale para qualquer ano. Remoção de série tira todos os episódios dela.
+- Assistir de novo, favoritar de novo ou adicionar a lista de novo depois da
+  remoção traz de volta (o `em` novo é maior).
+- Remoções juntam por chave (vale o `em` maior), até 300 por lista; as com
+  mais de 180 dias saem.
+- O servidor da conta (`SaimoConta/src/juntar.ts`) aplica as mesmas regras,
+  então aparelho ainda sem a 3.3.3 não consegue trazer de volta o que foi
+  removido num aparelho atualizado.
+
 Cada lado manda todos os perfis, então o celular e a TV ficam com os mesmos
 perfis e cada um com os seus favoritos e onde parou, qualquer que seja o
 perfil aberto em cada aparelho.

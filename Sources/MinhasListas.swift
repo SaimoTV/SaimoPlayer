@@ -154,9 +154,12 @@ final class MinhasListas: ObservableObject {
         listas.append(Lista(id: id, nome: nomeLivre, link: l, atualizadaEm: Date().timeIntervalSince1970,
                             total: canais.count, filmes: resumo.filmes, series: resumo.series))
         gravar()
+        Remocoes.anotarLista(l, removida: false)
     }
 
-    func remover(_ id: String) {
+    /// `anotar` falso: quem tira é a sincronia (a remoção já veio de outro aparelho).
+    func remover(_ id: String, anotar: Bool = true) {
+        if anotar { Remocoes.anotarLista(listas.first(where: { $0.id == id })?.link, removida: true) }
         listas.removeAll { $0.id == id }
         canaisPorLista.removeValue(forKey: id)
         try? FileManager.default.removeItem(at: arquivo(id))

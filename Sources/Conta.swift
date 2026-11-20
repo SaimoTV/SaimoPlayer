@@ -29,7 +29,6 @@ final class Conta: ObservableObject {
     var logado: Bool { token != nil }
 
     private var ultimoEnviado = ""
-    private var aplicandoAte = Date.distantPast
     private var agendado: DispatchWorkItem?
     private var relogio: Timer?
 
@@ -163,27 +162,27 @@ final class Conta: ObservableObject {
 
     // MARK: sincronizar
 
-    /// Baixa o que a conta tem, junta aqui (regras do Connect) e manda o que o
-    /// Mac tem; o servidor junta de novo e guarda. Só manda quando mudou.
+    /// Com mudança aqui: manda (PUT) e o servidor devolve tudo já juntado, que é
+    /// aplicado aqui. Sem mudança: só baixa (GET) e junta. Um pedido por
+    /// sincronia (cada pedido ao servidor é cobrado).
     func sincronizar(forcar: Bool = false) async {
         guard logado, !sincronizando else { return }
         sincronizando = true
         defer { sincronizando = false }
         do {
-            let remoto = try await chamar("GET", "/v1/dados")
             let model = PlayerModel.shared
+            let pacote = SincroniaConnect.pacote(model)
+            let texto = Self.texto(pacote)
+            let remoto = forcar || texto != ultimoEnviado
+                ? try await chamar("PUT", "/v1/dados", ["dados": pacote])
+                : try await chamar("GET", "/v1/dados")
             if let dados = remoto["dados"] as? [String: Any] {
-                aplicandoAte = Date().addingTimeInterval(3)
                 SincroniaConnect.aplicar(dados, model: model)
                 // Listas novas baixam em segundo plano; o resto assenta logo.
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
             }
-            let pacote = SincroniaConnect.pacote(model)
-            let texto = String(data: (try? JSONSerialization.data(withJSONObject: pacote, options: [.sortedKeys])) ?? Data(), encoding: .utf8) ?? ""
-            if forcar || texto != ultimoEnviado {
-                _ = try await chamar("PUT", "/v1/dados", ["dados": pacote])
-                ultimoEnviado = texto
-            }
+            // O servidor já tem tudo o que ficou aqui depois de juntar: só manda de novo se mudar.
+            ultimoEnviado = Self.texto(SincroniaConnect.pacote(model))
             sincronizadaEm = Date().timeIntervalSince1970 * 1000
             padrao.set(sincronizadaEm, forKey: chEm)
             erro = nil
@@ -192,13 +191,31 @@ final class Conta: ObservableObject {
         }
     }
 
-    /// Algo mudou aqui (o Connect avisa): manda em alguns segundos, várias mudanças num envio só.
+    private static func texto(_ pacote: [String: Any]) -> String {
+        String(data: (try? JSONSerialization.data(withJSONObject: pacote, options: [.sortedKeys])) ?? Data(), encoding: .utf8) ?? ""
+    }
+
+    /// Entre um envio e outro, no mínimo isso (assistindo, o ponto muda o tempo todo).
+    private static let intervaloMinimo: TimeInterval = 120
+
+    /// Algo mudou aqui (o Connect avisa): manda em alguns segundos, várias mudanças
+    /// num envio só, no máximo um envio a cada 2 min. Sem mudança desde o último
+    /// envio (eco de juntar), não vai à rede.
     func agendar(atraso: TimeInterval = 15) {
-        guard logado, Date() > aplicandoAte else { return }
+        guard logado else { return }
         agendado?.cancel()
-        let tarefa = DispatchWorkItem { MainActor.assumeIsolated { _ = Task { await Conta.shared.sincronizar() } } }
+        let passou = Date().timeIntervalSince1970 - sincronizadaEm / 1000
+        let espera = max(atraso, Self.intervaloMinimo - passou)
+        let tarefa = DispatchWorkItem {
+            MainActor.assumeIsolated {
+                let conta = Conta.shared
+                if conta.sincronizando { conta.agendar(atraso: 3); return }
+                if Self.texto(SincroniaConnect.pacote(PlayerModel.shared)) == conta.ultimoEnviado { return }
+                _ = Task { await conta.sincronizar() }
+            }
+        }
         agendado = tarefa
-        DispatchQueue.main.asyncAfter(deadline: .now() + atraso, execute: tarefa)
+        DispatchQueue.main.asyncAfter(deadline: .now() + espera, execute: tarefa)
     }
 
     var resumo: String {

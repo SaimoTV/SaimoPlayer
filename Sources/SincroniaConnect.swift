@@ -12,7 +12,8 @@ import Foundation
 ///
 /// Progresso: vale o mais recente. Favoritos: união. Endereços: vale o
 /// escolhido por último; quem nunca escolheu fica com o que o outro escolheu.
-/// Listas adicionadas: união pelo link.
+/// Listas adicionadas: união pelo link. Remoções (Remocoes.swift) viajam junto:
+/// o que foi tirado num aparelho não volta pela união (só se entrar de novo depois).
 @MainActor
 enum SincroniaConnect {
 
@@ -22,6 +23,7 @@ enum SincroniaConnect {
     private static func dados(de id: String, model: PlayerModel) -> (progresso: [[String: Any]], favTitulos: [[String: Any]], favCanais: [String]) {
         let defaults = Perfis.defaults(de: id)
         let tudo = defaults.dictionaryRepresentation()
+        let reg = Remocoes.ler(id)
         var progresso: [[String: Any]] = []
         for (completa, valor) in tudo where completa.hasPrefix(chaveProgresso) {
             let chave = String(completa.dropFirst(chaveProgresso.count))
@@ -32,6 +34,8 @@ enum SincroniaConnect {
             let serie = campos[0] == "s"
             if serie && campos.count < 4 { continue }
             let (titulo, ano) = serie ? separarAno(campos[1]) : (campos[1], "")
+            let emItem = ((tudo[completa + "|t"] as? Double ?? 0) * 1000).rounded()
+            if Remocoes.tituloRemovido(reg.prog, tipo: serie ? "s" : "f", titulo: titulo, ano: ano, emItem: emItem) { continue }
             progresso.append([
                 "tipo": serie ? "s" : "f",
                 "titulo": titulo,
@@ -47,7 +51,10 @@ enum SincroniaConnect {
         let favTitulos: [[String: Any]] = (defaults.stringArray(forKey: chaveFavTitulos) ?? []).compactMap { linha in
             let c = linha.components(separatedBy: "\t")
             guard c.count >= 3, !c[2].isEmpty else { return nil }
-            return ["tipo": c[0] == "s" ? "s" : "f", "titulo": c[2], "ano": c.count > 4 ? c[4] : "", "letra": c[1]]
+            let tipo = c[0] == "s" ? "s" : "f", ano = c.count > 4 ? c[4] : ""
+            var o: [String: Any] = ["tipo": tipo, "titulo": c[2], "ano": ano, "letra": c[1]]
+            if let em = reg.favEm[Remocoes.chaveTitulo(tipo, c[2], ano)] { o["em"] = Int(em) }
+            return o
         }
         let urls = Set(defaults.stringArray(forKey: chaveFavCanais) ?? [])
         let favCanais = model.channels.filter { urls.contains($0.source.absoluteString) }.map(\.name)
@@ -65,14 +72,21 @@ enum SincroniaConnect {
             var o: [String: Any] = ["id": p.id, "nome": p.nome, "avatar": p.avatar, "em": Int(p.em),
                                     "progresso": d.progresso, "favTitulos": d.favTitulos, "favCanais": d.favCanais]
             if p.ehKids { o["kids"] = true; o["codigo"] = p.codigo ?? "" }
+            Remocoes.anexar(&o, Remocoes.ler(p.id))
             return o
         }
-        let listas: [String: Any] = [
+        let regListas = Remocoes.lerListas()
+        var listas: [String: Any] = [
             "canais": Enderecos.canais,
             "filmes": Enderecos.filmes,
             "em": Int(Enderecos.escolhidosEm),
-            "minhas": MinhasListas.shared.listas.map { ["nome": $0.nome, "link": $0.link] },
+            "minhas": MinhasListas.shared.listas.map { l -> [String: Any] in
+                var o: [String: Any] = ["nome": l.nome, "link": l.link]
+                if let em = regListas.em[l.link] { o["em"] = Int(em) }
+                return o
+            },
         ]
+        if !regListas.rem.isEmpty { listas["minhasRemovidas"] = regListas.rem }
         var saida: [String: Any] = [
             "t": "dados",
             "progresso": principal.progresso,
@@ -121,6 +135,22 @@ enum SincroniaConnect {
     private static func aplicarDoPerfil(_ id: String, _ j: [String: Any], model: PlayerModel) {
         let defaults = Perfis.defaults(de: id)
         let ativo = id == Perfis.idAtivo
+        let reg = Remocoes.juntar(id, j)
+        // O que foi removido em outro aparelho depois de entrar aqui sai daqui também.
+        if !reg.prog.isEmpty {
+            let tudo = defaults.dictionaryRepresentation()
+            for (completa, _) in tudo where completa.hasPrefix(chaveProgresso) {
+                let chave = String(completa.dropFirst(chaveProgresso.count))
+                if chave.hasSuffix("|d") || chave.hasSuffix("|t") { continue }
+                let campos = chave.components(separatedBy: "|")
+                guard campos.count >= 2 else { continue }
+                let serie = campos[0] == "s"
+                let (titulo, ano) = serie ? separarAno(campos[1]) : (campos[1], "")
+                let em = ((tudo[completa + "|t"] as? Double ?? 0) * 1000).rounded()
+                guard Remocoes.tituloRemovido(reg.prog, tipo: serie ? "s" : "f", titulo: titulo, ano: ano, emItem: em) else { continue }
+                for k in [completa, completa + "|d", completa + "|t"] { defaults.removeObject(forKey: k) }
+            }
+        }
         for p in j["progresso"] as? [[String: Any]] ?? [] {
             guard let titulo = p["titulo"] as? String, !titulo.isEmpty else { continue }
             let serie = (p["tipo"] as? String) == "s"
@@ -130,6 +160,7 @@ enum SincroniaConnect {
             let temporada = Int(numero(p["temporada"])), episodio = Int(numero(p["episodio"]))
             guard pos > 0, !serie || (temporada > 0 && episodio > 0) else { continue }
             let ano = p["ano"] as? String ?? ""
+            if Remocoes.tituloRemovido(reg.prog, tipo: serie ? "s" : "f", titulo: titulo, ano: ano, emItem: em * 1000) { continue }
             let chave = serie
                 ? Progresso.chaveEpisodio(ano.isEmpty ? titulo : "\(titulo) (\(ano))", temporada, episodio)
                 : Progresso.chaveFilme(titulo)
@@ -140,26 +171,46 @@ enum SincroniaConnect {
             defaults.set(em, forKey: base + "|t")
         }
 
-        let titulos = j["favTitulos"] as? [[String: Any]] ?? []
+        let titulos = (j["favTitulos"] as? [[String: Any]] ?? []).filter { f in
+            let t = (f["tipo"] as? String) == "s" ? "s" : "f"
+            return !Remocoes.tituloRemovido(reg.fav, tipo: t, titulo: f["titulo"] as? String ?? "", ano: f["ano"] as? String ?? "",
+                                            emItem: Remocoes.numero(f["em"]))
+        }
+        let canaisRecebidos = (j["favCanais"] as? [String] ?? []).filter { !Remocoes.canalRemovido(reg, nome: $0) }
         if ativo {
             let favoritos = VodFavoritos.shared
+            for item in favoritos.itens {
+                let t = item.serie ? "s" : "f"
+                if Remocoes.tituloRemovido(reg.fav, tipo: t, titulo: item.titulo, ano: item.ano,
+                                           emItem: reg.favEm[Remocoes.chaveTitulo(t, item.titulo, item.ano)] ?? 0) {
+                    favoritos.alternar(item, anotar: false)
+                }
+            }
             for f in titulos {
                 guard let titulo = f["titulo"] as? String, !titulo.isEmpty else { continue }
                 let serie = (f["tipo"] as? String) == "s"
                 let ano = f["ano"] as? String ?? ""
                 if !favoritos.contem(titulo, serie: serie, ano: ano) {
                     favoritos.alternar(.init(titulo: titulo, serie: serie, letra: f["letra"] as? String ?? letra(titulo),
-                                             reservado: false, ano: ano))
+                                             reservado: false, ano: ano), anotar: false)
                 }
             }
-            for nome in j["favCanais"] as? [String] ?? [] {
+            for canal in model.channels where model.isFavorite(canal) && Remocoes.canalRemovido(reg, nome: canal.name) {
+                model.toggleFavorite(canal, anotar: false)
+            }
+            for nome in canaisRecebidos {
                 if let canal = model.channels.first(where: { $0.name == nome }), !model.isFavorite(canal) {
-                    model.toggleFavorite(canal)
+                    model.toggleFavorite(canal, anotar: false)
                 }
             }
             return
         }
-        var linhas = defaults.stringArray(forKey: chaveFavTitulos) ?? []
+        var linhas = (defaults.stringArray(forKey: chaveFavTitulos) ?? []).filter { l in
+            let c = l.components(separatedBy: "\t")
+            guard c.count >= 3 else { return true }
+            let t = c[0] == "s" ? "s" : "f", ano = c.count > 4 ? c[4] : ""
+            return !Remocoes.tituloRemovido(reg.fav, tipo: t, titulo: c[2], ano: ano, emItem: reg.favEm[Remocoes.chaveTitulo(t, c[2], ano)] ?? 0)
+        }
         for f in titulos {
             guard let titulo = f["titulo"] as? String, !titulo.isEmpty else { continue }
             let serie = (f["tipo"] as? String) == "s"
@@ -174,7 +225,10 @@ enum SincroniaConnect {
         }
         defaults.set(linhas, forKey: chaveFavTitulos)
         var urls = Set(defaults.stringArray(forKey: chaveFavCanais) ?? [])
-        for nome in j["favCanais"] as? [String] ?? [] {
+        for canal in model.channels where urls.contains(canal.source.absoluteString) && Remocoes.canalRemovido(reg, nome: canal.name) {
+            urls.remove(canal.source.absoluteString)
+        }
+        for nome in canaisRecebidos {
             if let canal = model.channels.first(where: { $0.name == nome }) { urls.insert(canal.source.absoluteString) }
         }
         defaults.set(Array(urls), forKey: chaveFavCanais)
@@ -213,11 +267,16 @@ enum SincroniaConnect {
                 ListasEstado.shared.atualizar()
             }
         }
+        let reg = Remocoes.juntarListas(l["minhasRemovidas"] as? [[String: Any]] ?? [])
+        for lista in MinhasListas.shared.listas where Remocoes.listaRemovida(reg, link: lista.link) {
+            MinhasListas.shared.remover(lista.id, anotar: false)
+        }
         let minhas = l["minhas"] as? [[String: Any]] ?? []
         let novas = minhas.compactMap { m -> (String, String)? in
             guard let link = (m["link"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
                   link.hasPrefix("http://") || link.hasPrefix("https://"),
-                  !MinhasListas.shared.listas.contains(where: { $0.link == link }) else { return nil }
+                  !MinhasListas.shared.listas.contains(where: { $0.link == link }),
+                  !Remocoes.listaRemovida(reg, link: link, emItem: Remocoes.numero(m["em"])) else { return nil }
             return (m["nome"] as? String ?? "", link)
         }
         guard !novas.isEmpty else { return }

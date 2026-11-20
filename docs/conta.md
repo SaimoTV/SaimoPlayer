@@ -27,7 +27,12 @@ README de lá.
 - O QR leva a `https://saimo-tv.com.br/conectar?c=ABCD2345`: com a conta
   aberta no navegador, um toque aprova a TV; sem conta, entra ali mesmo.
   No celular, Ajustes > Conta Saimo > Entrar numa TV aceita o código digitado.
-- Na TV, o código vence em 10 min e é trocado sozinho; a TV pergunta a cada 5 s.
+- Na TV, o código vence em 10 min; a TV pergunta a cada 8 s (o servidor diz o
+  intervalo em `intervalo`). Venceu, para de perguntar e mostra "Gerar novo
+  código" (desde a 3.3.3; antes trocava sozinho para sempre e uma tela
+  esquecida aberta gerava pedidos sem fim). Aba escondida não pergunta.
+- Pedidos sem sessão do site vão com `Content-Type: text/plain` (sem OPTIONS
+  antes de cada um); o servidor manda `access-control-max-age: 86400`.
 
 ## O que sincroniza
 
@@ -36,7 +41,9 @@ perfis (com Kids), onde parou, títulos e canais favoritos de cada perfil,
 listas (os dois endereços e as Minhas listas de link) e addons/Debrid. O
 servidor junta com as mesmas regras do Connect: progresso vale o mais novo,
 favoritos ficam com a união, perfis por id com o `em` maior, remoções valem
-sobre perfis mais antigos. Progresso e favoritos sem ano (Samsung/LG) se
+sobre perfis mais antigos. Desde a 3.3.3, o que foi removido ("Continue
+assistindo", favoritos, Minhas listas) viaja como remoção e não volta pela
+união (ver "Remoções" em `docs/perfis.md`). Progresso e favoritos sem ano (Samsung/LG) se
 juntam ao mesmo título com ano.
 
 | App | Perfis | Onde parou | Favoritos | Listas | Addons |
@@ -47,7 +54,13 @@ juntam ao mesmo título com ano.
 | Roku | sim | sim | sim | não | não |
 
 Quando sincroniza: ao abrir o app, ao voltar para ele (mais de 1 min depois),
-alguns segundos depois de uma mudança e a cada 10 minutos. Os dados ficam
+alguns segundos depois de uma mudança (no máximo uma vez a cada 2 min) e a
+cada 10 minutos. **Um pedido por sincronia** (cada pedido é cobrado): com
+mudança aqui, só o `PUT` (o servidor devolve tudo já juntado); sem mudança, só
+o `GET`.
+
+**Listas importadas de arquivo** (M3U escolhido no aparelho) não sincronizam:
+só as adicionadas por link e os dois endereços. Os dados ficam
 criptografados no servidor (AES-GCM), até 2 MB por conta.
 
 ## Sair e apagar

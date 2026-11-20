@@ -57,14 +57,17 @@ final class VodFavoritos: ObservableObject {
     }
 
     /// Marca ou desmarca. O que entra fica em primeiro.
-    func alternar(_ item: Item) {
-        if contem(item.titulo, serie: item.serie, ano: item.ano) {
+    /// `anotar` falso: quem mexe é a sincronia (não vira remoção nem favorito novo daqui).
+    func alternar(_ item: Item, anotar: Bool = true) {
+        let tinha = contem(item.titulo, serie: item.serie, ano: item.ano)
+        if tinha {
             itens.removeAll {
                 $0.titulo == item.titulo && $0.serie == item.serie && $0.ano == item.ano
             }
         } else {
             itens.insert(item, at: 0)
         }
+        if anotar { Remocoes.anotarFavorito(serie: item.serie, titulo: item.titulo, ano: item.ano, removido: tinha) }
         gravar()
         SaimoConnect.shared.avisarDados()
     }

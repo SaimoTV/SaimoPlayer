@@ -13,6 +13,7 @@ struct TelaConta: View {
     @State private var imagem: NSImage?
     @State private var situacao = "Pedindo um código…"
     @State private var tarefa: Task<Void, Never>?
+    @State private var venceu = false
     /// Formulário de e-mail e senha aberto (sem conta: entrar; com conta: criar ou trocar a senha).
     @State private var comEmail = false
 
@@ -64,6 +65,9 @@ struct TelaConta: View {
                 Text(codigo).font(.system(size: 38, weight: .heavy, design: .monospaced)).tracking(4)
                     .foregroundStyle(Color(red: 0.18, green: 0.83, blue: 0.75)).textSelection(.enabled)
                 Text(situacao).font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
+                if venceu {
+                    Button("Gerar novo QR") { esperar() }
+                }
                 Button("Entrar com e-mail e senha") { comEmail = true }
                 if !embutida {
                     HStack {
@@ -76,16 +80,23 @@ struct TelaConta: View {
         }
     }
 
+    /// Um código por rodada: venceu, para de perguntar e mostra "Gerar novo QR"
+    /// (cada pergunta ao servidor é cobrada; janela esquecida aberta não pergunta para sempre).
     private func esperar() {
         tarefa?.cancel()
+        venceu = false
+        codigo = "…"
+        situacao = "Pedindo um código…"
         tarefa = Task { @MainActor in
-            while !Task.isCancelled {
-                let pedido: Conta.Pedido
+            var pedido: Conta.Pedido?
+            for tentativa in 0..<3 where pedido == nil && !Task.isCancelled {
                 do { pedido = try await conta.pedirCodigo() } catch {
                     situacao = error.localizedDescription
-                    try? await Task.sleep(nanoseconds: 10_000_000_000)
-                    continue
+                    if tentativa < 2 { try? await Task.sleep(nanoseconds: 10_000_000_000) }
                 }
+            }
+            if Task.isCancelled { return }
+            if let pedido {
                 codigo = pedido.codigo
                 imagem = Conta.qr(pedido.url, lado: 216)
                 situacao = "Esperando o celular…"
@@ -97,7 +108,12 @@ struct TelaConta: View {
                     if r == true { situacao = "Pronto! Sincronizando…"; return }
                     if r == nil { break }
                 }
+                if Task.isCancelled { return }
             }
+            imagem = nil
+            codigo = ""
+            situacao = pedido == nil ? "Sem conexão agora." : "O código venceu."
+            venceu = true
         }
     }
 }

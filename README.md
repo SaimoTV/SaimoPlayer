@@ -406,6 +406,8 @@ até 5% qualquer tecla ou clique traz o brilho de volta, devagar (o evento não 
 
 Mac: Ajustes > Conta Saimo mostra o QR (o celular ou o site logado aprova) e tem "Entrar com e-mail e senha". Código em `Sources/Conta.swift` e `Sources/TelaConta.swift`; sincroniza pelo pacote do Connect (`SincroniaConnect`). Teste: `SAIMO_CONTA_API=http://127.0.0.1:8787`. Contrato comum de todos os apps: `docs/conta.md`. Sem conta, nada muda.
 
+Remoções (3.3.3): o que sai do Continue assistindo, dos favoritos e das Minhas listas é anotado em `Sources/Remocoes.swift` e viaja no pacote, para a sincronia não trazer de volta (regras em `docs/perfis.md`). Remover uma série do Continue assistindo tira todos os episódios dela. Uma sincronia é um pedido só (PUT com mudança, GET sem), no máximo um envio a cada 2 min. O QR para de perguntar quando o código vence e mostra "Gerar novo QR".
+
 ## Recursos pessoais (3.1.1)
 
 - Estatísticas (tempo, filmes e episódios vistos) e "Marcar como visto" no player.
