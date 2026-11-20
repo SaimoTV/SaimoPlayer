@@ -100,9 +100,15 @@ struct TelaConta: View {
                 codigo = pedido.codigo
                 imagem = Conta.qr(pedido.url, lado: 216)
                 situacao = "Esperando o celular…"
+                let inicio = Date()
                 while !Task.isCancelled, Date().timeIntervalSince1970 * 1000 < pedido.expiraEm {
-                    try? await Task.sleep(nanoseconds: UInt64(pedido.intervalo * 1_000_000_000))
+                    // 8 s nos 2 primeiros minutos, então 15 s, e 20 s depois de 5 min (cada pergunta é cobrada).
+                    let passou = Date().timeIntervalSince(inicio)
+                    let espera = passou < 120 ? pedido.intervalo : passou < 300 ? 15 : 20
+                    try? await Task.sleep(nanoseconds: UInt64(espera * 1_000_000_000))
                     if Task.isCancelled { return }
+                    // App atrás de outro: não pergunta.
+                    if !NSApplication.shared.isActive { continue }
                     var r: Bool? = false
                     do { r = try await conta.conferir(pedido) } catch { r = false }
                     if r == true { situacao = "Pronto! Sincronizando…"; return }

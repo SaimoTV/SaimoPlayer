@@ -39,7 +39,7 @@ final class Conta: ObservableObject {
 
     struct Erro: LocalizedError { let mensagem: String; var errorDescription: String? { mensagem } }
 
-    /// Na abertura: sincroniza em alguns segundos, ao voltar para o app e a cada 10 min.
+    /// Na abertura: sincroniza em alguns segundos, ao voltar para o app, ao sair dele (se mudou algo) e a cada 15 min.
     func iniciar() {
         NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated {
@@ -47,8 +47,20 @@ final class Conta: ObservableObject {
                 if c.logado, !c.sincronizando, Date().timeIntervalSince1970 * 1000 - c.sincronizadaEm > 60_000 { Task { await c.sincronizar() } }
             }
         }
-        relogio = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { _ in
-            MainActor.assumeIsolated { _ = Task { await Conta.shared.sincronizar() } }
+        // Saiu do app (outra janela na frente) com mudança ainda não enviada: manda já.
+        NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated {
+                let c = Conta.shared
+                guard c.logado, !c.sincronizando else { return }
+                if Self.texto(SincroniaConnect.pacote(PlayerModel.shared)) != c.ultimoEnviado { Task { await c.sincronizar() } }
+            }
+        }
+        // A cada 15 min com o app na frente (voltar para ele já sincroniza).
+        relogio = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { _ in
+            MainActor.assumeIsolated {
+                guard NSApplication.shared.isActive else { return }
+                _ = Task { await Conta.shared.sincronizar() }
+            }
         }
         if logado { DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Task { await Conta.shared.sincronizar() } } }
     }
@@ -196,7 +208,7 @@ final class Conta: ObservableObject {
     }
 
     /// Entre um envio e outro, no mínimo isso (assistindo, o ponto muda o tempo todo).
-    private static let intervaloMinimo: TimeInterval = 120
+    private static let intervaloMinimo: TimeInterval = 300
 
     /// Algo mudou aqui (o Connect avisa): manda em alguns segundos, várias mudanças
     /// num envio só, no máximo um envio a cada 2 min. Sem mudança desde o último
