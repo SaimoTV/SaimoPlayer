@@ -27,8 +27,9 @@ README de lá.
 - O QR leva a `https://saimo-tv.com.br/conectar?c=ABCD2345`: com a conta
   aberta no navegador, um toque aprova a TV; sem conta, entra ali mesmo.
   No celular, Ajustes > Conta Saimo > Entrar numa TV aceita o código digitado.
-- Na TV, o código vence em 10 min; a TV pergunta a cada 8 s (o servidor diz o
-  intervalo em `intervalo`). Venceu, para de perguntar e mostra "Gerar novo
+- Na TV, o código vence em 10 min; a TV pergunta a cada 8 s nos 2 primeiros
+  minutos (o servidor diz em `intervalo`), depois a cada 15 s e, passados 5 min,
+  a cada 20 s; com o app atrás de outro, não pergunta. Venceu, para de perguntar e mostra "Gerar novo
   código" (desde a 3.3.3; antes trocava sozinho para sempre e uma tela
   esquecida aberta gerava pedidos sem fim). Aba escondida não pergunta.
 - Pedidos sem sessão do site vão com `Content-Type: text/plain` (sem OPTIONS
@@ -54,8 +55,9 @@ juntam ao mesmo título com ano.
 | Roku | sim | sim | sim | não | não |
 
 Quando sincroniza: ao abrir o app, ao voltar para ele (mais de 1 min depois),
-alguns segundos depois de uma mudança (no máximo uma vez a cada 2 min) e a
-cada 10 minutos. **Um pedido por sincronia** (cada pedido é cobrado): com
+alguns segundos depois de uma mudança (no máximo uma vez a cada 5 min; ao sair
+do app ou esconder a aba, o que falta vai na hora) e a cada 15 minutos com o
+app na frente (desde a 3.3.5). **Um pedido por sincronia** (cada pedido é cobrado): com
 mudança aqui, só o `PUT` (o servidor devolve tudo já juntado); sem mudança, só
 o `GET`.
 
