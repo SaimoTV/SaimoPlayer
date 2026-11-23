@@ -139,7 +139,7 @@ enum GrupoAjustes: String, CaseIterable, Identifiable {
         case .listas: return "Endereços, Minhas listas, addons, importar e exportar"
         case .reproducao: return "Nitidez, tela, ao abrir e lista de canais"
         case .legendas: return "Tamanho, cor, posição e fundo"
-        case .aparencia: return "Tamanho do texto, cor do app e brilho"
+        case .aparencia: return "Tamanho do texto, negrito, alto contraste, cor e brilho"
         case .perfis: return "Trocar, gerenciar, seu tempo no Saimo e episódios novos"
         case .connect: return "Controle pelo celular"
         case .sistema: return "Atualizar catálogo e procurar versão nova"
@@ -449,9 +449,11 @@ struct TelaAjustes: View {
                         .id(estiloVersao)
                         case .aparencia:
                         secao("Aparência e acessibilidade") {
-                            linha("Tamanho do texto", TamanhoTexto.nome + " · clique para trocar", icone: "textformat.size.larger") {
-                                TamanhoTexto.proximo(); estiloVersao += 1
-                            }
+                            linha("Acessibilidade",
+                                  ([TamanhoTexto.nome] + (TamanhoTexto.negrito ? ["negrito"] : []) + (TamanhoTexto.contraste ? ["alto contraste"] : []))
+                                    .joined(separator: " · ") + " · com prévia antes de aplicar",
+                                  icone: "textformat.size.larger") { acessibilidadeAberta = true }
+                            .sheet(isPresented: $acessibilidadeAberta) { TelaAcessibilidade { acessibilidadeAberta = false; estiloVersao += 1 } }
                             linha("Cor do app", EstiloLegenda.temas[EstiloLegenda.indiceTema].0 + " · vale ao reabrir o app", icone: "paintpalette") {
                                 EstiloLegenda.proximoTema(); estiloVersao += 1
                             }
