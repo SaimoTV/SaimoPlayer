@@ -315,7 +315,7 @@ Telemetria: desligada (nenhum dado de uso sai do aparelho).
 
 ## Ajustes e acessibilidade (Mac)
 
-`TelaAjustes.swift` abre com os grupos (`GrupoAjustes`); Esc volta à lista. Acessibilidade (`TamanhoTexto.swift`): tamanho do texto, negrito e alto contraste numa janela com prévia. As telas usam `.font(.escalado(n))` no lugar de `.system(size: n)`; a barra do topo cresce junto até 1,3x (`TamanhoTexto.escalaDaBarra`; sem espaço, as abas viram ícones).
+`TelaAjustes.swift` abre com os grupos (`GrupoAjustes`); Esc volta à lista. Acessibilidade (`TamanhoTexto.swift`): tamanho do texto, negrito e alto contraste numa janela com prévia. As telas usam `.font(.escalado(n))` no lugar de `.system(size: n)`; a barra do topo cresce junto com o tamanho (`TamanhoTexto.escalaDaBarra`; sem espaço, as abas viram ícones).
 
 ## Dados publicados
 
