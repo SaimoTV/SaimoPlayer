@@ -421,3 +421,7 @@ Remoções (3.3.3): o que sai do Continue assistindo, dos favoritos e das Minhas
 ## Ajustes da 3.3.4
 
 - **On Demand com cache**: `Destaques` abre com a cópia em disco e a tela confere a novidade por trás (`Destaques.novidades`, no máximo 1x por minuto), trocando só se mudou.
+
+## Licença
+
+Código aberto sob a licença MIT (arquivo `LICENSE`). Bibliotecas de terceiros seguem as licenças delas.
