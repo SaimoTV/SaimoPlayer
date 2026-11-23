@@ -15,7 +15,7 @@ enum Tema {
     static var textoApagado: Color { TamanhoTexto.contraste ? Color.white.opacity(0.85) : Color.white.opacity(0.4) }
 
     /// Altura da barra do topo: o conteúdo das telas começa abaixo dela.
-    static let alturaDaBarra: CGFloat = 64
+    static var alturaDaBarra: CGFloat { 64 * TamanhoTexto.escalaDaBarra }
     /// Margem lateral das telas, a mesma das fileiras e do destaque.
     static let margem: CGFloat = 40
 

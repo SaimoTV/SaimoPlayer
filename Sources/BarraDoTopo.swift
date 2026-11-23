@@ -100,6 +100,8 @@ struct BarraDoTopo: View {
     var telaCheia: Bool
 
     @Namespace private var espaco
+    @State private var versaoTamanho = 0
+    private var k: CGFloat { TamanhoTexto.escalaDaBarra }
 
     private var abas: [Aba] {
         // Extras só aparece com o código digitado, e some sem deixar vão.
@@ -120,12 +122,12 @@ struct BarraDoTopo: View {
                 Image(nsImage: NSApp.applicationIconImage)
                     .resizable()
                     .interpolation(.high)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 30 * k, height: 30 * k)
                     .help("Saimo TV")
                     .padding(.leading, telaCheia ? 22 : 84)
 
                 Spacer(minLength: 0)
-                    .frame(maxWidth: .infinity, minHeight: 30)
+                    .frame(maxWidth: .infinity, minHeight: 30 * k)
                     .contentShape(Rectangle())
                     .gesture(WindowDragGesture())
 
@@ -135,7 +137,7 @@ struct BarraDoTopo: View {
 
                 // O perfil ativo: o avatar abre a troca de perfil.
                 Button { NotificationCenter.default.post(name: .abrirPerfis, object: nil) } label: {
-                    AvatarPerfil(nome: Perfis.ativo.nome, avatar: Perfis.ativo.avatar, tamanho: 30)
+                    AvatarPerfil(nome: Perfis.ativo.nome, avatar: Perfis.ativo.avatar, tamanho: 30 * k)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -143,8 +145,8 @@ struct BarraDoTopo: View {
 
                 Button { Aba.ajustes.abrir() } label: {
                     Image(systemName: "gearshape.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .frame(width: 34, height: 34)
+                        .font(.system(size: 15 * k, weight: .semibold))
+                        .frame(width: 34 * k, height: 34 * k)
                         .foregroundStyle(atual == .ajustes ? Color.black : Color.white)
                         .background {
                             if atual == .ajustes { Circle().fill(Color.white) }
@@ -171,6 +173,7 @@ struct BarraDoTopo: View {
             .zIndex(10)
         }
         .frame(height: Tema.alturaDaBarra)
+        .onReceive(NotificationCenter.default.publisher(for: .tamanhoTextoMudou)) { _ in versaoTamanho += 1 }
         .background(alignment: .top) {
             // O degradê faz a barra se ler sobre qualquer imagem, sem caixa.
             LinearGradient(colors: [.black.opacity(0.55), .black.opacity(0)],
@@ -197,10 +200,10 @@ struct BarraDoTopo: View {
         return Button { aba.abrir() } label: {
             HStack(spacing: 6) {
                 Image(systemName: aba.icone)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 13 * k, weight: .semibold))
                 if comNome {
                     Text(aba.titulo)
-                        .font(.system(size: 14, weight: escolhida ? .semibold : .medium))
+                        .font(.system(size: 14 * k, weight: escolhida ? .semibold : .medium))
                         .lineLimit(1)
                         .fixedSize()
                 }

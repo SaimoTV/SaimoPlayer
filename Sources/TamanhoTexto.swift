@@ -3,8 +3,8 @@ import SwiftUI
 /// Acessibilidade (Ajustes > Aparência e acessibilidade > Tamanho do texto).
 ///
 /// As telas usam `.font(.escalado(n))` no lugar de `.system(size: n)`: o
-/// tamanho escolhido multiplica todos. A barra do topo fica no tamanho fixo
-/// para sempre caber na janela.
+/// tamanho escolhido multiplica todos. A barra do topo cresce até 1,3x e, se não
+/// couber, troca os nomes das abas por ícones.
 enum TamanhoTexto {
     static let chave = "tamanhoTexto"
     static let opcoes: [(nome: String, valor: CGFloat)] = [("Normal", 1), ("Grande", 1.15), ("Muito grande", 1.3), ("Enorme", 1.45)]
@@ -29,6 +29,9 @@ enum TamanhoTexto {
         let v = UserDefaults.standard.double(forKey: chave)
         return v == 0 ? 1 : CGFloat(min(max(v, 0.8), 1.6))
     }
+
+    /// A barra do topo cresce junto, até 1,3x (acima disso as abas não cabem na janela).
+    static var escalaDaBarra: CGFloat { min(escala, 1.3) }
 
     static var nome: String { opcoes.min(by: { abs($0.valor - escala) < abs($1.valor - escala) })?.nome ?? "Normal" }
 
