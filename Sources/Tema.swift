@@ -10,8 +10,9 @@ enum Tema {
     static let aoVivo = Color(red: 1, green: 0x4D / 255, blue: 0x4F / 255)
     static let fundo = Color(red: 0x0B / 255, green: 0x0E / 255, blue: 0x14 / 255)
     static let cartao = Color.white.opacity(0.07)
-    static let textoSecundario = Color(red: 0xA8 / 255, green: 0xB4 / 255, blue: 0xC0 / 255)
-    static let textoApagado = Color.white.opacity(0.4)
+    /// Com "Alto contraste" (Ajustes > Acessibilidade) o texto secundário fica branco.
+    static var textoSecundario: Color { TamanhoTexto.contraste ? .white : Color(red: 0xA8 / 255, green: 0xB4 / 255, blue: 0xC0 / 255) }
+    static var textoApagado: Color { TamanhoTexto.contraste ? Color.white.opacity(0.85) : Color.white.opacity(0.4) }
 
     /// Altura da barra do topo: o conteúdo das telas começa abaixo dela.
     static let alturaDaBarra: CGFloat = 64
@@ -119,7 +120,7 @@ struct BotaoDeVidro: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 14, weight: .semibold))
+            .font(.escalado(14, weight: .semibold))
             .padding(.horizontal, 18)
             .padding(.vertical, 9)
             .foregroundStyle(proeminente ? Color.black : Color.white)
@@ -267,7 +268,7 @@ struct SeloAoVivo: View {
 
     var body: some View {
         Text(texto)
-            .font(.system(size: 11, weight: .bold))
+            .font(.escalado(11, weight: .bold))
             .foregroundStyle(.white)
             .lineLimit(1)
             .padding(.horizontal, 8)
@@ -301,7 +302,7 @@ struct Relogio: View {
     var body: some View {
         TimelineView(.everyMinute) { contexto in
             Text(contexto.date, format: .dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))
-                .font(.system(size: tamanho, weight: .medium).monospacedDigit())
+                .font(.escalado(tamanho, weight: .medium).monospacedDigit())
                 .foregroundStyle(.white)
         }
     }

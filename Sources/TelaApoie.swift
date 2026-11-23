@@ -15,22 +15,22 @@ struct TelaApoie: View {
             HStack(alignment: .center, spacing: 56) {
                 VStack(alignment: .leading, spacing: 14) {
                     Label("Comunidade Saimo TV", systemImage: "heart.fill")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.escalado(13, weight: .semibold))
                         .foregroundStyle(turquesa)
                         .padding(.horizontal, 12).padding(.vertical, 6)
                         .background(turquesa.opacity(0.14), in: Capsule())
                     (Text("Ajude a manter o Saimo TV ") + Text("100% gratuito").foregroundColor(turquesa))
-                        .font(.system(size: 40, weight: .heavy))
+                        .font(.escalado(40, weight: .heavy))
                     Text("Sem anúncios e sem mensalidade.")
-                        .font(.system(size: 18)).foregroundStyle(.white.opacity(0.8))
+                        .font(.escalado(18)).foregroundStyle(.white.opacity(0.8))
                     Text("O Saimo TV é um player: ele toca as listas e os links que você mesmo adiciona. O app não traz nenhum canal, filme ou série dentro; o que você assiste vem das suas próprias listas.")
-                        .font(.system(size: 15)).foregroundStyle(.white.opacity(0.8))
+                        .font(.escalado(15)).foregroundStyle(.white.opacity(0.8))
                         .fixedSize(horizontal: false, vertical: true)
                     Text("O desenvolvimento e as atualizações do app e do site custam dinheiro todo mês. Quem puder ajudar com qualquer valor faz uma diferença enorme para o Saimo TV continuar gratuito e sem anúncios.")
-                        .font(.system(size: 15)).foregroundStyle(.white.opacity(0.62))
+                        .font(.escalado(15)).foregroundStyle(.white.opacity(0.62))
                         .fixedSize(horizontal: false, vertical: true)
                     Text("Agora o Pix é direto: o valor vai direto para o desenvolvedor, Gabriel Saimo Ferreira, sem intermediário. Aponte a câmera do celular para o QR code ou copie o código Pix e cole no app do seu banco.")
-                        .font(.system(size: 15)).foregroundStyle(.white.opacity(0.8))
+                        .font(.escalado(15)).foregroundStyle(.white.opacity(0.8))
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 12) {
                         vantagem("nosign", "Zero anúncios", "Nada interrompendo o que você usa")
@@ -46,7 +46,7 @@ struct TelaApoie: View {
                     } label: {
                         Label(copiado ? "Código copiado" : "Copiar Pix copia e cola",
                               systemImage: copiado ? "checkmark" : "doc.on.doc")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.escalado(15, weight: .bold))
                             .padding(.horizontal, 22).padding(.vertical, 12)
                             .foregroundStyle(.white)
                             .background(LinearGradient(colors: [Color(red: 0.06, green: 0.66, blue: 0.60),
@@ -60,15 +60,15 @@ struct TelaApoie: View {
 
                 VStack(spacing: 14) {
                     Text("Aponte a câmera do celular")
-                        .font(.system(size: 17, weight: .bold)).foregroundStyle(.black)
+                        .font(.escalado(17, weight: .bold)).foregroundStyle(.black)
                     if let qr = Self.qr {
                         Image(nsImage: qr).interpolation(.none).resizable().frame(width: 240, height: 240)
                     }
                     Text("Pix direto")
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.escalado(15, weight: .bold))
                         .foregroundStyle(Color(red: 0.05, green: 0.45, blue: 0.56))
                     Text("Gabriel Saimo Ferreira")
-                        .font(.system(size: 12)).foregroundStyle(.gray)
+                        .font(.escalado(12)).foregroundStyle(.gray)
                 }
                 .padding(28)
                 .background(.white, in: RoundedRectangle(cornerRadius: 24))
@@ -83,10 +83,10 @@ struct TelaApoie: View {
 
     private func vantagem(_ icone: String, _ titulo: String, _ texto: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: icone).font(.system(size: 18)).foregroundStyle(turquesa)
+            Image(systemName: icone).font(.escalado(18)).foregroundStyle(turquesa)
             VStack(alignment: .leading, spacing: 3) {
-                Text(titulo).font(.system(size: 14, weight: .bold))
-                Text(texto).font(.system(size: 12)).foregroundStyle(.white.opacity(0.6))
+                Text(titulo).font(.escalado(14, weight: .bold))
+                Text(texto).font(.escalado(12)).foregroundStyle(.white.opacity(0.6))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

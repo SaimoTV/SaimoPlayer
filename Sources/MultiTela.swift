@@ -335,7 +335,7 @@ struct MolduraDaTela: View {
                     Spacer(minLength: 8)
                     Button { model.fecharTela(lado) } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.escalado(11, weight: .bold))
                             .frame(width: 24, height: 24)
                             .background(.ultraThinMaterial, in: Circle())
                     }
@@ -380,10 +380,10 @@ struct MolduraDaTela: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: ativa && !model.isMuted ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                    .font(.system(size: 10))
+                    .font(.escalado(10))
                     .frame(width: 14)
                 Text(canal.name)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.escalado(12, weight: .semibold))
                     .lineLimit(1)
                 if carregando {
                     ProgressView()
@@ -392,7 +392,7 @@ struct MolduraDaTela: View {
                         .frame(width: 9, height: 9)
                 }
                 Text(fonte(canal))
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.escalado(10, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineLimit(1)
             }
@@ -423,12 +423,12 @@ struct MolduraDaTela: View {
     private var escolha: some View {
         VStack(spacing: 12) {
             Image(systemName: "rectangle.split.2x1")
-                .font(.system(size: 34, weight: .light))
+                .font(.escalado(34, weight: .light))
                 .foregroundStyle(.white.opacity(0.7))
             Text("Escolha o canal da segunda tela")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
             Text("Clique num canal da lista ou escolha aqui.")
-                .font(.system(size: 12))
+                .font(.escalado(12))
                 .foregroundStyle(.white.opacity(0.6))
             HStack(spacing: 10) {
                 Menu("Escolher canal") {

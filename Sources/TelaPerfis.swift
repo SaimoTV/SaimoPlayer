@@ -21,7 +21,7 @@ struct AvatarPerfil: View {
                     LinearGradient(colors: [Color(red: 0.49, green: 0.55, blue: 1), Color(red: 0.1, green: 0.12, blue: 0.36)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                     Text(String(nome.trimmingCharacters(in: .whitespaces).first ?? "?").uppercased())
-                        .font(.system(size: tamanho * 0.44, weight: .heavy)).foregroundStyle(.white)
+                        .font(.escalado(tamanho * 0.44, weight: .heavy)).foregroundStyle(.white)
                 }
             }
         }
@@ -94,7 +94,7 @@ struct TelaPerfis: View {
         let atual = Perfis.ativo
         return VStack(spacing: 26) {
             Text(gerenciar ? "Gerenciar perfis" : "Quem está assistindo?")
-                .font(.system(size: 40, weight: .heavy)).foregroundStyle(.white)
+                .font(.escalado(40, weight: .heavy)).foregroundStyle(.white)
             if gerenciar {
                 Text("Clique num perfil para mudar o nome, o avatar ou o Kids.").foregroundStyle(.white.opacity(0.6))
             }
@@ -122,7 +122,7 @@ struct TelaPerfis: View {
                                 .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
                                 .foregroundStyle(.white.opacity(0.4))
                                 .frame(width: 120, height: 120)
-                                .overlay(Image(systemName: "plus").font(.system(size: 42)).foregroundStyle(.white.opacity(0.8)))
+                                .overlay(Image(systemName: "plus").font(.escalado(42)).foregroundStyle(.white.opacity(0.8)))
                             Text("Adicionar perfil").foregroundStyle(.white.opacity(0.75))
                         }
                     }
@@ -145,7 +145,7 @@ struct TelaPerfis: View {
                     .toggleStyle(.checkbox).foregroundStyle(.white.opacity(0.8))
             }
             Text("Cada perfil tem os seus favoritos, o que está assistindo e os recentes. As listas e os ajustes valem para todos. Até \(Perfis.maximo) perfis. O perfil Kids só mostra filmes e séries classificados até 12 anos e nada adulto.")
-                .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.45)).multilineTextAlignment(.center).frame(maxWidth: 560)
+                .font(.escalado(12.5)).foregroundStyle(.white.opacity(0.45)).multilineTextAlignment(.center).frame(maxWidth: 560)
         }
         .padding(40)
         .id(versao)
@@ -168,18 +168,18 @@ private struct BotaoDePerfil: View {
                     AvatarPerfil(nome: nome, avatar: avatar, tamanho: 120)
                         .opacity(editando ? 0.5 : 1)
                         .overlay {
-                            if editando { Image(systemName: "pencil").font(.system(size: 38, weight: .bold)).foregroundStyle(.white) }
+                            if editando { Image(systemName: "pencil").font(.escalado(38, weight: .bold)).foregroundStyle(.white) }
                         }
                         .overlay(RoundedRectangle(cornerRadius: 30, style: .continuous)
                             .strokeBorder(sobre ? Color.white : (atual ? Tema.acento : .clear), lineWidth: 4))
                     if kids {
-                        Text("KIDS").font(.system(size: 11, weight: .heavy)).foregroundStyle(Color(red: 0.16, green: 0.08, blue: 0))
+                        Text("KIDS").font(.escalado(11, weight: .heavy)).foregroundStyle(Color(red: 0.16, green: 0.08, blue: 0))
                             .padding(.horizontal, 8).padding(.vertical, 3)
                             .background(Capsule().fill(Color(red: 1, green: 0.71, blue: 0.24)))
                             .offset(x: 6, y: 6)
                     }
                 }
-                Text(nome).font(.system(size: 16, weight: atual ? .bold : .medium))
+                Text(nome).font(.escalado(16, weight: atual ? .bold : .medium))
                     .foregroundStyle(.white.opacity(sobre || atual ? 1 : 0.75)).lineLimit(1).frame(maxWidth: 130)
             }
             .scaleEffect(sobre ? 1.06 : 1)
@@ -195,7 +195,7 @@ struct BotaoPerfis: ButtonStyle {
     var perigo = false
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .semibold))
+            .font(.escalado(15, weight: .semibold))
             .foregroundStyle(principal ? Color.black : (perigo ? Color(red: 1, green: 0.7, blue: 0.7) : .white))
             .padding(.horizontal, 22).padding(.vertical, 11)
             .background(Capsule().fill(principal ? Tema.acento : Color.white.opacity(configuration.isPressed ? 0.15 : 0.07)))
@@ -216,11 +216,11 @@ struct PedirCodigoView: View {
     var body: some View {
         VStack(spacing: 18) {
             AvatarPerfil(nome: perfil.nome, avatar: perfil.avatar, tamanho: 90)
-            Text("Código do perfil \(perfil.nome)").font(.system(size: 30, weight: .heavy)).foregroundStyle(.white)
+            Text("Código do perfil \(perfil.nome)").font(.escalado(30, weight: .heavy)).foregroundStyle(.white)
             Text(motivo).foregroundStyle(.white.opacity(0.65))
             SecureField("••••", text: $codigo)
                 .textFieldStyle(.plain)
-                .font(.system(size: 28, weight: .bold))
+                .font(.escalado(28, weight: .bold))
                 .multilineTextAlignment(.center)
                 .frame(width: 180, height: 56)
                 .background(RoundedRectangle(cornerRadius: 14).fill(Color.white.opacity(0.07)))
@@ -260,11 +260,11 @@ private struct EditarPerfilView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                Text(perfil == nil ? "Novo perfil" : "Editar perfil").font(.system(size: 34, weight: .heavy)).foregroundStyle(.white)
+                Text(perfil == nil ? "Novo perfil" : "Editar perfil").font(.escalado(34, weight: .heavy)).foregroundStyle(.white)
                 HStack(spacing: 22) {
                     AvatarPerfil(nome: nome.isEmpty ? "?" : nome, avatar: avatar, tamanho: 104)
                     TextField("Nome do perfil", text: $nome)
-                        .textFieldStyle(.plain).font(.system(size: 20, weight: .semibold))
+                        .textFieldStyle(.plain).font(.escalado(20, weight: .semibold))
                         .padding(.horizontal, 16).frame(width: 360, height: 50)
                         .background(RoundedRectangle(cornerRadius: 14).fill(Color.white.opacity(0.07)))
                         .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.white.opacity(0.22)))
@@ -282,9 +282,9 @@ private struct EditarPerfilView: View {
                 if perfil?.id != Perfis.principal {
                     Toggle(isOn: $kids) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Perfil Kids").font(.system(size: 15, weight: .bold)).foregroundStyle(.white)
+                            Text("Perfil Kids").font(.escalado(15, weight: .bold)).foregroundStyle(.white)
                             Text("Só filmes e séries classificados até 12 anos, nada adulto. Sair dele pede um código de 4 números.")
-                                .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.6))
+                                .font(.escalado(12.5)).foregroundStyle(.white.opacity(0.6))
                         }
                     }
                     .toggleStyle(.checkbox).frame(width: 520, alignment: .leading)

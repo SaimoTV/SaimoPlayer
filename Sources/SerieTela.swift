@@ -198,25 +198,25 @@ struct SerieTela: View {
                     capa
                     VStack(alignment: .leading, spacing: 12) {
                         Text("SÉRIE")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.escalado(12, weight: .bold))
                             .tracking(2)
                             .foregroundStyle(Tema.acento)
                         titulo
                         if let frase = ficha?.frase, !frase.isEmpty {
-                            Text(frase).font(.system(size: 15)).italic()
+                            Text(frase).font(.escalado(15)).italic()
                                 .foregroundStyle(.white.opacity(0.7))
                                 .lineLimit(1)
                         }
                         selos
                         if let generos = ficha?.generos, !generos.isEmpty {
                             Text(generos.joined(separator: "  ·  "))
-                                .font(.system(size: 13))
+                                .font(.escalado(13))
                                 .foregroundStyle(.white.opacity(0.65))
                         }
                         botoes.padding(.top, 6)
                         if let sinopse = ficha?.sinopse, !sinopse.isEmpty {
                             Text(sinopse)
-                                .font(.system(size: 15))
+                                .font(.escalado(15))
                                 .lineSpacing(3)
                                 .foregroundStyle(.white.opacity(0.9))
                                 .lineLimit(4)
@@ -234,11 +234,11 @@ struct SerieTela: View {
                 if let elenco = ficha?.elenco, !elenco.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .lastTextBaseline) {
-                            Text("Elenco").font(.system(size: 18, weight: .semibold))
+                            Text("Elenco").font(.escalado(18, weight: .semibold))
                             Spacer()
                             if let ficha, !ficha.assinatura.isEmpty {
                                 Text("Criação: \(ficha.assinatura)")
-                                    .font(.system(size: 13))
+                                    .font(.escalado(13))
                                     .foregroundStyle(.white.opacity(0.6))
                                     .lineLimit(1)
                             }
@@ -266,7 +266,7 @@ struct SerieTela: View {
     @ViewBuilder
     private var titulo: some View {
         let nome = Text(Generos.semAno(serie.titulo))
-            .font(.system(size: 38, weight: .bold))
+            .font(.escalado(38, weight: .bold))
             .lineLimit(2)
             .foregroundStyle(.white)
         if let endereco = ficha?.logo, let url = URL(string: endereco) {
@@ -290,7 +290,7 @@ struct SerieTela: View {
         return ZStack {
             RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.08))
             Text(String(serie.titulo.prefix(1)).uppercased())
-                .font(.system(size: 54, weight: .semibold))
+                .font(.escalado(54, weight: .semibold))
                 .foregroundStyle(Tema.acento.opacity(0.7))
             if let endereco, let url = URL(string: endereco) {
                 AsyncImage(url: url) { imagem in
@@ -309,10 +309,10 @@ struct SerieTela: View {
             HStack(spacing: 8) {
                 if ficha.nota > 0 {
                     HStack(spacing: 4) {
-                        Image(systemName: "star.fill").font(.system(size: 11))
+                        Image(systemName: "star.fill").font(.escalado(11))
                         Text(String(format: "%.1f", ficha.nota))
                     }
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.escalado(13, weight: .semibold))
                     .foregroundStyle(.yellow)
                     .padding(.horizontal, 10).padding(.vertical, 4)
                     .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
@@ -349,7 +349,7 @@ struct SerieTela: View {
                 if let alvo { tocar(alvo) }
             } label: {
                 Label(rotulo, systemImage: "play.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .padding(.horizontal, 26).padding(.vertical, 11)
                     .background(.white, in: RoundedRectangle(cornerRadius: 9))
                     .foregroundStyle(.black)
@@ -361,7 +361,7 @@ struct SerieTela: View {
             Button { favoritos.alternar(item) } label: {
                 Label(marcado ? "Nos favoritos" : "Favoritar",
                       systemImage: marcado ? "star.fill" : "star")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .padding(.horizontal, 20).padding(.vertical, 11)
                     .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 9))
                     .foregroundStyle(marcado ? .yellow : .white)
@@ -376,7 +376,7 @@ struct SerieTela: View {
         let lista = daTemporada(temporada)
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 14) {
-                Text("Episódios").font(.system(size: 22, weight: .semibold))
+                Text("Episódios").font(.escalado(22, weight: .semibold))
                 Spacer()
                 if versoes.count > 1 {
                     HStack(spacing: 6) {
@@ -459,7 +459,7 @@ struct SerieTela: View {
 
     private func seta(_ simbolo: String) -> some View {
         Image(systemName: simbolo)
-            .font(.system(size: 13, weight: .semibold))
+            .font(.escalado(13, weight: .semibold))
             .foregroundStyle(.white.opacity(0.85))
             .frame(width: 30, height: 30)
             .background(Color.white.opacity(0.12), in: Circle())
@@ -468,7 +468,7 @@ struct SerieTela: View {
     private func pilula(_ texto: String, ativa: Bool, acao: @escaping () -> Void) -> some View {
         Button(action: acao) {
             Text(texto)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.escalado(13, weight: .semibold))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 7)
                 .background(Capsule().fill(ativa ? Color.white : Color.white.opacity(0.12)))
@@ -507,7 +507,7 @@ struct SerieTela: View {
                             .aspectRatio(contentMode: .fill)
                     } else {
                         Text("\(ep.numero)")
-                            .font(.system(size: 40, weight: .semibold, design: .rounded))
+                            .font(.escalado(40, weight: .semibold, design: .rounded))
                             .foregroundStyle(Tema.acento.opacity(0.8))
                     }
                 }
@@ -516,7 +516,7 @@ struct SerieTela: View {
                     if destaque {
                         Label(noAr ? "Assistindo" : (partida?.comecado == true ? "Continuar" : "Comece aqui"),
                               systemImage: "play.fill")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.escalado(11, weight: .bold))
                             .padding(.horizontal, 8).padding(.vertical, 3)
                             .background(Tema.acento, in: Capsule())
                             .foregroundStyle(.white)
@@ -526,7 +526,7 @@ struct SerieTela: View {
                 .overlay(alignment: .topTrailing) {
                     if visto {
                         Label("Assistido", systemImage: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.escalado(11, weight: .bold))
                             .padding(.horizontal, 8).padding(.vertical, 3)
                             .background(.black.opacity(0.7), in: Capsule())
                             .foregroundStyle(Tema.acento)
@@ -551,21 +551,21 @@ struct SerieTela: View {
                         .strokeBorder(destaque ? Tema.acento : .clear, lineWidth: 2))
 
                 Text("\(ep.numero). \(nome)")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.escalado(14, weight: .semibold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 if let sinopse = info?.sinopse, !sinopse.isEmpty {
                     Text(sinopse)
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(.white.opacity(0.6))
                         .lineLimit(2, reservesSpace: true)
                         .multilineTextAlignment(.leading)
                 } else {
-                    Text(" ").font(.system(size: 12)).lineLimit(2, reservesSpace: true)
+                    Text(" ").font(.escalado(12)).lineLimit(2, reservesSpace: true)
                 }
                 if !linhaDeBaixo.isEmpty {
                     Text(linhaDeBaixo)
-                        .font(.system(size: 11))
+                        .font(.escalado(11))
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }

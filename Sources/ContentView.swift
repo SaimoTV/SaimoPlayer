@@ -242,7 +242,7 @@ struct ContentView: View {
                     HStack {
                         Button { model.sairDoArquivo() } label: {
                             Label("Voltar", systemImage: "chevron.left")
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(.escalado(14, weight: .semibold))
                                 .padding(.horizontal, 14).padding(.vertical, 8)
                                 .vidroPainel(raio: 18, tinta: .black)
                                 .environment(\.colorScheme, .dark)
@@ -322,7 +322,7 @@ struct ContentView: View {
             statLine("Quadros perdidos", "\(model.stats.droppedFrames)")
             statLine("Travamentos", "\(model.stats.stalls)")
         }
-        .font(.system(size: 11, design: .monospaced))
+        .font(.escalado(11, design: .monospaced))
         .padding(12)
         .vidroPainel(raio: 14)
         .foregroundStyle(.white)
@@ -378,12 +378,12 @@ struct ChannelRow: View {
                     .truncationMode(.tail)
                 if let onAir = epg.nowNext(for: channel, at: epg.clock) {
                     Text(onAir.current.title)
-                        .font(.system(size: 10))
+                        .font(.escalado(10))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     if let detail = onAir.current.shortDetail {
                         Text(detail)
-                            .font(.system(size: 9))
+                            .font(.escalado(9))
                             .foregroundStyle(.tertiary)
                             .lineLimit(1)
                     }
@@ -460,11 +460,11 @@ struct ChannelIcon: View {
             .overlay {
                 if let glyph {
                     Image(systemName: glyph)
-                        .font(.system(size: size * 0.46, weight: .medium))
+                        .font(.escalado(size * 0.46, weight: .medium))
                         .foregroundStyle(.primary)
                 } else {
                     Text(initials)
-                        .font(.system(size: size * 0.36, weight: .semibold, design: .rounded))
+                        .font(.escalado(size * 0.36, weight: .semibold, design: .rounded))
                         .foregroundStyle(.primary)
                 }
             }
@@ -507,7 +507,7 @@ private struct ControlBar: View {
             if model.podePausar || !model.isPlaying {
                 Button(action: model.togglePlayPause) {
                     Image(systemName: model.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.escalado(17, weight: .semibold))
                         .frame(width: 22)
                 }
                 .help(model.isPlaying ? "Pausar (Espaço)" : "Tocar (Espaço)")
@@ -696,7 +696,7 @@ private struct ControlBar: View {
             }
             .help("Tela cheia (F)")
         }
-        .font(.system(size: 15))
+        .font(.escalado(15))
         .buttonStyle(.plain)
         .foregroundStyle(.white)
         .tint(.white)
@@ -732,7 +732,7 @@ private struct QualityBadge: View {
     var body: some View {
         if let label {
             Text(label)
-                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .font(.escalado(10, weight: .bold, design: .rounded))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 2)
                 .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 4))
@@ -763,7 +763,7 @@ private struct ScrubBar: View {
     var body: some View {
         HStack(spacing: 8) {
             Text(relogio(model.position))
-                .font(.system(size: 10, design: .monospaced))
+                .font(.escalado(10, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.75))
             Slider(value: Binding(
                 get: { model.position },
@@ -795,7 +795,7 @@ private struct ScrubBar: View {
                     }
                 }
             Text(relogio(model.duration))
-                .font(.system(size: 10, design: .monospaced))
+                .font(.escalado(10, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.5))
         }
     }
@@ -815,7 +815,7 @@ private struct ScrubBar: View {
             .clipShape(RoundedRectangle(cornerRadius: 6))
             .overlay(RoundedRectangle(cornerRadius: 6).stroke(.white.opacity(0.8), lineWidth: 1.5))
             Text(relogio(t))
-                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .font(.escalado(11, weight: .semibold, design: .monospaced))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 6).padding(.vertical, 2)
                 .background(.black.opacity(0.7), in: Capsule())
@@ -884,10 +884,10 @@ private struct SourceBadge: View {
                             .frame(width: 5, height: 5)
                     }
                     Text(rotulo)
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .font(.escalado(10, weight: .medium, design: .rounded))
                         .lineLimit(1)
                     Image(systemName: "chevron.up.chevron.down")
-                        .font(.system(size: 8, weight: .bold))
+                        .font(.escalado(8, weight: .bold))
                         .foregroundStyle(.white.opacity(0.75))
                 }
             }
@@ -966,7 +966,7 @@ private struct LiveBadge: View {
                     .fill(atLive ? Color.red : Color.secondary)
                     .frame(width: 7, height: 7)
                 Text(atLive ? "AO VIVO" : "VOLTAR AO VIVO")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.escalado(10, weight: .bold))
             }
         }
         .help("Ir para o ponto ao vivo")
@@ -996,10 +996,10 @@ private struct AvisoNaTela: View {
     var body: some View {
         VStack(spacing: 14) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 30))
+                .font(.escalado(30))
                 .foregroundStyle(.yellow)
             Text(texto)
-                .font(.system(size: 16, weight: .medium))
+                .font(.escalado(16, weight: .medium))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.white)
                 .frame(maxWidth: 420)
@@ -1021,12 +1021,12 @@ private struct LegendaNaTela: View {
                 VStack {
                     Spacer()
                     if let aviso = model.legendaAviso {
-                        Text(aviso).font(.system(size: 12)).foregroundStyle(.white.opacity(0.8))
+                        Text(aviso).font(.escalado(12)).foregroundStyle(.white.opacity(0.8))
                             .padding(.horizontal, 10).padding(.vertical, 5)
                             .background(.black.opacity(0.6), in: Capsule())
                     } else if let fala = model.legendaExternaEm(model.player.currentTime().seconds) {
                         Text(fala)
-                            .font(.system(size: EstiloLegenda.tamanho, weight: .medium))
+                            .font(.escalado(EstiloLegenda.tamanho, weight: .medium))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(EstiloLegenda.cor)
                             .shadow(color: .black, radius: 2, x: 0, y: 1)
@@ -1054,7 +1054,7 @@ private struct PulosNaTela: View {
             if let trecho = model.puloNaTela {
                 Button(action: model.pularTrecho) {
                     Text(trecho.tipo.rotulo)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.escalado(14, weight: .semibold))
                         .foregroundStyle(.black)
                         .padding(.horizontal, 18).padding(.vertical, 11)
                         .background(.white, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -1064,12 +1064,12 @@ private struct PulosNaTela: View {
             } else if let proximo = model.proximoNaTela {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Próximo episódio em \(proximo.resta) s")
-                        .font(.system(size: 12)).foregroundStyle(.white.opacity(0.65))
+                        .font(.escalado(12)).foregroundStyle(.white.opacity(0.65))
                     Text("Temporada \(proximo.episodio.temporada) · Episódio \(proximo.episodio.numero)")
-                        .font(.system(size: 15, weight: .semibold)).foregroundStyle(.white)
+                        .font(.escalado(15, weight: .semibold)).foregroundStyle(.white)
                     HStack(spacing: 8) {
                         Button { model.tocarProximo() } label: {
-                            Text("Assistir agora").font(.system(size: 13, weight: .semibold))
+                            Text("Assistir agora").font(.escalado(13, weight: .semibold))
                                 .foregroundStyle(.black)
                                 .padding(.horizontal, 12).padding(.vertical, 7)
                                 .background(.white, in: RoundedRectangle(cornerRadius: 8, style: .continuous))

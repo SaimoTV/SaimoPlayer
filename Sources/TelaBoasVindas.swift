@@ -18,28 +18,28 @@ struct TelaBoasVindas: View {
             Tema.fundo.ignoresSafeArea()
             HStack(alignment: .top, spacing: 28) {
                 cartao(destaque: true) {
-                    Text("Entrar ou criar conta").font(.system(size: 30, weight: .bold))
-                    Text("Por que criar uma conta?").font(.system(size: 16, weight: .semibold)).padding(.top, 10)
+                    Text("Entrar ou criar conta").font(.escalado(30, weight: .bold))
+                    Text("Por que criar uma conta?").font(.escalado(16, weight: .semibold)).padding(.top, 10)
                     ForEach(["Perfis, favoritos, listas e addons guardados e em qualquer aparelho.",
                              "Continue de onde parou no celular, na TV e no computador.",
                              "Trocou de aparelho ou reinstalou? Nada se perde."], id: \.self) { t in
-                        Text("•  \(t)").font(.system(size: 15)).foregroundStyle(Tema.textoSecundario)
+                        Text("•  \(t)").font(.escalado(15)).foregroundStyle(Tema.textoSecundario)
                     }
                     // O QR já aparece aqui; o botão do formulário troca o QR por e-mail e senha.
                     TelaConta(fechar: {}, embutida: true).padding(.top, 10)
                 }
                 cartao(destaque: false) {
-                    Text("Entrar sem login").font(.system(size: 30, weight: .bold))
+                    Text("Entrar sem login").font(.escalado(30, weight: .bold))
                     (Text("A conta não é obrigatória. ").bold()
                      + Text("Dá para usar o Saimo TV inteiro sem entrar: tudo fica guardado só neste computador."))
-                        .font(.system(size: 16)).foregroundStyle(Tema.textoSecundario).padding(.top, 6)
+                        .font(.escalado(16)).foregroundStyle(Tema.textoSecundario).padding(.top, 6)
                     Text("Crie a conta quando quiser, em Ajustes > Conta Saimo.")
-                        .font(.system(size: 16)).foregroundStyle(Tema.textoSecundario)
+                        .font(.escalado(16)).foregroundStyle(Tema.textoSecundario)
                     Button {
                         UserDefaults.standard.set(true, forKey: Self.chave)
                         terminar()
                     } label: {
-                        Text("Entrar sem login").font(.system(size: 16, weight: .semibold)).padding(.horizontal, 22).padding(.vertical, 10)
+                        Text("Entrar sem login").font(.escalado(16, weight: .semibold)).padding(.horizontal, 22).padding(.vertical, 10)
                     }
                     .buttonStyle(.bordered)
                     .padding(.top, 14)

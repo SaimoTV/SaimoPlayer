@@ -99,27 +99,27 @@ struct FichaTela: View {
                     capa
                     VStack(alignment: .leading, spacing: 12) {
                         Text(tipo)
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.escalado(12, weight: .bold))
                             .tracking(2)
                             .foregroundStyle(Tema.acento)
                         Text(Generos.semAno(alvo.titulo))
-                            .font(.system(size: 38, weight: .bold))
+                            .font(.escalado(38, weight: .bold))
                             .lineLimit(2)
                             .foregroundStyle(.white)
                         if let frase = ficha?.frase, !frase.isEmpty {
-                            Text(frase).font(.system(size: 15)).italic()
+                            Text(frase).font(.escalado(15)).italic()
                                 .foregroundStyle(.white.opacity(0.7))
                         }
                         selos
                         if let generos = ficha?.generos, !generos.isEmpty {
                             Text(generos.joined(separator: "  ·  "))
-                                .font(.system(size: 13))
+                                .font(.escalado(13))
                                 .foregroundStyle(.white.opacity(0.65))
                         }
                         botoes.padding(.top, 6)
                         if let sinopse = ficha?.sinopse, !sinopse.isEmpty {
                             Text(sinopse)
-                                .font(.system(size: 15))
+                                .font(.escalado(15))
                                 .lineSpacing(3)
                                 .foregroundStyle(.white.opacity(0.9))
                                 .frame(maxWidth: 680, alignment: .leading)
@@ -127,7 +127,7 @@ struct FichaTela: View {
                                 .padding(.top, 6)
                         } else if !carregando {
                             Text("Sem ficha para este título.")
-                                .font(.system(size: 14)).foregroundStyle(.secondary)
+                                .font(.escalado(14)).foregroundStyle(.secondary)
                         }
                         creditos
                     }
@@ -136,7 +136,7 @@ struct FichaTela: View {
 
                 if let elenco = ficha?.elenco, !elenco.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Elenco").font(.system(size: 18, weight: .semibold))
+                        Text("Elenco").font(.escalado(18, weight: .semibold))
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(alignment: .top, spacing: 18) {
                                 ForEach(elenco) { pessoa in
@@ -165,7 +165,7 @@ struct FichaTela: View {
         return ZStack {
             RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.white.opacity(0.08))
             Text(String(alvo.titulo.prefix(1)).uppercased())
-                .font(.system(size: 60, weight: .semibold))
+                .font(.escalado(60, weight: .semibold))
                 .foregroundStyle(Tema.acento.opacity(0.7))
             if let endereco, let url = URL(string: endereco) {
                 AsyncImage(url: url) { imagem in
@@ -211,7 +211,7 @@ struct FichaTela: View {
                 Label(alvo.serie ? "Ver episódios"
                           : (andamento ?? 0) > 0 ? "Continuar" : "Assistir",
                       systemImage: "play.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .padding(.horizontal, 26).padding(.vertical, 11)
                     .background(.white, in: RoundedRectangle(cornerRadius: 9))
                     .foregroundStyle(.black)
@@ -222,7 +222,7 @@ struct FichaTela: View {
             if let abrirComAddons {
                 Button(action: abrirComAddons) {
                     Label("Addons", systemImage: "puzzlepiece.extension")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.escalado(14, weight: .semibold))
                         .padding(.horizontal, 16).padding(.vertical, 11)
                         .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 9))
                         .foregroundStyle(.white)
@@ -233,7 +233,7 @@ struct FichaTela: View {
             Button { favoritos.alternar(item) } label: {
                 Label(marcado ? "Nos favoritos" : "Favoritar",
                       systemImage: marcado ? "star.fill" : "star")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .padding(.horizontal, 20).padding(.vertical, 11)
                     .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 9))
                     .foregroundStyle(marcado ? .yellow : .white)
@@ -253,8 +253,8 @@ struct FichaTela: View {
             if !linhas.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(linhas, id: \.0) { rotulo, valor in
-                        (Text("\(rotulo): ").font(.system(size: 13, weight: .semibold))
-                            + Text(valor).font(.system(size: 13)).foregroundColor(.white.opacity(0.65)))
+                        (Text("\(rotulo): ").font(.escalado(13, weight: .semibold))
+                            + Text(valor).font(.escalado(13)).foregroundColor(.white.opacity(0.65)))
                     }
                 }
                 .padding(.top, 4)
@@ -341,13 +341,13 @@ struct AtorTela: View {
                     FotoRedonda(endereco: perfil?.foto ?? pessoa.foto, nome: pessoa.nome, tamanho: 140)
                     VStack(alignment: .leading, spacing: 8) {
                         Text(perfil?.nome.isEmpty == false ? perfil!.nome : pessoa.nome)
-                            .font(.system(size: 34, weight: .bold))
+                            .font(.escalado(34, weight: .bold))
                         if let dados = perfil?.dados, !dados.isEmpty {
-                            Text(dados).font(.system(size: 14)).foregroundStyle(Tema.acento)
+                            Text(dados).font(.escalado(14)).foregroundStyle(Tema.acento)
                         }
                         if let bio = perfil?.biografia, !bio.isEmpty {
                             Text(bio)
-                                .font(.system(size: 14))
+                                .font(.escalado(14))
                                 .lineSpacing(2)
                                 .foregroundStyle(.white.opacity(0.7))
                                 .lineLimit(4)
@@ -360,13 +360,13 @@ struct AtorTela: View {
                     Text(carregando ? "Procurando no acervo…"
                          : trabalhos.count == 1 ? "1 título no acervo"
                          : "\(trabalhos.count) títulos no acervo")
-                        .font(.system(size: 19, weight: .semibold))
+                        .font(.escalado(19, weight: .semibold))
                     if carregando { ProgressView().controlSize(.small) }
                 }
 
                 if !carregando && trabalhos.isEmpty {
                     Text("Aparece aqui só o que dá para assistir neste app.")
-                        .font(.system(size: 13)).foregroundStyle(.secondary)
+                        .font(.escalado(13)).foregroundStyle(.secondary)
                 }
 
                 LazyVGrid(columns: colunas, alignment: .leading, spacing: 22) {
@@ -411,7 +411,7 @@ func corDaClassificacao(_ nota: String) -> Color {
 func botaoVoltar(_ texto: String, acao: @escaping () -> Void) -> some View {
     Button(action: acao) {
         Label(texto, systemImage: "chevron.left")
-            .font(.system(size: 14, weight: .medium))
+            .font(.escalado(14, weight: .medium))
             .padding(.horizontal, 12).padding(.vertical, 6)
             .vidroCapsula(interativo: true)
     }
@@ -426,7 +426,7 @@ struct Selo: View {
 
     var body: some View {
         Text(texto)
-            .font(.system(size: 13, weight: .semibold))
+            .font(.escalado(13, weight: .semibold))
             .foregroundStyle(cor)
             .padding(.horizontal, 10).padding(.vertical, 4)
             .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
@@ -464,7 +464,7 @@ private struct FotoRedonda: View {
         ZStack {
             Circle().fill(Color.white.opacity(0.1))
             Text(String(nome.prefix(1)).uppercased())
-                .font(.system(size: tamanho * 0.36, weight: .semibold))
+                .font(.escalado(tamanho * 0.36, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.5))
             if let endereco, let url = URL(string: endereco) {
                 AsyncImage(url: url) { imagem in
@@ -484,11 +484,11 @@ struct FotoDePessoa: View {
         VStack(spacing: 7) {
             FotoRedonda(endereco: pessoa.foto, nome: pessoa.nome, tamanho: 96)
             Text(pessoa.nome)
-                .font(.system(size: 13, weight: .medium))
+                .font(.escalado(13, weight: .medium))
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Text(pessoa.papel)
-                .font(.system(size: 11))
+                .font(.escalado(11))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
         }
@@ -504,7 +504,7 @@ private struct CapaDeTrabalho: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.08))
                 Text(String(trabalho.achado.titulo.prefix(1)).uppercased())
-                    .font(.system(size: 34, weight: .semibold))
+                    .font(.escalado(34, weight: .semibold))
                     .foregroundStyle(Tema.acento.opacity(0.7))
                 if let endereco = trabalho.capa, let url = URL(string: endereco) {
                     AsyncImage(url: url) { imagem in
@@ -516,11 +516,11 @@ private struct CapaDeTrabalho: View {
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             Text(trabalho.achado.nomeCompleto)
-                .font(.system(size: 13, weight: .medium))
+                .font(.escalado(13, weight: .medium))
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Text(trabalho.papel.isEmpty ? (trabalho.achado.serie ? "Série" : "Filme") : trabalho.papel)
-                .font(.system(size: 11))
+                .font(.escalado(11))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
         }

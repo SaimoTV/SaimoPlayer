@@ -31,18 +31,18 @@ struct PainelDeCanais: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Canais")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.escalado(28, weight: .bold))
                     .foregroundStyle(.white)
                 Spacer()
                 if let atual = model.selecaoDaLista, let n = numeros[atual] {
-                    Text("\(n)").font(.system(size: 17, weight: .semibold)).foregroundStyle(Tema.acento)
+                    Text("\(n)").font(.escalado(17, weight: .semibold)).foregroundStyle(Tema.acento)
                 }
                 Text("\(numeros.count)")
-                    .font(.system(size: 17))
+                    .font(.escalado(17))
                     .foregroundStyle(Tema.textoSecundario)
                 Button { interface.painelCanais = false } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.escalado(12, weight: .bold))
                         .frame(width: 26, height: 26)
                         .vidro(Circle(), interativo: true)
                 }
@@ -83,7 +83,7 @@ struct PainelDeCanais: View {
                                 }
                             } label: {
                                 Text(grupo.categoria.rawValue)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.escalado(13, weight: .medium))
                                     .lineLimit(1)
                                     .padding(.horizontal, 12).padding(.vertical, 6)
                                     .foregroundStyle(ativa ? Color.black : Color.white)
@@ -106,7 +106,7 @@ struct PainelDeCanais: View {
                     LazyVStack(alignment: .leading, spacing: 4, pinnedViews: []) {
                         ForEach(grupos, id: \.categoria) { grupo in
                             Text(grupo.categoria.rawValue.uppercased())
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.escalado(11, weight: .bold))
                                 .tracking(1.2)
                                 .foregroundStyle(Tema.textoApagado)
                                 .padding(.top, 10)
@@ -132,7 +132,7 @@ struct PainelDeCanais: View {
             }
 
             Text("Clique assiste · botão direito: fontes e favoritos · ⌘↑ ⌘↓ trocam de canal")
-                .font(.system(size: 11))
+                .font(.escalado(11))
                 .foregroundStyle(Tema.textoApagado)
         }
         .padding(18)
@@ -161,19 +161,19 @@ private struct LinhaDeCanal: View {
         Button { model.escolherNaLista(canal.id) } label: {
             HStack(spacing: 12) {
                 Text("\(numero)")
-                    .font(.system(size: 14, weight: .medium).monospacedDigit())
+                    .font(.escalado(14, weight: .medium).monospacedDigit())
                     .foregroundStyle(noAr ? Tema.acento : Tema.textoApagado)
                     .frame(width: 30, alignment: .trailing)
                 ChannelIcon(channel: canal, size: 46)
                     .environment(\.colorScheme, .dark)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(canal.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.escalado(15, weight: .semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     if let programa {
                         Text(programa.current.title)
-                            .font(.system(size: 12))
+                            .font(.escalado(12))
                             .foregroundStyle(Tema.textoSecundario)
                             .lineLimit(1)
                         BarraDeProgresso(fracao: programa.progress, altura: 3)
@@ -263,11 +263,11 @@ struct CartaoNoAr: View {
                     if let numero { Text("\(numero)").foregroundStyle(Tema.acento) }
                     Text(canal.name).foregroundStyle(Tema.acento)
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
                 .lineLimit(1)
                 if let programa {
                     Text(programa.current.title)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.escalado(20, weight: .bold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     HStack(spacing: 6) {
@@ -279,12 +279,12 @@ struct CartaoNoAr: View {
                                 .lineLimit(1)
                         }
                     }
-                    .font(.system(size: 13))
+                    .font(.escalado(13))
                     BarraDeProgresso(fracao: programa.progress, altura: 4)
                         .padding(.top, 4)
                 } else {
                     Text("Sem programação para este canal")
-                        .font(.system(size: 13))
+                        .font(.escalado(13))
                         .foregroundStyle(Tema.textoSecundario)
                 }
             }
@@ -304,26 +304,26 @@ struct CartaoNoAr: View {
                                            serie: model.playingFileDetail.hasPrefix("Temporada")) {
                     Image(nsImage: capa).resizable().interpolation(.high).aspectRatio(contentMode: .fill)
                 } else {
-                    Image(systemName: "film").font(.system(size: 20)).foregroundStyle(.white.opacity(0.8))
+                    Image(systemName: "film").font(.escalado(20)).foregroundStyle(.white.opacity(0.8))
                 }
             }
             .frame(width: 52, height: 76)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             VStack(alignment: .leading, spacing: 4) {
                 Text(model.playingFileName)
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.escalado(18, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 if !model.playingFileDetail.isEmpty {
                     Text(model.playingFileDetail)
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(Tema.acento)
                         .lineLimit(1)
                 }
                 if model.duration > 0 {
                     let falta = Int(max(0, model.duration - model.position) / 60)
                     Text(falta > 0 ? "faltam \(falta) min de \(Int(model.duration / 60))" : "terminando")
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(Tema.textoSecundario)
                 }
             }

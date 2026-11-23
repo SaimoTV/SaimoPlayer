@@ -49,8 +49,13 @@ struct VodGridView: View {
         let opcoes: [OpcaoFonte]
     }
 
+    /// Muda com o tamanho do texto: as telas se redesenham já no tamanho novo.
+    @State private var versaoTamanho = 0
+
     var body: some View {
         conteudo
+            .id(versaoTamanho)
+            .onReceive(NotificationCenter.default.publisher(for: .tamanhoTextoMudou)) { _ in versaoTamanho += 1 }
             .task { await abrir() }
             .onChange(of: estado.secao) { antiga, nova in
                 // Busca é sempre sobre a seção aberta: carregar "mae" de Extras
@@ -205,10 +210,10 @@ struct VodGridView: View {
                                 VStack(alignment: .leading, spacing: 3) {
                                     HStack(spacing: 6) {
                                         Text("\(rotulo(opcao.versao)) · Fonte \(opcao.numero) de \(opcao.total)")
-                                            .font(.system(size: 14, weight: .medium))
+                                            .font(.escalado(14, weight: .medium))
                                         if let selo = opcao.selo {
                                             Text(selo)
-                                                .font(.system(size: 10, weight: .bold))
+                                                .font(.escalado(10, weight: .bold))
                                                 .padding(.horizontal, 5).padding(.vertical, 1)
                                                 .background(Tema.acento.opacity(0.85),
                                                             in: Capsule())
@@ -499,11 +504,11 @@ struct VodGridView: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(tituloDaGrade)
-                    .font(.system(size: 30, weight: .bold))
+                    .font(.escalado(30, weight: .bold))
                     .foregroundStyle(.white)
                 Text(carregando ? "Carregando…" : "\(total.formatted()) títulos"
                      + (estado.genero.isEmpty ? "" : " · \(estado.genero)"))
-                    .font(.system(size: 14))
+                    .font(.escalado(14))
                     .foregroundStyle(Tema.acento)
             }
             Spacer(minLength: 12)
@@ -717,7 +722,7 @@ struct VodGridView: View {
     private func letra(_ texto: String, ativa: Bool, ajuda: String, acao: @escaping () -> Void) -> some View {
         Button(action: acao) {
             Text(texto)
-                .font(.system(size: texto.count > 1 ? 12 : 15, weight: ativa ? .bold : .medium))
+                .font(.escalado(texto.count > 1 ? 12 : 15, weight: ativa ? .bold : .medium))
                 .foregroundStyle(ativa ? Color.black : Color.white)
                 .frame(width: 48, height: 30)
                 .background(Capsule().fill(ativa ? Color.white : Color.clear))
@@ -1188,7 +1193,7 @@ private struct CelulaDaGrade: View {
                         Image(nsImage: imagem).resizable().interpolation(.high).aspectRatio(contentMode: .fill)
                     } else {
                         Image(systemName: serie ? "tv" : "film")
-                            .font(.system(size: 26))
+                            .font(.escalado(26))
                             .foregroundStyle(.white.opacity(0.25))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
@@ -1205,7 +1210,7 @@ private struct CelulaDaGrade: View {
             .overlay(alignment: .topLeading) {
                 if let selo {
                     Text(selo)
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.escalado(10, weight: .heavy))
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(.black.opacity(0.65), in: Capsule())
                         .foregroundStyle(.white)
@@ -1215,7 +1220,7 @@ private struct CelulaDaGrade: View {
             .overlay(alignment: .topTrailing) {
                 if favorito {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.escalado(11, weight: .bold))
                         .foregroundStyle(.yellow)
                         .padding(5)
                         .background(.black.opacity(0.5), in: Circle())
@@ -1225,11 +1230,11 @@ private struct CelulaDaGrade: View {
             .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
 
             Text(titulo)
-                .font(.system(size: 13, weight: .medium))
+                .font(.escalado(13, weight: .medium))
                 .lineLimit(2, reservesSpace: true)
                 .foregroundStyle(.white)
             Text(detalheComAno)
-                .font(.system(size: 11))
+                .font(.escalado(11))
                 .foregroundStyle(Tema.textoSecundario)
                 .lineLimit(1)
         }

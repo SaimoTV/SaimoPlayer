@@ -40,7 +40,7 @@ struct PainelEpisodios: View {
                             ForEach(episodio.temporadas, id: \.self) { t in
                                 Button { temporada = t } label: {
                                     Text("Temporada \(t)")
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.escalado(13, weight: .medium))
                                         .padding(.horizontal, 12).padding(.vertical, 6)
                                         .foregroundStyle(temporada == t ? Color.black : Color.white)
                                         .background(Capsule().fill(temporada == t ? Color.white : Color.white.opacity(0.1)))
@@ -72,17 +72,17 @@ struct PainelEpisodios: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Episódios")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.escalado(18, weight: .semibold))
                     .foregroundStyle(.white)
                 Text(episodio.serie)
-                    .font(.system(size: 12))
+                    .font(.escalado(12))
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(1)
             }
             Spacer()
             Button(action: fechar) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.escalado(12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.8))
                     .frame(width: 26, height: 26)
                     .vidro(Circle(), interativo: true)
@@ -140,7 +140,7 @@ struct PainelEpisodios: View {
                 imagem(info?.imagem, numero: ep.numero, noAr: noAr)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(ep.numero). \(nome)")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.escalado(13, weight: .semibold))
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -159,7 +159,7 @@ struct PainelEpisodios: View {
                             Text(ep.versao == "leg" ? "Legendado" : "Dublado")
                         }
                     }
-                    .font(.system(size: 11))
+                    .font(.escalado(11))
                     .foregroundStyle(.white.opacity(0.55))
                     .labelStyle(.titleAndIcon)
                     if let fracao, fracao > 0 {
@@ -195,12 +195,12 @@ struct PainelEpisodios: View {
                     .aspectRatio(contentMode: .fill)
             } else {
                 Text("\(numero)")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.escalado(20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.5))
             }
             if noAr {
                 Image(systemName: "play.circle.fill")
-                    .font(.system(size: 22))
+                    .font(.escalado(22))
                     .foregroundStyle(.white)
                     .shadow(radius: 3)
             }

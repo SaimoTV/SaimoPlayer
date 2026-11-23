@@ -50,7 +50,7 @@ struct EPGGuideView: View {
     private var header: some View {
         HStack(spacing: 12) {
             Image(systemName: "calendar.badge.clock")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
             Text("Programação")
                 .font(.headline)
 
@@ -167,7 +167,7 @@ struct EPGGuideView: View {
                 let time = origin.addingTimeInterval(Double(step) * 1800)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(time, format: .dateTime.hour().minute())
-                        .font(.system(size: 11, weight: step % 2 == 0 ? .semibold : .regular))
+                        .font(.escalado(11, weight: step % 2 == 0 ? .semibold : .regular))
                         .foregroundStyle(step % 2 == 0 ? .primary : .secondary)
                     Rectangle()
                         .fill(.quaternary)
@@ -185,7 +185,7 @@ struct EPGGuideView: View {
         HStack(spacing: 10) {
             ChannelIcon(channel: channel, size: 30)
             Text(channel.name)
-                .font(.system(size: 12, weight: .medium))
+                .font(.escalado(12, weight: .medium))
                 .lineLimit(2)
             Spacer(minLength: 0)
         }
@@ -231,7 +231,7 @@ struct EPGGuideView: View {
         let live = programme.start <= now && programme.stop > now
         return VStack(alignment: .leading, spacing: 2) {
             Text(programme.title)
-                .font(.system(size: 12, weight: live ? .semibold : .regular))
+                .font(.escalado(12, weight: live ? .semibold : .regular))
                 .lineLimit(1)
             HStack(spacing: 4) {
                 Text(programme.start, format: .dateTime.hour().minute())
@@ -239,7 +239,7 @@ struct EPGGuideView: View {
                     Text("· \(programme.category)").lineLimit(1)
                 }
             }
-            .font(.system(size: 10))
+            .font(.escalado(10))
             .foregroundStyle(.secondary)
 
             if live {

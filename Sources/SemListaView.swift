@@ -28,31 +28,31 @@ struct SemListaView: View {
     var body: some View {
         VStack(spacing: compacto ? 8 : 16) {
             Image(systemName: secao == .canais ? "tv.slash" : "film.slash")
-                .font(.system(size: compacto ? 28 : 48))
+                .font(.escalado(compacto ? 28 : 48))
                 .foregroundStyle(Tema.textoSecundario)
 
             Text(secao == .canais ? "Nenhum canal encontrado" : "Nenhum título encontrado")
-                .font(.system(size: compacto ? 15 : 20, weight: .bold))
+                .font(.escalado(compacto ? 15 : 20, weight: .bold))
                 .foregroundStyle(.white)
 
             if !compacto {
                 Text(textoDeAjuda)
-                    .font(.system(size: 14))
+                    .font(.escalado(14))
                     .foregroundStyle(Tema.textoSecundario)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 380)
                 if !temAlgumaLista {
                     HStack(spacing: 10) {
                         Button { MinhasListas.shared.pedirNova() } label: {
-                            Label("Adicionar lista", systemImage: "link.badge.plus").font(.system(size: 13, weight: .semibold))
+                            Label("Adicionar lista", systemImage: "link.badge.plus").font(.escalado(13, weight: .semibold))
                         }
                         .buttonStyle(.borderedProminent)
                         Button { VodEstado.shared.secao = .ajustes } label: {
-                            Label("Endereços do Saimo", systemImage: "gearshape").font(.system(size: 13))
+                            Label("Endereços do Saimo", systemImage: "gearshape").font(.escalado(13))
                         }
                         .buttonStyle(.bordered)
                         Button { VodEstado.shared.mostrarAddons = true } label: {
-                            Label("Addons e Debrid", systemImage: "puzzlepiece.extension").font(.system(size: 13))
+                            Label("Addons e Debrid", systemImage: "puzzlepiece.extension").font(.escalado(13))
                         }
                         .buttonStyle(.bordered)
                     }

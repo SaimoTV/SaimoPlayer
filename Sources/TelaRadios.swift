@@ -81,7 +81,7 @@ private struct RadioTocando: View {
         HStack(alignment: .center, spacing: 26) {
             ImagemRemota(endereco: radio.logo, modo: .fit) {
                 Text(String(radio.nome.first { $0.isLetter || $0.isNumber } ?? "R").uppercased())
-                    .font(.system(size: 54, weight: .bold, design: .rounded))
+                    .font(.escalado(54, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
             .frame(width: 120, height: 120)
@@ -94,16 +94,16 @@ private struct RadioTocando: View {
                     Circle().fill(radios.falhou ? Color.gray : Tema.aoVivo).frame(width: 9, height: 9)
                         .opacity(radios.noAr ? 1 : 0.5)
                     Text(radios.falhou ? "FORA DO AR" : radios.noAr ? "NO AR" : "CONECTANDO")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.escalado(12, weight: .bold))
                         .tracking(1.5)
                         .foregroundStyle(Tema.acento)
                 }
                 Text(radio.nome)
-                    .font(.system(size: 32, weight: .bold))
+                    .font(.escalado(32, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 if let estilo = Radios.estilo(de: radio)?.titulo {
-                    Text(estilo).font(.system(size: 14)).foregroundStyle(Tema.textoSecundario)
+                    Text(estilo).font(.escalado(14)).foregroundStyle(Tema.textoSecundario)
                 }
                 Equalizador(tocando: radios.noAr)
                     .frame(width: 260, height: 34)

@@ -816,15 +816,15 @@ struct FolhaStreamsAddon: View {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(pedido.titulo)
-                                .font(.system(size: 20, weight: .bold))
+                                .font(.escalado(20, weight: .bold))
                                 .foregroundStyle(.white)
                             if let t = pedido.temporada, let e = pedido.episodio {
                                 Text(String(format: "Temporada %d · Episódio %d — Escolha uma fonte dos addons", t, e))
-                                    .font(.system(size: 13))
+                                    .font(.escalado(13))
                                     .foregroundStyle(.white.opacity(0.65))
                             } else {
                                 Text("Escolha uma fonte dos seus addons Stremio")
-                                    .font(.system(size: 13))
+                                    .font(.escalado(13))
                                     .foregroundStyle(.white.opacity(0.65))
                             }
                         }
@@ -833,7 +833,7 @@ struct FolhaStreamsAddon: View {
                             estado.fechar()
                         } label: {
                             Image(systemName: "xmark")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.escalado(13, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.8))
                                 .frame(width: 28, height: 28)
                                 .background(Color.white.opacity(0.1), in: Circle())
@@ -847,7 +847,7 @@ struct FolhaStreamsAddon: View {
                                 Image(systemName: estado.precisaConfigurarDebrid ? "key.fill" : "exclamationmark.triangle.fill")
                                     .foregroundStyle(estado.precisaConfigurarDebrid ? Tema.acento : .orange)
                                 Text(erro)
-                                    .font(.system(size: 12.5))
+                                    .font(.escalado(12.5))
                                     .foregroundStyle(.white.opacity(0.9))
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -869,17 +869,17 @@ struct FolhaStreamsAddon: View {
                         HStack(spacing: 12) {
                             ProgressView().controlSize(.small)
                             Text("Consultando addons instalados…")
-                                .font(.system(size: 13))
+                                .font(.escalado(13))
                                 .foregroundStyle(.white.opacity(0.75))
                         }
                         .frame(maxWidth: .infinity, minHeight: 160)
                     } else if estado.resultados.isEmpty {
                         VStack(spacing: 10) {
                             Image(systemName: "puzzlepiece.extension")
-                                .font(.system(size: 28))
+                                .font(.escalado(28))
                                 .foregroundStyle(.white.opacity(0.35))
                             Text("Nenhuma fonte retornada.")
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.escalado(14, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.75))
                         }
                         .frame(maxWidth: .infinity, minHeight: 160)
@@ -940,13 +940,13 @@ struct FolhaStreamsAddon: View {
 
                     let rotulo: String = s.rotuloFonte
                     Text(rotulo)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.escalado(13, weight: .semibold))
                         .foregroundStyle(Color.white)
                         .lineLimit(1)
 
                     if s.tituloExibicao != s.rotuloFonte {
                         Text(s.tituloExibicao)
-                            .font(.system(size: 12))
+                            .font(.escalado(12))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
@@ -957,7 +957,7 @@ struct FolhaStreamsAddon: View {
                     ProgressView().controlSize(.small)
                 } else {
                     Image(systemName: "play.fill")
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(.white.opacity(0.85))
                         .frame(width: 30, height: 30)
                         .background(Tema.acento.opacity(0.85), in: Circle())
@@ -981,7 +981,7 @@ struct FolhaStreamsAddon: View {
 
     private func etiqueta(_ texto: String, destaque: Bool = false, aviso: Bool = false) -> some View {
         Text(texto)
-            .font(.system(size: 10.5, weight: .semibold))
+            .font(.escalado(10.5, weight: .semibold))
             .foregroundStyle(aviso ? Color.orange : .white)
             .padding(.horizontal, 7)
             .padding(.vertical, 2.5)

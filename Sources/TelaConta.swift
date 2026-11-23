@@ -34,12 +34,12 @@ struct TelaConta: View {
 
     private var logado: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Conta Saimo").font(.system(size: 26, weight: .bold)).foregroundStyle(.white)
-            Text(conta.email ?? "").font(.system(size: 16)).foregroundStyle(.white)
+            Text("Conta Saimo").font(.escalado(26, weight: .bold)).foregroundStyle(.white)
+            Text(conta.email ?? "").font(.escalado(16)).foregroundStyle(.white)
             Text(conta.sincronizando ? "sincronizando…" : (conta.erro ?? Conta.haQuanto(conta.sincronizadaEm)))
-                .font(.system(size: 14)).foregroundStyle(Tema.textoSecundario)
+                .font(.escalado(14)).foregroundStyle(Tema.textoSecundario)
             Text("Perfis, onde parou, favoritos, listas e addons. Sair mantém os dados neste Mac.")
-                .font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
+                .font(.escalado(13)).foregroundStyle(Tema.textoSecundario)
             HStack(spacing: 12) {
                 Button("Sincronizar agora") { Task { await conta.sincronizar(forcar: true) } }.disabled(conta.sincronizando)
                 if conta.email != nil { Button("Trocar a senha") { comEmail = true } }
@@ -59,19 +59,19 @@ struct TelaConta: View {
             }
             .frame(width: embutida ? 190 : 240, height: embutida ? 190 : 240)
             VStack(alignment: .leading, spacing: 12) {
-                if !embutida { Text("Entrar na Conta Saimo").font(.system(size: 24, weight: .bold)).foregroundStyle(.white) }
+                if !embutida { Text("Entrar na Conta Saimo").font(.escalado(24, weight: .bold)).foregroundStyle(.white) }
                 Text("No celular com o Saimo e a sua conta, leia o QR com a câmera. Ou abra Ajustes > Conta Saimo > Entrar numa TV e digite o código:")
-                    .font(.system(size: 14)).foregroundStyle(Tema.textoSecundario).fixedSize(horizontal: false, vertical: true)
-                Text(codigo).font(.system(size: 38, weight: .heavy, design: .monospaced)).tracking(4)
+                    .font(.escalado(14)).foregroundStyle(Tema.textoSecundario).fixedSize(horizontal: false, vertical: true)
+                Text(codigo).font(.escalado(38, weight: .heavy, design: .monospaced)).tracking(4)
                     .foregroundStyle(Color(red: 0.18, green: 0.83, blue: 0.75)).textSelection(.enabled)
-                Text(situacao).font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
+                Text(situacao).font(.escalado(13)).foregroundStyle(Tema.textoSecundario)
                 if venceu {
                     Button("Gerar novo QR") { esperar() }
                 }
                 Button("Entrar com e-mail e senha") { comEmail = true }
                 if !embutida {
                     HStack {
-                        Text("Sem conta, tudo continua só neste Mac.").font(.system(size: 12)).foregroundStyle(.gray)
+                        Text("Sem conta, tudo continua só neste Mac.").font(.escalado(12)).foregroundStyle(.gray)
                         Spacer()
                         Button("Fechar", action: fechar).keyboardShortcut(.cancelAction)
                     }
@@ -142,18 +142,18 @@ private struct FormSenha: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(emailFixo != nil ? "Trocar a senha" : (criando ? "Criar conta" : "Entrar com e-mail e senha"))
-                .font(.system(size: 24, weight: .bold)).foregroundStyle(.white)
+                .font(.escalado(24, weight: .bold)).foregroundStyle(.white)
             if let emailFixo {
                 Text(emailFixo).foregroundStyle(Tema.textoSecundario)
                 SecureField("Senha atual (em branco se a conta não tem)", text: $senha).textFieldStyle(.roundedBorder).textContentType(.password)
                 SecureField("Senha nova (8 ou mais)", text: $nova).textFieldStyle(.roundedBorder).textContentType(.newPassword)
-                Text("Trocar a senha tira a conta dos outros aparelhos.").font(.system(size: 12)).foregroundStyle(.gray)
+                Text("Trocar a senha tira a conta dos outros aparelhos.").font(.escalado(12)).foregroundStyle(.gray)
             } else {
                 TextField("Seu e-mail", text: $email).textFieldStyle(.roundedBorder).textContentType(.username)
                 SecureField(criando ? "Crie uma senha (8 ou mais)" : "Senha", text: $senha).textFieldStyle(.roundedBorder)
                     .textContentType(criando ? .newPassword : .password)
             }
-            if !aviso.isEmpty { Text(aviso).font(.system(size: 13)).foregroundStyle(aviso.hasPrefix("Pronto") ? .green : .red) }
+            if !aviso.isEmpty { Text(aviso).font(.escalado(13)).foregroundStyle(aviso.hasPrefix("Pronto") ? .green : .red) }
             HStack(spacing: 12) {
                 if emailFixo != nil {
                     Button("Trocar a senha") {

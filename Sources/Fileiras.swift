@@ -143,7 +143,7 @@ struct DestaqueTopo: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(estado.titulo)
-                .font(.system(size: 34, weight: .bold))
+                .font(.escalado(34, weight: .bold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -151,17 +151,17 @@ struct DestaqueTopo: View {
             if !estado.meta.isEmpty {
                 HStack(spacing: 5) {
                     if estado.metaComNota {
-                        Image(systemName: "star.fill").font(.system(size: 13))
+                        Image(systemName: "star.fill").font(.escalado(13))
                     }
                     Text(estado.meta)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.escalado(16, weight: .medium))
                         .lineLimit(1)
                 }
                 .foregroundStyle(Tema.acento)
             }
             if !estado.sinopse.isEmpty {
                 Text(estado.sinopse)
-                    .font(.system(size: 14))
+                    .font(.escalado(14))
                     .foregroundStyle(.white.opacity(0.85))
                     .lineLimit(2)
                     .lineSpacing(2)
@@ -294,7 +294,7 @@ struct FileiraView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(fila.titulo)
-                .font(.system(size: 19, weight: .semibold))
+                .font(.escalado(19, weight: .semibold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, Tema.margem)
 
@@ -324,7 +324,7 @@ struct FileiraView: View {
                             if let remover = cartao.remover {
                                 Button(action: remover) {
                                     Image(systemName: "xmark")
-                                        .font(.system(size: 10, weight: .bold))
+                                        .font(.escalado(10, weight: .bold))
                                         .foregroundStyle(.white)
                                         .padding(6)
                                         .background(.black.opacity(0.78), in: Circle())
@@ -377,7 +377,7 @@ struct FileiraView: View {
             withAnimation(.easeInOut(duration: 0.35)) { primeiro = ids[alvo] }
         } label: {
             Image(systemName: simbolo)
-                .font(.system(size: 16, weight: .bold))
+                .font(.escalado(16, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: 38, height: 38)
                 .vidro(Circle(), interativo: true)
@@ -428,7 +428,7 @@ private struct CapaCartao: View {
             .overlay(alignment: .topLeading) {
                 if let selo = cartao.selo {
                     Text(selo)
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.escalado(10, weight: .heavy))
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(.black.opacity(0.65), in: Capsule())
                         .foregroundStyle(.white)
@@ -439,7 +439,7 @@ private struct CapaCartao: View {
             .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
 
             Text(cartao.titulo)
-                .font(.system(size: 13, weight: .medium))
+                .font(.escalado(13, weight: .medium))
                 .foregroundStyle(.white)
                 .lineLimit(2, reservesSpace: true)
                 .frame(width: largura, alignment: .leading)
@@ -452,7 +452,7 @@ private struct CapaCartao: View {
             Image(nsImage: imagem).resizable().interpolation(.high).aspectRatio(contentMode: .fill)
         } else {
             Text(cartao.inicial)
-                .font(.system(size: 44, weight: .semibold, design: .rounded))
+                .font(.escalado(44, weight: .semibold, design: .rounded))
                 .foregroundStyle(Tema.acento.opacity(0.6))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -462,7 +462,7 @@ private struct CapaCartao: View {
     private var estrela: some View {
         if let favorito = cartao.favorito, favorito.marcado {
             Image(systemName: "star.fill")
-                .font(.system(size: 11, weight: .bold))
+                .font(.escalado(11, weight: .bold))
                 .foregroundStyle(.yellow)
                 .padding(5)
                 .background(.black.opacity(0.5), in: Circle())
@@ -505,11 +505,11 @@ private struct LargoCartao: View {
                 .strokeBorder(.white.opacity(0.08), lineWidth: 1))
 
             Text(cartao.titulo)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.escalado(14, weight: .semibold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Text(cartao.subtitulo ?? " ")
-                .font(.system(size: 12))
+                .font(.escalado(12))
                 .foregroundStyle(Tema.textoSecundario)
                 .lineLimit(1)
         }
@@ -530,7 +530,7 @@ private struct LargoCartao: View {
 
     private var inicial: some View {
         Text(cartao.inicial)
-            .font(.system(size: 40, weight: .bold, design: .rounded))
+            .font(.escalado(40, weight: .bold, design: .rounded))
             .foregroundStyle(.white.opacity(0.85))
     }
 }
@@ -557,19 +557,19 @@ private struct SecaoCartao: View {
                            startPoint: .top, endPoint: .bottom)
             HStack(spacing: 12) {
                 Image(systemName: cartao.icone ?? "film")
-                    .font(.system(size: 19, weight: .semibold))
+                    .font(.escalado(19, weight: .semibold))
                     .foregroundStyle(.black.opacity(0.8))
                     .frame(width: 44, height: 44)
                     .background(Circle().fill(cartao.cor ?? Tema.acento))
                 VStack(alignment: .leading, spacing: 1) {
                     Text(cartao.titulo)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.escalado(24, weight: .bold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
                     if let subtitulo = cartao.subtitulo {
                         Text(subtitulo)
-                            .font(.system(size: 13))
+                            .font(.escalado(13))
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
@@ -599,7 +599,7 @@ private struct EventoCartao: View {
                     HStack(spacing: 18) {
                         escudo(escudos.casa, escudos.nomeCasa)
                         Text("x")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.escalado(18, weight: .bold))
                             .foregroundStyle(.white.opacity(0.5))
                         escudo(escudos.fora, escudos.nomeFora)
                     }
@@ -612,7 +612,7 @@ private struct EventoCartao: View {
                         SeloAoVivo(texto: cartao.selo ?? "AO VIVO")
                     } else if let selo = cartao.selo {
                         Text(selo)
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.escalado(11, weight: .bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 8).padding(.vertical, 3)
                             .background(.white.opacity(0.16), in: Capsule())
@@ -630,11 +630,11 @@ private struct EventoCartao: View {
                 .strokeBorder(cartao.seloAoVivo ? Tema.aoVivo.opacity(0.45) : .white.opacity(0.08), lineWidth: 1))
 
             Text(cartao.titulo)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.escalado(14, weight: .semibold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Text(cartao.subtitulo ?? " ")
-                .font(.system(size: 12))
+                .font(.escalado(12))
                 .foregroundStyle(Tema.textoSecundario)
                 .lineLimit(1)
         }
@@ -659,7 +659,7 @@ struct LogoDeLiga: View {
             Image(nsImage: imagem).resizable().interpolation(.high).aspectRatio(contentMode: .fit)
         } else {
             Circle().fill(.white.opacity(0.1))
-                .overlay(Text(inicial).font(.system(size: 22, weight: .bold, design: .rounded))
+                .overlay(Text(inicial).font(.escalado(22, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.7)))
         }
     }

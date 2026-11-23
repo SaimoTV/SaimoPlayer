@@ -15,13 +15,13 @@ struct AtualizacaoView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.down.circle.fill")
-                    .font(.system(size: 26))
+                    .font(.escalado(26))
                     .foregroundStyle(.tint)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Versão \(versao.numero) disponível")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.escalado(16, weight: .semibold))
                     Text("Você está na \(atualizacao.atual)")
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -29,7 +29,7 @@ struct AtualizacaoView: View {
             if !versao.notas.isEmpty {
                 ScrollView {
                     Text(versao.notas)
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
                 }
@@ -39,7 +39,7 @@ struct AtualizacaoView: View {
             andamento
 
             Text(explicacao)
-                .font(.system(size: 11))
+                .font(.escalado(11))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -81,17 +81,17 @@ struct AtualizacaoView: View {
                 ProgressView(value: fracao)
                     .progressViewStyle(.linear)
                 Text("Baixando a versão nova… \(Int(fracao * 100))%")
-                    .font(.system(size: 11))
+                    .font(.escalado(11))
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
         case .pronto:
             Label("Pronta para instalar", systemImage: "checkmark.circle.fill")
-                .font(.system(size: 12, weight: .medium))
+                .font(.escalado(12, weight: .medium))
                 .foregroundStyle(.green)
         case .falhou:
             Label("Não deu para baixar aqui dentro.", systemImage: "exclamationmark.triangle.fill")
-                .font(.system(size: 12, weight: .medium))
+                .font(.escalado(12, weight: .medium))
                 .foregroundStyle(.orange)
         case nil:
             EmptyView()

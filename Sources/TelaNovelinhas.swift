@@ -37,7 +37,7 @@ struct TelaNovelinhas: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Novelinhas").font(.system(size: 34, weight: .bold))
+                        Text("Novelinhas").font(.escalado(34, weight: .bold))
                         Text("Minisséries em pé, de um minuto por episódio.")
                             .foregroundStyle(.secondary)
                     }
@@ -97,7 +97,7 @@ struct TelaNovelinhas: View {
                     .aspectRatio(9 / 16, contentMode: .fit)
                     .clipped()
                     Text(n.dublada ? "DUB" : "LEG")
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.escalado(10, weight: .heavy))
                         .foregroundStyle(n.dublada ? Color.green : Color.orange)
                         .padding(.horizontal, 5).padding(.vertical, 2)
                         .background(.black.opacity(0.65), in: RoundedRectangle(cornerRadius: 4))
@@ -112,9 +112,9 @@ struct TelaNovelinhas: View {
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                Text(n.titulo).font(.system(size: 12, weight: .semibold)).lineLimit(2)
+                Text(n.titulo).font(.escalado(12, weight: .semibold)).lineLimit(2)
                 Text(parada.map { "Ep. \($0.ep) de \(n.episodios)" } ?? "\(n.episodios) episódios")
-                    .font(.system(size: 11)).foregroundStyle(.secondary)
+                    .font(.escalado(11)).foregroundStyle(.secondary)
             }
         }
         .buttonStyle(.plain)

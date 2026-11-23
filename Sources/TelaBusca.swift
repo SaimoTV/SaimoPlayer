@@ -29,17 +29,17 @@ struct TelaBusca: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.escalado(20, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.8))
                     TextField("Buscar filmes, séries, canais…", text: $texto)
                         .textFieldStyle(.plain)
-                        .font(.system(size: 24, weight: .medium))
+                        .font(.escalado(24, weight: .medium))
                         .foregroundStyle(.white)
                         .focused($focado)
                         .onSubmit { guardarRecente() }
                     if !texto.isEmpty {
                         Button { texto = "" } label: {
-                            Image(systemName: "xmark.circle.fill").font(.system(size: 18))
+                            Image(systemName: "xmark.circle.fill").font(.escalado(18))
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(.white.opacity(0.6))
@@ -53,11 +53,11 @@ struct TelaBusca: View {
 
                 if texto.isEmpty, !recentes.isEmpty {
                     HStack(spacing: 8) {
-                        Text("Buscas recentes").font(.system(size: 13)).foregroundStyle(Tema.textoSecundario)
+                        Text("Buscas recentes").font(.escalado(13)).foregroundStyle(Tema.textoSecundario)
                         ForEach(recentes.prefix(6), id: \.self) { termo in
                             Button(termo) { texto = termo }
                                 .buttonStyle(.plain)
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.escalado(13, weight: .medium))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 12).padding(.vertical, 5)
                                 .vidroCapsula(interativo: true)
@@ -65,7 +65,7 @@ struct TelaBusca: View {
                     }
                 } else {
                     Text("Erros de digitação e falta de acento não atrapalham. Enter guarda a busca nas recentes.")
-                        .font(.system(size: 13))
+                        .font(.escalado(13))
                         .foregroundStyle(Tema.textoSecundario)
                 }
             }

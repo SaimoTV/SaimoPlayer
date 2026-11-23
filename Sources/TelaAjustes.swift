@@ -116,6 +116,52 @@ enum Preferencias {
     }
 }
 
+/// Os grupos dos Ajustes: a tela abre com a lista deles e cada um mostra só os seus.
+enum GrupoAjustes: String, CaseIterable, Identifiable {
+    case conta, listas, reproducao, legendas, aparencia, perfis, connect, sistema, parental
+    var id: String { rawValue }
+    var nome: String {
+        switch self {
+        case .conta: return "Conta Saimo"
+        case .listas: return "Listas e canais"
+        case .reproducao: return "Reprodução"
+        case .legendas: return "Legendas"
+        case .aparencia: return "Aparência e acessibilidade"
+        case .perfis: return "Perfis e estatísticas"
+        case .connect: return "Saimo Connect"
+        case .sistema: return "Sistema"
+        case .parental: return "Controle parental"
+        }
+    }
+    var sobre: String {
+        switch self {
+        case .conta: return "Perfis, listas e favoritos em todos os aparelhos"
+        case .listas: return "Endereços, Minhas listas, addons, importar e exportar"
+        case .reproducao: return "Nitidez, tela, ao abrir e lista de canais"
+        case .legendas: return "Tamanho, cor, posição e fundo"
+        case .aparencia: return "Tamanho do texto, cor do app e brilho"
+        case .perfis: return "Trocar, gerenciar, seu tempo no Saimo e episódios novos"
+        case .connect: return "Controle pelo celular"
+        case .sistema: return "Atualizar catálogo e procurar versão nova"
+        case .parental: return "Conteúdo adulto e senha"
+        }
+    }
+    var icone: String {
+        switch self {
+        case .conta: return "person.crop.circle.badge.checkmark"
+        case .listas: return "list.bullet.rectangle"
+        case .reproducao: return "play.rectangle"
+        case .legendas: return "captions.bubble"
+        case .aparencia: return "accessibility"
+        case .perfis: return "person.2.fill"
+        case .connect: return "iphone.radiowaves.left.and.right"
+        case .sistema: return "gearshape.2"
+        case .parental: return "lock"
+        }
+    }
+    var semKids: Bool { self == .conta || self == .parental }
+}
+
 /// Os ajustes, em seções como na TV Box: reprodução, geral, canais e sistema.
 /// Cada linha diz o que faz e o valor de agora; clicar troca.
 struct TelaAjustes: View {
@@ -128,6 +174,9 @@ struct TelaAjustes: View {
     @ObservedObject private var conta = Conta.shared
     @State private var estiloVersao = 0
     @State private var contaAberta = false
+    /// O grupo aberto (nulo = a lista de grupos).
+    @State private var grupo: GrupoAjustes?
+    @State private var acessibilidadeAberta = false
 
     private var resumoAddonsDebrid: String {
         let ativos = addons.ativos.count
@@ -169,301 +218,298 @@ struct TelaAjustes: View {
         ZStack(alignment: .top) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
-                    Text("Ajustes")
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundStyle(.white)
-
-                    if !Perfis.kidsAtivo {
-                        secao("Conta Saimo") {
-                            linha("Conta Saimo", conta.resumo, icone: "person.crop.circle.badge.checkmark") {
-                                contaAberta = true
-                            }
-                        }
-                        // Sem conta: a primeira opção fica em destaque.
-                        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .strokeBorder(Tema.acento.opacity(conta.logado ? 0 : 0.8), lineWidth: 2)
-                            .padding(.top, 20))
-                        .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
-                    }
-
-                    secao("Estatísticas") {
-                        linha("Seu tempo no Saimo", Estatisticas.resumo(), icone: "chart.bar") { }
-                        linha("Séries favoritas com episódio novo", NovosEpisodios.resumo(), icone: "bell") {
-                            NovosEpisodios.dispensarTodos(); estiloVersao += 1
-                        }
-                    }
-                    .id(estiloVersao)
-
-                    secao("Perfis") {
-                        linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
-                              icone: "person.crop.circle") {
-                            NotificationCenter.default.post(name: .abrirPerfis, object: nil)
-                        }
-                        linha("Gerenciar perfis", "Criar, editar, avatares e perfil Kids (até \(Perfis.maximo))",
-                              icone: "person.2.fill") {
-                            NotificationCenter.default.post(name: .abrirPerfis, object: "gerenciar")
-                        }
-                    }
-
-                    secao("Aparência e legenda") {
-                        linha("Cor do app", EstiloLegenda.temas[EstiloLegenda.indiceTema].0 + " · vale ao reabrir o app", icone: "paintpalette") {
-                            EstiloLegenda.proximoTema(); estiloVersao += 1
-                        }
-                        linha("Tamanho da legenda", EstiloLegenda.tamanhos[EstiloLegenda.indiceTamanho].0, icone: "textformat.size") {
-                            EstiloLegenda.proximoTamanho(); estiloVersao += 1
-                        }
-                        linha("Cor da legenda", EstiloLegenda.cores[EstiloLegenda.indiceCor].0, icone: "eyedropper") {
-                            EstiloLegenda.proximaCor(); estiloVersao += 1
-                        }
-                        linha("Posição da legenda", EstiloLegenda.posicoes[EstiloLegenda.indicePosicao].0, icone: "arrow.up.and.down") {
-                            EstiloLegenda.proximaPosicao(); estiloVersao += 1
-                        }
-                        linha("Fundo da legenda", EstiloLegenda.fundo ? "Com fundo" : "Sem fundo", icone: "rectangle.dashed") {
-                            EstiloLegenda.alternarFundo(); estiloVersao += 1
-                        }
-                    }
-                    .id(estiloVersao)
-
-                    secao("Reprodução") {
-                        linha("Super Resolução (Upscaling)", Preferencias.rotuloUpscaling(model.upscaling),
-                              icone: "sparkles") {
-                            switch model.upscaling {
-                            case "off": model.upscaling = "hd"
-                            case "hd":  model.upscaling = "4k"
-                            default:    model.upscaling = "off"
-                            }
-                        }
-                        alternador("Preencher a tela", "Corta as bordas em vez de mostrar faixas pretas",
-                                   icone: "rectangle.arrowtriangle.2.outward", valor: $model.fillScreen)
-                        alternador("Manter à frente", "A janela fica por cima das outras",
-                                   icone: "pin.fill", valor: $model.alwaysOnTop)
-                        alternador("Estatísticas do vídeo", "Resolução, bitrate e buffer no canto da imagem",
-                                   icone: "chart.bar.xaxis", valor: $model.showStats)
-                        alternador("Sem som", "Silencia o vídeo e o ao vivo",
-                                   icone: "speaker.slash.fill", valor: $model.isMuted)
-                    }
-
-                    secao("Tela") {
-                        BrilhoDoApp()
-                    }
-
-                    secao("Geral") {
-                        linha("Ao abrir o app", model.abrirNoCanal ? "Ir direto ao último canal" : "Mostrar a tela inicial",
-                              icone: "house.fill") {
-                            model.abrirNoCanal.toggle()
-                        }
-                        alternador("Lista de canais em janela separada",
-                                   "Uma janela ao lado do player, como antes (⇧⌘L)",
-                                   icone: "sidebar.leading", valor: $model.detachedList)
-                    }
-
-                    secao("Listas") {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Os endereços de onde o app lê os canais e os filmes e séries. Já vêm preenchidos; troque por outros, ou deixe em branco e salve para desligar uma lista (o app fica vazio naquela parte).")
-                                .font(.system(size: 13))
-                                .foregroundStyle(Tema.textoSecundario)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.top, 14)
-                        .padding(.bottom, 6)
-
-                        Divider().background(Color.white.opacity(0.08))
-
-                        // Canais
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Image(systemName: "tv")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundStyle(Tema.acento)
-                                    .frame(width: 26)
-
-                                Text("Canais")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundStyle(.white)
-
-                                Spacer()
-
-                                if !urlCanais.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    Button("Apagar") {
-                                        urlCanais = ""
-                                        salvarListas()
-                                    }
-                                    .buttonStyle(.plain)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(.red.opacity(0.85))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
-                                }
-                            }
-
-                            TextField("https://exemplo.dev/canais/", text: $urlCanais)
-                                .textFieldStyle(.plain)
-                                .font(.system(size: 13, design: .monospaced))
-                                .foregroundStyle(.white)
-                                .padding(9)
-                                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
-
-                            Text("Lista de canais, rádios e guia de programação.")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Tema.textoApagado)
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 12)
-
-                        Divider().background(Color.white.opacity(0.08))
-
-                        // Filmes e séries
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Image(systemName: "film.stack")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundStyle(Tema.acento)
-                                    .frame(width: 26)
-
-                                Text("Filmes e séries")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundStyle(.white)
-
-                                Spacer()
-
-                                if !urlFilmes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    Button("Apagar") {
-                                        urlFilmes = ""
-                                        salvarListas()
-                                    }
-                                    .buttonStyle(.plain)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(.red.opacity(0.85))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
-                                }
-                            }
-
-                            TextField("https://exemplo.dev/filmes/", text: $urlFilmes)
-                                .textFieldStyle(.plain)
-                                .font(.system(size: 13, design: .monospaced))
-                                .foregroundStyle(.white)
-                                .padding(9)
-                                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
-
-                            Text("Lista de filmes, séries, animes e doramas.")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Tema.textoApagado)
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 12)
-
-                        Divider().background(Color.white.opacity(0.08))
-
-                        // Ações de Listas
+                    if let g = grupo {
                         HStack(spacing: 12) {
-                            Spacer()
-
-                            if let status = statusListas {
-                                Text(status)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(status.contains("✓") ? Tema.acento : .orange)
-                                    .transition(.opacity)
+                            Button { withAnimation(.easeOut(duration: 0.15)) { grupo = nil } } label: {
+                                Image(systemName: "chevron.left").font(.escalado(16, weight: .semibold))
+                                    .frame(width: 34, height: 34).background(Color.white.opacity(0.08), in: Circle())
                             }
+                            .buttonStyle(.plain).help("Voltar aos ajustes").keyboardShortcut(.escape, modifiers: [])
+                            Text(g.nome).font(.escalado(30, weight: .bold)).foregroundStyle(.white)
+                        }
+                        switch g {
+                        case .conta:
+                            EmptyView()
+                        case .listas:
+                        secao("Listas") {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Os endereços de onde o app lê os canais e os filmes e séries. Já vêm preenchidos; troque por outros, ou deixe em branco e salve para desligar uma lista (o app fica vazio naquela parte).")
+                                    .font(.escalado(13))
+                                    .foregroundStyle(Tema.textoSecundario)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding(.horizontal, 18)
+                            .padding(.top, 14)
+                            .padding(.bottom, 6)
 
-                            Button {
-                                salvarListas()
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "checkmark")
-                                    Text("Salvar")
+                            Divider().background(Color.white.opacity(0.08))
+
+                            // Canais
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .center, spacing: 10) {
+                                    Image(systemName: "tv")
+                                        .font(.escalado(15, weight: .semibold))
+                                        .foregroundStyle(Tema.acento)
+                                        .frame(width: 26)
+
+                                    Text("Canais")
+                                        .font(.escalado(15, weight: .semibold))
+                                        .foregroundStyle(.white)
+
+                                    Spacer()
+
+                                    if !urlCanais.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        Button("Apagar") {
+                                            urlCanais = ""
+                                            salvarListas()
+                                        }
+                                        .buttonStyle(.plain)
+                                        .font(.escalado(12, weight: .medium))
+                                        .foregroundStyle(.red.opacity(0.85))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
+                                    }
                                 }
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.black)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 6)
-                                .background(Tema.acento, in: RoundedRectangle(cornerRadius: 8))
+
+                                TextField("https://exemplo.dev/canais/", text: $urlCanais)
+                                    .textFieldStyle(.plain)
+                                    .font(.escalado(13, design: .monospaced))
+                                    .foregroundStyle(.white)
+                                    .padding(9)
+                                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                                Text("Lista de canais, rádios e guia de programação.")
+                                    .font(.escalado(12))
+                                    .foregroundStyle(Tema.textoApagado)
                             }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 10)
-                    }
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 12)
 
-                    secao("Minhas listas") {
-                        ForEach(minhas.listas) { lista in
-                            linha(lista.nome, "\(lista.total) canais · toque para remover", icone: "list.bullet") {
-                                minhas.confirmarRemocao(lista)
+                            Divider().background(Color.white.opacity(0.08))
+
+                            // Filmes e séries
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .center, spacing: 10) {
+                                    Image(systemName: "film.stack")
+                                        .font(.escalado(15, weight: .semibold))
+                                        .foregroundStyle(Tema.acento)
+                                        .frame(width: 26)
+
+                                    Text("Filmes e séries")
+                                        .font(.escalado(15, weight: .semibold))
+                                        .foregroundStyle(.white)
+
+                                    Spacer()
+
+                                    if !urlFilmes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        Button("Apagar") {
+                                            urlFilmes = ""
+                                            salvarListas()
+                                        }
+                                        .buttonStyle(.plain)
+                                        .font(.escalado(12, weight: .medium))
+                                        .foregroundStyle(.red.opacity(0.85))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 6))
+                                    }
+                                }
+
+                                TextField("https://exemplo.dev/filmes/", text: $urlFilmes)
+                                    .textFieldStyle(.plain)
+                                    .font(.escalado(13, design: .monospaced))
+                                    .foregroundStyle(.white)
+                                    .padding(9)
+                                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                                Text("Lista de filmes, séries, animes e doramas.")
+                                    .font(.escalado(12))
+                                    .foregroundStyle(Tema.textoApagado)
+                            }
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 12)
+
+                            Divider().background(Color.white.opacity(0.08))
+
+                            // Ações de Listas
+                            HStack(spacing: 12) {
+                                Spacer()
+
+                                if let status = statusListas {
+                                    Text(status)
+                                        .font(.escalado(12, weight: .medium))
+                                        .foregroundStyle(status.contains("✓") ? Tema.acento : .orange)
+                                        .transition(.opacity)
+                                }
+
+                                Button {
+                                    salvarListas()
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "checkmark")
+                                        Text("Salvar")
+                                    }
+                                    .font(.escalado(12, weight: .semibold))
+                                    .foregroundStyle(.black)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 6)
+                                    .background(Tema.acento, in: RoundedRectangle(cornerRadius: 8))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
+                        }
+
+                        secao("Minhas listas") {
+                            ForEach(minhas.listas) { lista in
+                                linha(lista.nome, "\(lista.total) canais · toque para remover", icone: "list.bullet") {
+                                    minhas.confirmarRemocao(lista)
+                                }
+                            }
+                            linha("Adicionar lista por link",
+                                  minhas.listas.isEmpty
+                                  ? "Uma lista .m3u: os canais entram no Ao vivo. Também chegam do celular pelo Saimo Connect"
+                                  : "Até \(MinhasListas.maximo) listas",
+                                  icone: "plus.circle") {
+                                minhas.pedirNova()
                             }
                         }
-                        linha("Adicionar lista por link",
-                              minhas.listas.isEmpty
-                              ? "Uma lista .m3u: os canais entram no Ao vivo. Também chegam do celular pelo Saimo Connect"
-                              : "Até \(MinhasListas.maximo) listas",
-                              icone: "plus.circle") {
-                            minhas.pedirNova()
-                        }
-                    }
 
-                    secao("Addons e Debrid") {
-                        linha("Gerenciar Addons e Debrid",
-                              resumoAddonsDebrid,
-                              icone: "puzzlepiece.extension") {
-                            VodEstado.shared.mostrarAddons = true
-                        }
-                    }
-
-                    secao("Canais") {
-                        linha("Importar lista .m3u", "Junta os canais de um arquivo à lista", icone: "square.and.arrow.down") {
-                            ChannelListActions.importList(into: model)
-                        }
-                        linha("Adicionar canal por endereço", "Cole o URL de um fluxo .m3u8", icone: "link.badge.plus") {
-                            ChannelListActions.addByURL(into: model)
-                        }
-                        linha("Exportar playlist", "Salva a lista com os links do app", icone: "square.and.arrow.up") {
-                            model.exportPlaylist()
-                        }
-                        linha("Atualizar guia", "Busca a programação de novo (⇧⌘G)", icone: "calendar.badge.clock") {
-                            EPGService.shared.refresh(channels: model.channels)
-                        }
-                        linha("Programação completa", "A grade de todos os canais", icone: "list.bullet.rectangle") {
-                            model.showGuide = true
-                        }
-                    }
-
-                    secao("Saimo Connect") {
-                        informacao("Controle pelo celular",
-                                   connect.ativo
-                                   ? "No app Saimo do celular, toque em Conectar e escolha \"\(connect.nome)\" (\(ProxyServer.lanAddress() ?? "sem rede"):\(SaimoConnect.porta))"
-                                   : "Indisponível: a porta \(SaimoConnect.porta) está ocupada",
-                                   icone: "iphone.radiowaves.left.and.right")
-                        informacao("Celulares autorizados", rotuloDosCelulares, icone: "iphone")
-                        linha("Esquecer todos os celulares", "Na próxima conexão o Mac pergunta de novo",
-                              icone: "iphone.slash") {
-                            connect.esquecerTodos()
-                        }
-                    }
-
-                    secao("Sistema") {
-                        linha("Atualizar Catálogo e Fontes",
-                              catalogoAtualizado ? "✓ Catálogo e fontes atualizados com sucesso!" : "Recarrega filmes, séries e novas fontes da nuvem",
-                              icone: "arrow.clockwise") {
-                            Vod.limparCache()
-                            model.refreshCatalog()
-                            EPGService.shared.refresh(channels: model.channels)
-                            withAnimation { catalogoAtualizado = true }
-                            Task {
-                                try? await Task.sleep(nanoseconds: 3_000_000_000)
-                                withAnimation { catalogoAtualizado = false }
+                        secao("Addons e Debrid") {
+                            linha("Gerenciar Addons e Debrid",
+                                  resumoAddonsDebrid,
+                                  icone: "puzzlepiece.extension") {
+                                VodEstado.shared.mostrarAddons = true
                             }
                         }
-                        linha("Procurar atualização", "v\(versao)", icone: "arrow.down.circle") {
-                            Atualizacao.shared.procurar(manual: true)
+                        secao("Canais") {
+                            linha("Importar lista .m3u", "Junta os canais de um arquivo à lista", icone: "square.and.arrow.down") {
+                                ChannelListActions.importList(into: model)
+                            }
+                            linha("Adicionar canal por endereço", "Cole o URL de um fluxo .m3u8", icone: "link.badge.plus") {
+                                ChannelListActions.addByURL(into: model)
+                            }
+                            linha("Exportar playlist", "Salva a lista com os links do app", icone: "square.and.arrow.up") {
+                                model.exportPlaylist()
+                            }
+                            linha("Atualizar guia", "Busca a programação de novo (⇧⌘G)", icone: "calendar.badge.clock") {
+                                EPGService.shared.refresh(channels: model.channels)
+                            }
+                            linha("Programação completa", "A grade de todos os canais", icone: "list.bullet.rectangle") {
+                                model.showGuide = true
+                            }
                         }
-                    }
-
-                    // Controle parental: no fim, separado e discreto. No Kids não aparece.
-                    if !Perfis.kidsAtivo {
+                        case .reproducao:
+                        secao("Reprodução") {
+                            linha("Super Resolução (Upscaling)", Preferencias.rotuloUpscaling(model.upscaling),
+                                  icone: "sparkles") {
+                                switch model.upscaling {
+                                case "off": model.upscaling = "hd"
+                                case "hd":  model.upscaling = "4k"
+                                default:    model.upscaling = "off"
+                                }
+                            }
+                            alternador("Preencher a tela", "Corta as bordas em vez de mostrar faixas pretas",
+                                       icone: "rectangle.arrowtriangle.2.outward", valor: $model.fillScreen)
+                            alternador("Manter à frente", "A janela fica por cima das outras",
+                                       icone: "pin.fill", valor: $model.alwaysOnTop)
+                            alternador("Estatísticas do vídeo", "Resolução, bitrate e buffer no canto da imagem",
+                                       icone: "chart.bar.xaxis", valor: $model.showStats)
+                            alternador("Sem som", "Silencia o vídeo e o ao vivo",
+                                       icone: "speaker.slash.fill", valor: $model.isMuted)
+                        }
+                        secao("Geral") {
+                            linha("Ao abrir o app", model.abrirNoCanal ? "Ir direto ao último canal" : "Mostrar a tela inicial",
+                                  icone: "house.fill") {
+                                model.abrirNoCanal.toggle()
+                            }
+                            alternador("Lista de canais em janela separada",
+                                       "Uma janela ao lado do player, como antes (⇧⌘L)",
+                                       icone: "sidebar.leading", valor: $model.detachedList)
+                        }
+                        case .legendas:
+                        secao("Legendas") {
+                            linha("Tamanho da legenda", EstiloLegenda.tamanhos[EstiloLegenda.indiceTamanho].0, icone: "textformat.size") {
+                                EstiloLegenda.proximoTamanho(); estiloVersao += 1
+                            }
+                            linha("Cor da legenda", EstiloLegenda.cores[EstiloLegenda.indiceCor].0, icone: "eyedropper") {
+                                EstiloLegenda.proximaCor(); estiloVersao += 1
+                            }
+                            linha("Posição da legenda", EstiloLegenda.posicoes[EstiloLegenda.indicePosicao].0, icone: "arrow.up.and.down") {
+                                EstiloLegenda.proximaPosicao(); estiloVersao += 1
+                            }
+                            linha("Fundo da legenda", EstiloLegenda.fundo ? "Com fundo" : "Sem fundo", icone: "rectangle.dashed") {
+                                EstiloLegenda.alternarFundo(); estiloVersao += 1
+                            }
+                        }
+                        .id(estiloVersao)
+                        case .aparencia:
+                        secao("Aparência e acessibilidade") {
+                            linha("Tamanho do texto", TamanhoTexto.nome + " · clique para trocar", icone: "textformat.size.larger") {
+                                TamanhoTexto.proximo(); estiloVersao += 1
+                            }
+                            linha("Cor do app", EstiloLegenda.temas[EstiloLegenda.indiceTema].0 + " · vale ao reabrir o app", icone: "paintpalette") {
+                                EstiloLegenda.proximoTema(); estiloVersao += 1
+                            }
+                        }
+                        .id(estiloVersao)
+                        secao("Tela") {
+                            BrilhoDoApp()
+                        }
+                        case .perfis:
+                        secao("Perfis") {
+                            linha("Trocar de perfil", "\(Perfis.ativo.nome)\(Perfis.ativo.ehKids ? " (Kids)" : "") · \(Perfis.todos.count) perfil(is)",
+                                  icone: "person.crop.circle") {
+                                NotificationCenter.default.post(name: .abrirPerfis, object: nil)
+                            }
+                            linha("Gerenciar perfis", "Criar, editar, avatares e perfil Kids (até \(Perfis.maximo))",
+                                  icone: "person.2.fill") {
+                                NotificationCenter.default.post(name: .abrirPerfis, object: "gerenciar")
+                            }
+                        }
+                        secao("Estatísticas") {
+                            linha("Seu tempo no Saimo", Estatisticas.resumo(), icone: "chart.bar") { }
+                            linha("Séries favoritas com episódio novo", NovosEpisodios.resumo(), icone: "bell") {
+                                NovosEpisodios.dispensarTodos(); estiloVersao += 1
+                            }
+                        }
+                        .id(estiloVersao)
+                        case .connect:
+                        secao("Saimo Connect") {
+                            informacao("Controle pelo celular",
+                                       connect.ativo
+                                       ? "No app Saimo do celular, toque em Conectar e escolha \"\(connect.nome)\" (\(ProxyServer.lanAddress() ?? "sem rede"):\(SaimoConnect.porta))"
+                                       : "Indisponível: a porta \(SaimoConnect.porta) está ocupada",
+                                       icone: "iphone.radiowaves.left.and.right")
+                            informacao("Celulares autorizados", rotuloDosCelulares, icone: "iphone")
+                            linha("Esquecer todos os celulares", "Na próxima conexão o Mac pergunta de novo",
+                                  icone: "iphone.slash") {
+                                connect.esquecerTodos()
+                            }
+                        }
+                        case .sistema:
+                        secao("Sistema") {
+                            linha("Atualizar Catálogo e Fontes",
+                                  catalogoAtualizado ? "✓ Catálogo e fontes atualizados com sucesso!" : "Recarrega filmes, séries e novas fontes da nuvem",
+                                  icone: "arrow.clockwise") {
+                                Vod.limparCache()
+                                model.refreshCatalog()
+                                EPGService.shared.refresh(channels: model.channels)
+                                withAnimation { catalogoAtualizado = true }
+                                Task {
+                                    try? await Task.sleep(nanoseconds: 3_000_000_000)
+                                    withAnimation { catalogoAtualizado = false }
+                                }
+                            }
+                            linha("Procurar atualização", "v\(versao)", icone: "arrow.down.circle") {
+                                Atualizacao.shared.procurar(manual: true)
+                            }
+                        }
+                        case .parental:
                         secao("Controle parental") {
                             linha("Conteúdo adulto",
                                   model.restrictedUnlocked ? "Liberado · clique para bloquear" : "Bloqueado · clique para liberar com a senha",
@@ -483,16 +529,48 @@ struct TelaAjustes: View {
                                     }
                                     Button(modo == "trocar" ? "Trocar" : "Liberar") { confirmarParental() }
                                     Button("Cancelar") { parental = nil }
-                                    Text(avisoParental).font(.system(size: 12)).foregroundStyle(Color(red: 1, green: 0.7, blue: 0.7))
+                                    Text(avisoParental).font(.escalado(12)).foregroundStyle(Color(red: 1, green: 0.7, blue: 0.7))
                                 }
                                 .padding(.horizontal, 18).padding(.vertical, 10)
                             }
                         }
                         .opacity(0.72)
+                        }
+                    } else {
+                        Text("Ajustes")
+                            .font(.escalado(34, weight: .bold))
+                            .foregroundStyle(.white)
+                        VStack(spacing: 10) {
+                            ForEach(GrupoAjustes.allCases.filter { !$0.semKids || !Perfis.kidsAtivo }) { g in
+                                Button {
+                                    // A conta abre a janela dela direto: o grupo teria uma linha só.
+                                    if g == .conta { contaAberta = true } else { withAnimation(.easeOut(duration: 0.15)) { grupo = g } }
+                                } label: {
+                                    HStack(spacing: 16) {
+                                        Image(systemName: g.icone).font(.escalado(20, weight: .semibold))
+                                            .foregroundStyle(Tema.acento).frame(width: 30)
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(g.nome).font(.escalado(16, weight: .semibold)).foregroundStyle(.white)
+                                            Text(g == .conta && conta.logado ? conta.resumo : g.sobre)
+                                                .font(.escalado(13)).foregroundStyle(Tema.textoSecundario)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right").foregroundStyle(Tema.textoApagado)
+                                    }
+                                    .padding(.horizontal, 18).padding(.vertical, 14)
+                                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .strokeBorder(Tema.acento.opacity(g == .conta && !conta.logado ? 0.8 : 0), lineWidth: 2))
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(LinhaSobMouse())
+                            }
+                        }
+                        .sheet(isPresented: $contaAberta) { TelaConta { contaAberta = false } }
                     }
 
                     Text("Saimo TV \(versao) para Mac")
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(Tema.textoApagado)
                 }
                 .frame(maxWidth: 760, alignment: .leading)
@@ -571,12 +649,12 @@ struct TelaAjustes: View {
     private func informacao(_ titulo: String, _ detalhe: String, icone: String) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icone)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
                 .foregroundStyle(Tema.acento)
                 .frame(width: 26)
             VStack(alignment: .leading, spacing: 2) {
-                Text(titulo).font(.system(size: 15, weight: .medium)).foregroundStyle(.white)
-                Text(detalhe).font(.system(size: 12)).foregroundStyle(Tema.textoSecundario)
+                Text(titulo).font(.escalado(15, weight: .medium)).foregroundStyle(.white)
+                Text(detalhe).font(.escalado(12)).foregroundStyle(Tema.textoSecundario)
                     .textSelection(.enabled)
             }
             Spacer()
@@ -588,7 +666,7 @@ struct TelaAjustes: View {
     private func secao<Conteudo: View>(_ titulo: String, @ViewBuilder _ conteudo: () -> Conteudo) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(titulo.uppercased())
-                .font(.system(size: 12, weight: .bold))
+                .font(.escalado(12, weight: .bold))
                 .tracking(1.5)
                 .foregroundStyle(Tema.acento)
                 .padding(.leading, 6)
@@ -602,16 +680,16 @@ struct TelaAjustes: View {
         Button(action: acao) {
             HStack(spacing: 14) {
                 Image(systemName: icone)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .foregroundStyle(Tema.acento)
                     .frame(width: 26)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(titulo).font(.system(size: 15, weight: .medium)).foregroundStyle(.white)
-                    Text(detalhe).font(.system(size: 12)).foregroundStyle(Tema.textoSecundario)
+                    Text(titulo).font(.escalado(15, weight: .medium)).foregroundStyle(.white)
+                    Text(detalhe).font(.escalado(12)).foregroundStyle(Tema.textoSecundario)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.escalado(12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.4))
             }
             .padding(.horizontal, 18)
@@ -625,12 +703,12 @@ struct TelaAjustes: View {
                             valor: Binding<Bool>) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icone)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
                 .foregroundStyle(Tema.acento)
                 .frame(width: 26)
             VStack(alignment: .leading, spacing: 2) {
-                Text(titulo).font(.system(size: 15, weight: .medium)).foregroundStyle(.white)
-                Text(detalhe).font(.system(size: 12)).foregroundStyle(Tema.textoSecundario)
+                Text(titulo).font(.escalado(15, weight: .medium)).foregroundStyle(.white)
+                Text(detalhe).font(.escalado(12)).foregroundStyle(Tema.textoSecundario)
             }
             Spacer()
             Toggle("", isOn: valor)

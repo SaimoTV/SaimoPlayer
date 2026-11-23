@@ -57,10 +57,10 @@ struct TelaAddonsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Addons Stremio e Debrid")
-                    .font(.system(size: 19, weight: .bold))
+                    .font(.escalado(19, weight: .bold))
                     .foregroundStyle(.white)
                 Text("Protocolo HTTP Stremio (/manifest.json) + resolução Debrid no cliente")
-                    .font(.system(size: 12.5))
+                    .font(.escalado(12.5))
                     .foregroundStyle(.white.opacity(0.55))
             }
             Spacer()
@@ -96,16 +96,16 @@ struct TelaAddonsView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Label("Configurar pelo celular ou navegador", systemImage: "qrcode")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.escalado(14, weight: .semibold))
                     .foregroundStyle(.white)
                 Text("Escaneie o QR Code ou abra este endereço na mesma rede Wi-Fi para colar URLs de addons e chaves Debrid rapidamente:")
-                    .font(.system(size: 12.5))
+                    .font(.escalado(12.5))
                     .foregroundStyle(.white.opacity(0.68))
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 8) {
                     Text(enderecoWebAddons)
-                        .font(.system(size: 12.5, design: .monospaced))
+                        .font(.escalado(12.5, design: .monospaced))
                         .foregroundStyle(Tema.acento)
                         .textSelection(.enabled)
                     Button(copiadoURL ? "Copiado!" : "Copiar") {
@@ -129,7 +129,7 @@ struct TelaAddonsView: View {
     private var blocoInstalarAddon: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Instalar addon Stremio")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.escalado(15, weight: .semibold))
                 .foregroundStyle(.white)
 
             HStack(spacing: 10) {
@@ -158,7 +158,7 @@ struct TelaAddonsView: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                     Text(erroInstalacao)
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(.orange)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -169,7 +169,7 @@ struct TelaAddonsView: View {
 
             if let avisoSucesso {
                 Text(avisoSucesso)
-                    .font(.system(size: 12))
+                    .font(.escalado(12))
                     .foregroundStyle(.green)
             }
         }
@@ -183,7 +183,7 @@ struct TelaAddonsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Addons instalados (\(store.addons.count))")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .foregroundStyle(.white)
                 Spacer()
             }
@@ -191,13 +191,13 @@ struct TelaAddonsView: View {
             if store.addons.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "puzzlepiece.extension")
-                        .font(.system(size: 26))
+                        .font(.escalado(26))
                         .foregroundStyle(.white.opacity(0.3))
                     Text("Nenhum addon instalado.")
-                        .font(.system(size: 13.5, weight: .medium))
+                        .font(.escalado(13.5, weight: .medium))
                         .foregroundStyle(.white.opacity(0.75))
                     Text("O Saimo começa vazio por padrão. Cole acima a URL /manifest.json de qualquer addon HTTP Stremio que você desejar usar.")
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .foregroundStyle(.white.opacity(0.5))
                         .multilineTextAlignment(.center)
                 }
@@ -227,10 +227,10 @@ struct TelaAddonsView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
                         Text(item.manifest.name)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.escalado(14, weight: .semibold))
                             .foregroundStyle(.white)
                         Text("v\(item.manifest.version)")
-                            .font(.system(size: 11))
+                            .font(.escalado(11))
                             .foregroundStyle(.white.opacity(0.5))
                         if item.manifest.behaviorHints?.configurationRequired == true {
                             badge("Requer configuração", cor: .orange)
@@ -240,7 +240,7 @@ struct TelaAddonsView: View {
                         }
                     }
                     Text(item.manifestUrlString)
-                        .font(.system(size: 11.5, design: .monospaced))
+                        .font(.escalado(11.5, design: .monospaced))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -296,20 +296,20 @@ struct TelaAddonsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     if let desc = item.manifest.description, !desc.isEmpty {
                         Text(desc)
-                            .font(.system(size: 12))
+                            .font(.escalado(12))
                             .foregroundStyle(.white.opacity(0.72))
                     }
                     Text("Recursos: \(item.manifest.resources.map(\.name).joined(separator: ", "))")
-                        .font(.system(size: 11.5))
+                        .font(.escalado(11.5))
                         .foregroundStyle(.white.opacity(0.6))
                     if let prefixos = item.manifest.idPrefixes, !prefixos.isEmpty {
                         Text("Prefixos de ID: \(prefixos.joined(separator: ", "))")
-                            .font(.system(size: 11.5))
+                            .font(.escalado(11.5))
                             .foregroundStyle(.white.opacity(0.6))
                     }
                     if !item.manifest.catalogs.isEmpty {
                         Text("Catálogos (\(item.manifest.catalogs.count)): " + item.manifest.catalogs.map { "\($0.tituloExibicao) [\($0.type)]" }.joined(separator: " · "))
-                            .font(.system(size: 11.5))
+                            .font(.escalado(11.5))
                             .foregroundStyle(.white.opacity(0.6))
                     }
                 }
@@ -326,10 +326,10 @@ struct TelaAddonsView: View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Serviços Debrid (TorBox, Real-Debrid, AllDebrid, Premiumize)")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.escalado(15, weight: .semibold))
                     .foregroundStyle(.white)
                 Text("Torrents P2P (infoHash) são convertidos sob demanda em HTTPS direto na sua conta Debrid. O Saimo não executa cliente torrent local.")
-                    .font(.system(size: 12))
+                    .font(.escalado(12))
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -350,10 +350,10 @@ struct TelaAddonsView: View {
                         )) {
                             HStack(spacing: 8) {
                                 Text(provedor.nome)
-                                    .font(.system(size: 13.5, weight: .semibold))
+                                    .font(.escalado(13.5, weight: .semibold))
                                     .foregroundStyle(.white)
                                 Text(provedor.dicaChave)
-                                    .font(.system(size: 11))
+                                    .font(.escalado(11))
                                     .foregroundStyle(.white.opacity(0.45))
                             }
                         }
@@ -392,10 +392,10 @@ struct TelaAddonsView: View {
             )) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Sincronizar chaves Debrid via Saimo Connect")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.escalado(13, weight: .medium))
                         .foregroundStyle(.white)
                     Text("Desativado por padrão por segurança. Quando ativo, envia suas chaves aos aparelhos pareados na sua rede.")
-                        .font(.system(size: 11.5))
+                        .font(.escalado(11.5))
                         .foregroundStyle(.white.opacity(0.55))
                 }
             }
@@ -437,7 +437,7 @@ struct TelaAddonsView: View {
 
     private func badge(_ texto: String, cor: Color) -> some View {
         Text(texto)
-            .font(.system(size: 10.5, weight: .semibold))
+            .font(.escalado(10.5, weight: .semibold))
             .foregroundStyle(cor)
             .padding(.horizontal, 7)
             .padding(.vertical, 2)

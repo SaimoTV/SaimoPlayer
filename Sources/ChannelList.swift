@@ -25,7 +25,7 @@ struct ChannelListView: View {
     private var acervo: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Acervo")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.escalado(11, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 14)
                 .padding(.top, 10)
@@ -37,7 +37,7 @@ struct ChannelListView: View {
                 ForEach(secoesDoAcervo) { secao in
                     Label(secao.titulo, systemImage: secao.icone)
                         .labelStyle(.titleAndIcon)
-                        .font(.system(size: 12))
+                        .font(.escalado(12))
                         .fontWeight(vod.secao == secao ? .semibold : .regular)
                         .padding(.vertical, 5)
                         .padding(.horizontal, 9)
