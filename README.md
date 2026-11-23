@@ -313,6 +313,10 @@ e dá para conferir com `python3 scripts/validar_formato_saimo.py` antes de usar
 
 Telemetria: desligada (nenhum dado de uso sai do aparelho).
 
+## Ajustes e acessibilidade (Mac)
+
+`TelaAjustes.swift` abre com os grupos (`GrupoAjustes`); Esc volta à lista. Acessibilidade (`TamanhoTexto.swift`): tamanho do texto, negrito e alto contraste numa janela com prévia. As telas usam `.font(.escalado(n))` no lugar de `.system(size: n)`; a barra do topo fica fixa.
+
 ## Dados publicados
 
 No formato do Saimo, os apps leem estes arquivos do endereço que a pessoa
